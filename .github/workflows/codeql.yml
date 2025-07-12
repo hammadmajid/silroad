@@ -43,7 +43,7 @@ jobs:
     # Install dependencies for the monorepo
     - name: Install dependencies
       run: |
-        pnpm install --frozen-lockfile
+        pnpm install
 
     # Build the monorepo (if build step is required)
     - name: Build monorepo
