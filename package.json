@@ -1,6 +1,9 @@
 {
 	"name": "silroad",
 	"version": "0.1.0",
+	"scripts": {
+		"build": "turbo build"
+	},
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
 		"turbo": "^2.5.4"
