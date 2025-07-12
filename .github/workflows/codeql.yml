@@ -1,0 +1,65 @@
+name: "CodeQL Security Analysis"
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    name: Analyze JavaScript/TypeScript
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'pnpm'
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
+    # Initialize CodeQL tools for scanning
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # Override default queries to include more security checks
+        queries: +security-and-quality
+
+    # Install dependencies for the monorepo
+    - name: Install dependencies
+      run: |
+        pnpm install --frozen-lockfile
+
+    # Build the monorepo (if build step is required)
+    - name: Build monorepo
+      run: |
+        pnpm run build
+
+    # Perform CodeQL Analysis
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+    # Optional: Upload results to GitHub Advanced Security
+    - name: Upload CodeQL results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: ../results/javascript.sarif
