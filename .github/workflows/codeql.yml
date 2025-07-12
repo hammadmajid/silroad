@@ -27,11 +27,6 @@ jobs:
       with:
         node-version: '23'
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-
     # Initialize CodeQL tools for scanning
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
@@ -39,16 +34,6 @@ jobs:
         languages: ${{ matrix.language }}
         # Override default queries to include more security checks
         queries: +security-and-quality
-
-    # Install dependencies for the monorepo
-    - name: Install dependencies
-      run: |
-        pnpm install
-
-    # Build the monorepo (if build step is required)
-    - name: Build monorepo
-      run: |
-        pnpm run build
 
     # Perform CodeQL Analysis
     - name: Perform CodeQL Analysis
