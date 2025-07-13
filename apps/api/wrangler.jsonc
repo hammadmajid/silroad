@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "hono",
+  "name": "silroad-api",
   "main": "src/index.ts",
   "compatibility_date": "2025-07-13"
   // "compatibility_flags": [
