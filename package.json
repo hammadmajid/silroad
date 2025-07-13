@@ -2,7 +2,8 @@
 	"name": "silroad",
 	"version": "0.1.0",
 	"scripts": {
-		"build": "turbo build"
+		"build": "turbo build",
+		"deploy:web": "turbo deploy --filter=web"
 	},
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
