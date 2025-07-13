@@ -3,7 +3,8 @@
 	"version": "0.1.0",
 	"scripts": {
 		"build": "turbo build",
-		"deploy:web": "turbo deploy --filter=web"
+		"deploy:web": "turbo deploy --filter=web",
+		"deploy:api": "turbo deploy --filter=api"
 	},
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
