@@ -8,6 +8,7 @@
 	},
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
+		"biome": "^0.3.3",
 		"turbo": "^2.5.4"
 	}
 }
