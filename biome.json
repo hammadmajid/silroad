@@ -6,10 +6,18 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": true
+		"ignoreUnknown": true,
+		"includes": [
+			"**",
+			"!apps/web/src/routeTree.gen.ts",
+			"!**/worker-configuration.d.ts"
+		]
 	},
 	"assist": {
-		"enabled": true
+		"enabled": true,
+		"actions": {
+			"recommended": true
+		}
 	},
 	"formatter": {
 		"enabled": true,
@@ -18,7 +26,8 @@
 	"linter": {
 		"enabled": true,
 		"domains": {
-			"next": "all"
+			"react": "all",
+			"project": "all"
 		},
 		"rules": {
 			"recommended": true
