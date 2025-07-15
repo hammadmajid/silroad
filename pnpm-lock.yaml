@@ -20,6 +20,9 @@ importers:
       '@hono/trpc-server':
         specifier: ^0.4.0
         version: 0.4.0(@trpc/server@11.4.3(typescript@5.8.3))(hono@4.8.4)
+      '@repo/trpc':
+        specifier: workspace:*
+        version: link:../../services/trpc
       hono:
         specifier: ^4.8.4
         version: 4.8.4
@@ -96,10 +99,17 @@ importers:
         version: 2.5.4
 
   services/trpc:
+    dependencies:
+      '@trpc/server':
+        specifier: ^11.4.3
+        version: 11.4.3(typescript@5.8.3)
     devDependencies:
       turbo:
         specifier: ^2.5.4
         version: 2.5.4
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
 
   utils/config:
     devDependencies:
