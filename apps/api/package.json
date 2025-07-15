@@ -13,6 +13,8 @@
 		"wrangler": "^4.24.3"
 	},
 	"dependencies": {
-		"hono": "^4.8.4"
+		"@hono/trpc-server": "^0.4.0",
+		"hono": "^4.8.4",
+		"@repo/trpc": "workspace:*"
 	}
 }
