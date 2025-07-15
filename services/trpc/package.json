@@ -3,6 +3,10 @@
 	"version": "1.0.0",
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
-		"turbo": "^2.5.4"
+		"turbo": "^2.5.4",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"@trpc/server": "^11.4.3"
 	}
 }
