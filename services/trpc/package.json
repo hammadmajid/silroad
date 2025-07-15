@@ -1,5 +1,5 @@
 {
-	"name": "trpc",
+	"name": "@repo/trpc",
 	"version": "1.0.0",
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
