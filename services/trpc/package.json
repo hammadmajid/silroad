@@ -1,6 +1,9 @@
 {
 	"name": "@repo/trpc",
 	"version": "1.0.0",
+	"exports": {
+		".": "./src/index.ts"
+	},
 	"packageManager": "pnpm@10.12.2",
 	"devDependencies": {
 		"turbo": "^2.5.4",
