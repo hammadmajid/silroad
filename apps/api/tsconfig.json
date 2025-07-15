@@ -1,9 +1,6 @@
 {
-  "extends": "../../utils/config/tsconfig/base.json",
-  "compilerOptions": {
-    "lib": [
-      "ESNext",
-      "WebWorker"
-    ]
-  }
+	"extends": "../../utils/config/tsconfig/base.json",
+	"compilerOptions": {
+		"lib": ["ESNext", "WebWorker"]
+	}
 }
