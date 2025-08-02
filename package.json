@@ -18,7 +18,7 @@
 		"deploy": "pnpm run build && wrangler deploy",
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "wrangler d1 migrations apply silroad"
+		"db:migrate": "drizzle-kit migrate"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
