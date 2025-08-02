@@ -58,6 +58,9 @@
 		]
 	},
 	"dependencies": {
-		"drizzle-orm": "^0.44.4"
+		"drizzle-orm": "^0.44.4",
+		"formsnap": "^2.0.1",
+		"sveltekit-superforms": "^2.27.1",
+		"zod": "^4.0.14"
 	}
 }
