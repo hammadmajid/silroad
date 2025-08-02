@@ -1,5 +1,5 @@
-import { mysqlTable, int } from 'drizzle-orm/mysql-core';
+import { sqliteTable, int } from 'drizzle-orm/sqlite-core';
 
-export const users = mysqlTable('users', {
+export const users = sqliteTable('users', {
 	id: int()
 });
