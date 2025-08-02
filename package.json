@@ -16,7 +16,9 @@
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"test:e2e": "playwright test",
 		"deploy": "pnpm run build && wrangler deploy",
-		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
+		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "wrangler d1 migrations apply silroad"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
