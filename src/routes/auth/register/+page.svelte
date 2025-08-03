@@ -1,0 +1,116 @@
+<script lang="ts">
+	import { superForm } from 'sveltekit-superforms';
+	import { Field, Control, Label, Description, FieldErrors } from 'formsnap';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema.js';
+	import SuperDebug from 'sveltekit-superforms';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+
+	let { data } = $props();
+
+	const form = superForm(data.form, {
+		validators: zod4Client(schema),
+		delayMs: 400
+	});
+	const { form: formData, enhance, submitting, delayed, message } = form;
+</script>
+
+<div class="mx-auto w-xl space-y-2 py-4">
+	{#if $message}
+		<div class="w-full card preset-filled-error-700-300 p-4 text-center">
+			<p>{$message}</p>
+		</div>
+	{/if}
+	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-4" method="POST" use:enhance>
+		<div class="flex flex-col items-center justify-between gap-1 md:flex-row">
+			<div class="space-y-2">
+				<Field {form} name="firstName">
+					<Control>
+						{#snippet children({ props })}
+							<Label class="label-text">First name</Label>
+							<input
+								class="input"
+								{...props}
+								type="text"
+								bind:value={$formData.firstName}
+								placeholder="John"
+							/>
+						{/snippet}
+					</Control>
+					<Description class="sr-only"
+						>Enter your given name as it appears on official documents.</Description
+					>
+					<FieldErrors class="text-error-700-300" />
+				</Field>
+			</div>
+			<div class="space-y-2">
+				<Field {form} name="lastName">
+					<Control>
+						{#snippet children({ props })}
+							<Label class="label-text">Last name</Label>
+							<input
+								class="input"
+								{...props}
+								type="text"
+								bind:value={$formData.lastName}
+								placeholder="Doe"
+							/>
+						{/snippet}
+					</Control>
+					<Description class="sr-only">Enter your family name or surname.</Description>
+					<FieldErrors class="text-error-700-300" />
+				</Field>
+			</div>
+		</div>
+		<div class="space-y-2">
+			<Field {form} name="email">
+				<Control>
+					{#snippet children({ props })}
+						<Label class="label-text">Email</Label>
+						<input
+							class="input"
+							{...props}
+							type="email"
+							bind:value={$formData.email}
+							placeholder="john@example.com"
+						/>
+					{/snippet}
+				</Control>
+				<Description class="sr-only"
+					>Provide a valid email address for account verification and communication.</Description
+				>
+				<FieldErrors class="text-error-700-300" />
+			</Field>
+		</div>
+		<div class="space-y-2">
+			<Field {form} name="password">
+				<Control>
+					{#snippet children({ props })}
+						<Label class="label-text">Password</Label>
+						<input class="input" {...props} type="password" bind:value={$formData.password} />
+					{/snippet}
+				</Control>
+				<Description class="sr-only"
+					>Choose a strong password with at least 8 characters, including letters and numbers.</Description
+				>
+				<FieldErrors class="text-error-700-300" />
+			</Field>
+		</div>
+
+		<div class="flex items-center space-x-2">
+			<input class="checkbox" id="agree" type="checkbox" required />
+			<label for="agree" class="label-text cursor-pointer select-none">
+				I agree to the <a href="/terms" class="anchor">Terms</a> and
+				<a href="/privacy" class="anchor">Privacy Policy</a>
+			</label>
+		</div>
+
+		<button type="submit" class="btn w-full preset-filled" disabled={$submitting}>
+			Register
+			{#if $delayed}
+				<LoaderCircle class="animate-spin" />
+			{/if}
+		</button>
+	</form>
+	<SuperDebug data={$formData} />
+</div>
