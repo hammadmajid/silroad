@@ -3,12 +3,13 @@ import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core"
 export const users = sqliteTable("users", {
 	id: text("id")
 		.primaryKey()
-		.$defaultFn(() => crypto.randomUUID()),
-	name: text("name"),
-	email: text("email").unique(),
+		.$defaultFn(() => crypto.randomUUID()).notNull(),
+	name: text("name").notNull(),
+	email: text("email").unique().notNull(),
 	emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
 	image: text("image"),
 	password: text("password").notNull(),
+	hash: text("hash").notNull(),
 })
 
 export const verificationTokens = sqliteTable(
