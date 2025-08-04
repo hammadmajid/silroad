@@ -13,7 +13,7 @@ declare global {
                 email: string,
                 name: string,
                 image: string | null,
-            }
+            } | undefined
         }
     }
 }
