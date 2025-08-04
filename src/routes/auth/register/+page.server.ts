@@ -8,7 +8,11 @@ import { sessions, users } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateSalt, hashPassword } from "$lib/utils/crypto";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
+    if (locals.user) {
+        throw redirect(303, "/explore")
+    }
+
     return {
         form: await superValidate(zod4(schema)),
     };
