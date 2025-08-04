@@ -6,12 +6,14 @@ import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async () => {
     return {
+        // @ts-expect-error: https://github.com/ciscoheat/sveltekit-superforms/issues/626
         form: await superValidate(zod4(schema)),
     };
 };
 
 export const actions = {
     default: async ({ request }) => {
+        // @ts-expect-error: https://github.com/ciscoheat/sveltekit-superforms/issues/626
         const form = await superValidate(request, zod4(schema));
 
         if (!form.valid) {
