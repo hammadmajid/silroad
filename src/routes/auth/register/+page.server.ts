@@ -4,7 +4,7 @@ import { superValidate, message } from "sveltekit-superforms";
 import { zod4 } from "sveltekit-superforms/adapters";
 import { fail, redirect } from '@sveltejs/kit';
 import { getDb } from "$lib/db"
-import { users } from "$lib/db/schema";
+import { sessions, users } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateSalt, hashPassword } from "$lib/utils/crypto";
 
@@ -15,7 +15,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions = {
-    default: async ({ request, platform }) => {
+    default: async ({ request, platform, cookies, locals }) => {
         const form = await superValidate(request, zod4(schema));
         const db = getDb(platform);
 
@@ -42,9 +42,25 @@ export const actions = {
             hash: salt,
         }).returning()
 
-        // TODO: create session in db
+        const [session] = await db.insert(sessions).values({
+            userId: user.id,
+            expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days in ms
+            sessionToken: generateSalt(),
+        }).returning()
+
         // TODO: cache session in KV
 
-        throw redirect(301, "/settings/profile");
+        cookies.set("session_token", session.sessionToken, {
+            path: "/",
+            expires: session.expires,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 14 * 24 * 60 * 60, // 14 days in seconds
+        })
+
+        locals.user = user;
+
+        throw redirect(302, "/settings/profile");
     }
 }
