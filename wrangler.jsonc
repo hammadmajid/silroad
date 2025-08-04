@@ -21,6 +21,10 @@
     {
       "pattern": "silroad.space",
       "custom_domain": true
+    },  
+    {
+      "pattern": "www.silroad.space",
+      "custom_domain": true
     }
   ],
   "d1_databases": [
