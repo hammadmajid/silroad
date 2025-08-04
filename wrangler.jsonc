@@ -3,43 +3,41 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "silroad",
-  "main": ".svelte-kit/cloudflare/_worker.js",
-  "compatibility_date": "2025-08-02",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "assets": {
-    "binding": "ASSETS",
-    "directory": ".svelte-kit/cloudflare"
-  },
-  "observability": {
-    "enabled": true
-  },
-  "routes": [
-    {
-      "pattern": "silroad.space",
-      "custom_domain": true
-    },  
-    {
-      "pattern": "www.silroad.space",
-      "custom_domain": true
-    }
-  ],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "silroad",
-      "database_id": "593db8b3-fa2d-452b-92db-ac7c7d3f4659",
-      "migrations_dir": "drizzle/"
-    }
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "KV",
-      "id": "819395fc9c1c4e7c97cef038f7d4d88c",
-      "preview_id": "f022f4074ec9401c9d5d1e38df373360"
-    }
-  ]
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "silroad",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"compatibility_date": "2025-08-02",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	"observability": {
+		"enabled": true
+	},
+	"routes": [
+		{
+			"pattern": "silroad.space",
+			"custom_domain": true
+		},
+		{
+			"pattern": "www.silroad.space",
+			"custom_domain": true
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "silroad",
+			"database_id": "593db8b3-fa2d-452b-92db-ac7c7d3f4659",
+			"migrations_dir": "drizzle/"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "819395fc9c1c4e7c97cef038f7d4d88c",
+			"preview_id": "f022f4074ec9401c9d5d1e38df373360"
+		}
+	]
 }
