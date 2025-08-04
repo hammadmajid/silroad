@@ -13,7 +13,7 @@ if (!token) {
 
 export default defineConfig({
 	dialect: 'sqlite',
-	schema: './src/db/schema.ts',
+	schema: './src/lib/db/schema.ts',
 	driver: 'd1-http',
 	dbCredentials: {
 		accountId,
