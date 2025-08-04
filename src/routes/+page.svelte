@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Silroad</title>
+</svelte:head>
+
 <section class="flex flex-col items-center justify-center py-16">
 	<h1 class="mb-2 h1">Welcome to Silroad</h1>
 	<p class="mb-8 max-w-xl text-center text-xl">Connect with people</p>

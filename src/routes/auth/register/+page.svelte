@@ -15,6 +15,10 @@
 	const { form: formData, enhance, submitting, delayed, message } = form;
 </script>
 
+<svelte:head>
+	<title>Register | Silroad</title>
+</svelte:head>
+
 <div class="mx-auto w-xl space-y-2 py-4">
 	{#if $message}
 		<div class="w-full card preset-filled-error-700-300 p-4 text-center">
