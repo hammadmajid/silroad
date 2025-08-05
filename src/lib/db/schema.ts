@@ -10,7 +10,7 @@ export const users = sqliteTable('users', {
 	emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
 	image: text('image'),
 	password: text('password').notNull(),
-	hash: text('hash').notNull()
+	salt: text('salt').notNull()
 });
 
 export const verificationTokens = sqliteTable(
