@@ -17,7 +17,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {
-			path: "/"
+			path: '/'
 		});
 		event.locals.user = undefined;
 	}

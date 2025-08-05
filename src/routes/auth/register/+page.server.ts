@@ -33,7 +33,7 @@ export const actions = {
 		const salt = generateSalt();
 		const hashedPaswword = await hashPassword(password, salt);
 
-		const exists = await userRepo.getByEmail(email)
+		const exists = await userRepo.getByEmail(email);
 		if (exists) {
 			return message(form, 'Failed to create user');
 		}
@@ -46,8 +46,8 @@ export const actions = {
 		const session = await sessionRepo.create(user);
 		if (!session) {
 			// TODO: handle this properly
-			console.error("/auth/register: failed to create session")
-			throw redirect(302, "/auth/login")
+			console.error('/auth/register: failed to create session');
+			throw redirect(302, '/auth/login');
 		}
 
 		cookies.set(SESSION_COOKIE_NAME, session.token, {
@@ -56,7 +56,7 @@ export const actions = {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'strict',
-			maxAge: Math.max((session.expiresAt.getTime() - Date.now()) / 1000),
+			maxAge: Math.max((session.expiresAt.getTime() - Date.now()) / 1000)
 		});
 
 		locals.user = user;
