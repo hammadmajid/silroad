@@ -1,7 +1,13 @@
 import * as crypto from 'node:crypto';
 
+const BYTE_LENGTH = 32;
+
+export const generateSessionToken = () => {
+	return crypto.randomBytes(BYTE_LENGTH).toString('base64url');
+};
+
 export const generateSalt = () => {
-	return crypto.randomBytes(32).toString('hex').normalize();
+	return crypto.randomBytes(BYTE_LENGTH).toString('hex').normalize();
 };
 
 export const hashPassword = async (password: string, salt: string): Promise<string> => {
