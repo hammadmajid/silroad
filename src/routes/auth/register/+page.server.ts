@@ -22,6 +22,7 @@ export const actions = {
 	default: async ({ request, platform, cookies, locals }) => {
 		const form = await superValidate(request, zod4(schema));
 		const db = getDb(platform);
+		const kv = platform?.env.KV;
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -58,7 +59,13 @@ export const actions = {
 			})
 			.returning();
 
-		// TODO: cache session in KV
+		await kv?.put(session.sessionToken, JSON.stringify({
+			userId: user.id,
+			userEmail: user.email,
+			userName: user.name,
+			userImage: user.image,
+			sessionExpires: session.sessionToken,
+		}));
 
 		cookies.set('session_token', session.sessionToken, {
 			path: '/',
