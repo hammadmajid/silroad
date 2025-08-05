@@ -25,12 +25,18 @@ export class SessionRepo {
 
   async getByToken(token: string): Promise<SerializableSession | null> {
     try {
-      const now = Date.now();
+      const now = new Date(Date.now());
 
       const kvSession = await this.kv.get(token);
 
       if (kvSession) {
-        return JSON.parse(kvSession);
+        const parsed = JSON.parse(kvSession);
+
+        if (new Date(parsed.sessionExpiresAt) <= now) {
+          await this.kv.delete(token);
+          return null;
+        }
+        return parsed;
       } else {
         const result = await this.db
           .select({
