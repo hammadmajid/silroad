@@ -3,9 +3,8 @@ import { schema } from './schema';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
-import { getDb } from '$lib/db';
-import { sessions, users } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
+import { UserRepo } from '$lib/repos/user';
 import { generateSalt, hashPassword } from '$lib/utils/crypto';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -21,8 +20,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions = {
 	default: async ({ request, platform, cookies, locals }) => {
 		const form = await superValidate(request, zod4(schema));
-		const db = getDb(platform);
-		const kv = platform?.env.KV;
+		const sessionRepo = new SessionRepo(platform);
+		const userRepo = new UserRepo(platform);
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -32,52 +31,39 @@ export const actions = {
 
 		// hash password here to prevent timing attack
 		const salt = generateSalt();
-		const hashedPassword = await hashPassword(password, salt);
+		const hashedPaswword = await hashPassword(password, salt);
 
-		const exists = await db.select().from(users).where(eq(users.email, email));
-
-		if (exists.length > 0) {
+		const exists = await userRepo.getByEmail(email)
+		if (exists) {
 			return message(form, 'Failed to create user');
 		}
 
-		const [user] = await db
-			.insert(users)
-			.values({
-				name: `${firstName} ${lastName}`,
-				email: email,
-				password: hashedPassword,
-				hash: salt
-			})
-			.returning();
+		const user = await userRepo.create(email, `${firstName} ${lastName}`, hashedPaswword, salt);
+		if (!user) {
+			return message(form, 'Failed to create user');
+		}
 
-		const [session] = await db
-			.insert(sessions)
-			.values({
-				userId: user.id,
-				expires: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days in ms
-				sessionToken: generateSalt()
-			})
-			.returning();
+		const session = await sessionRepo.create(user);
+		if (!session) {
+			// TODO: handle this properly
+			console.error("/auth/register: failed to create session")
+			throw redirect(302, "/auth/login")
+		}
 
-		await kv?.put(session.sessionToken, JSON.stringify({
-			userId: user.id,
-			userEmail: user.email,
-			userName: user.name,
-			userImage: user.image,
-			sessionExpires: session.sessionToken,
-		}));
-
-		cookies.set('session_token', session.sessionToken, {
+		cookies.set(SESSION_COOKIE_NAME, session.token, {
 			path: '/',
-			expires: session.expires,
+			expires: session.expiresAt,
 			httpOnly: true,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'lax',
-			maxAge: 14 * 24 * 60 * 60 // 14 days in seconds
+			sameSite: 'strict',
+			maxAge: Math.max((session.expiresAt.getTime() - Date.now()) / 1000),
 		});
 
 		locals.user = user;
 
-		throw redirect(302, '/settings/profile');
+		// TODO: send the email verification code; then
+		// throw redirect(302, "/auth/register/verify-email")
+
+		throw redirect(302, '/explore');
 	}
 };
