@@ -1,9 +1,15 @@
 <script lang="ts">
+	import type { LayoutProps } from './$types';
+
 	import '../app.css';
 	import { AppBar } from '@skeletonlabs/skeleton-svelte';
-	import Building2 from '@lucide/svelte/icons/building-2';
 
-	let { children } = $props();
+	import Building2 from '@lucide/svelte/icons/building-2';
+	import User from '@lucide/svelte/icons/user';
+
+	let { data, children }: LayoutProps = $props();
+
+	const { id, image } = data;
 </script>
 
 <AppBar>
@@ -15,17 +21,17 @@
 	{#snippet trail()}
 		<ul class="flex items-center gap-4">
 			<li>
-				<a href="/about" class="anchor">About</a>
-			</li>
-			<li>
 				<a href="/explore" class="anchor">Explore</a>
 			</li>
-			<li>
-				<a href="/#faq" class="anchor">FAQ</a>
-			</li>
-			<li>
-				<a href="/auth/login" class="btn preset-filled">Login</a>
-			</li>
+			{#if id}
+				<li>
+					<a href="/settings/profile" class="btn-icon preset-filled"><User /></a>
+				</li>
+			{:else}
+				<li>
+					<a href="/auth/login" class="btn preset-filled">Login</a>
+				</li>
+			{/if}
 		</ul>
 	{/snippet}
 </AppBar>
