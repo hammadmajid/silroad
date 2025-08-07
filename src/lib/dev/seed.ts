@@ -12,20 +12,61 @@ const password = 'Pass!234';
 const salt = generateSalt();
 const hashedPassword = await hashPassword(password, salt);
 
+// Helper function to insert data in batches
+async function insertInBatches<T extends Record<string, any>>(
+  db: ReturnType<typeof getDb>,
+  table: any,
+  data: T[],
+  batchSize: number = 10
+) {
+  if (data.length === 0) return;
+
+  for (let i = 0; i < data.length; i += batchSize) {
+    const batch = data.slice(i, i + batchSize);
+    try {
+      await db.insert(table).values(batch).run();
+    } catch (error) {
+      console.error(`Failed to insert batch ${Math.floor(i / batchSize) + 1}:`, error);
+      throw error;
+    }
+  }
+}
+
 export async function seedDatabase(
   platform: App.Platform | undefined,
-  opts: { users: number; sessions: number; organizations: number }
+  count: number
 ) {
   const db = getDb(platform);
 
-  await clearDatabase(db);
+  try {
+    console.log('Starting database seeding...');
 
-  const organizations = await createOrganizations(db, opts.organizations);
-  const users = await createUsers(db, opts.users, organizations);
-  await assignOrganizationMembers(db, users, organizations);
-  const events = await createEvents(db, organizations);
-  await assignEventOrganizersAndAttendees(db, events, users);
-  await createSessions(db, opts.sessions, users);
+    await clearDatabase(db);
+    console.log('Database cleared');
+
+    const organizations = await createOrganizations(db, count);
+    console.log(`Created ${organizations.length} organizations`);
+
+    const users = await createUsers(db, count, organizations);
+    console.log(`Created ${users.length} users`);
+
+    await assignOrganizationMembers(db, users, organizations);
+    console.log('Assigned organization members');
+
+    const events = await createEvents(db, organizations);
+    console.log(`Created ${events.length} events`);
+
+    await assignEventOrganizersAndAttendees(db, events, users);
+    console.log('Assigned event organizers and attendees');
+
+    await createSessions(db, count, users);
+    console.log(`Created ${count} sessions`);
+
+    console.log('Database seeding completed successfully');
+  } catch (error) {
+    console.error('Error during database seeding:', error);
+    throw error;
+  }
 }
 
 // ----------------------------
@@ -45,20 +86,32 @@ async function clearDatabase(db: ReturnType<typeof getDb>) {
 
 async function createOrganizations(db: ReturnType<typeof getDb>, count: number) {
   const organizations: typeof schema.organizations.$inferInsert[] = [];
+  const usedSlugs = new Set<string>();
 
   for (let i = 0; i < count; i++) {
     const name = faker.company.name();
+    let slug = faker.helpers.slugify(name.toLowerCase());
+
+    // Ensure unique slugs
+    let counter = 1;
+    while (usedSlugs.has(slug)) {
+      slug = `${faker.helpers.slugify(name.toLowerCase())}-${counter}`;
+      counter++;
+    }
+    usedSlugs.add(slug);
+
     organizations.push({
       id: crypto.randomUUID(),
       name,
-      slug: faker.helpers.slugify(name.toLowerCase()),
+      slug,
       description: faker.company.catchPhrase(),
       avatar: faker.image.avatar(),
       backgroundImage: faker.image.urlPicsumPhotos()
     });
   }
 
-  await db.insert(schema.organizations).values(organizations).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.organizations, organizations, 10);
   return organizations;
 }
 
@@ -70,25 +123,46 @@ async function createUsers(
   organizations: typeof schema.organizations.$inferInsert[]
 ) {
   const users: typeof schema.users.$inferInsert[] = [];
+  const usedEmails = new Set<string>();
+  const usedOrganizationIds = new Set<string>();
 
   for (let i = 0; i < count; i++) {
-    const organization =
-      faker.datatype.boolean() && organizations.length > 0
-        ? faker.helpers.arrayElement(organizations)
-        : undefined;
+    // Only assign organization if it hasn't been used (due to unique constraint)
+    let organization: typeof schema.organizations.$inferInsert | undefined;
+    if (organizations.length > 0) {
+      const availableOrgs = organizations.filter(org => !usedOrganizationIds.has(org.id!));
+      if (availableOrgs.length > 0 && faker.datatype.boolean()) {
+        organization = faker.helpers.arrayElement(availableOrgs);
+        if (organization?.id) {
+          usedOrganizationIds.add(organization.id);
+        }
+      }
+    }
+
+    // Ensure unique emails
+    let email = faker.internet.email();
+    let counter = 1;
+    while (usedEmails.has(email)) {
+      const [localPart, domain] = email.split('@');
+      email = `${localPart}${counter}@${domain}`;
+      counter++;
+    }
+    usedEmails.add(email);
 
     users.push({
       id: crypto.randomUUID(),
       name: faker.person.fullName(),
-      email: faker.internet.email(),
+      email,
+      // Omit emailVerified to let it default to null/undefined
       image: faker.image.avatarGitHub(),
       password: hashedPassword,
       salt,
-      organizationId: organization?.id ?? null
+      organizationId: organization?.id || null
     });
   }
 
-  await db.insert(schema.users).values(users).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.users, users, 10);
   return users;
 }
 
@@ -100,6 +174,7 @@ async function assignOrganizationMembers(
   organizations: typeof schema.organizations.$inferInsert[]
 ) {
   const members: typeof schema.organizationMembers.$inferInsert[] = [];
+  const memberPairs = new Set<string>();
 
   for (const org of organizations) {
     const orgUsers = users.filter((u) => u.organizationId === org.id);
@@ -111,14 +186,20 @@ async function assignOrganizationMembers(
     const allMembers = [...orgUsers, ...additionalUsers];
     for (const user of allMembers) {
       if (!user) continue;
-      members.push({
-        userId: user.id!,
-        organizationId: org.id!
-      });
+
+      const pairKey = `${user.id}-${org.id}`;
+      if (!memberPairs.has(pairKey)) {
+        memberPairs.add(pairKey);
+        members.push({
+          userId: user.id!,
+          organizationId: org.id!
+        });
+      }
     }
   }
 
-  await db.insert(schema.organizationMembers).values(members).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.organizationMembers, members, 10);
 }
 
 // ----------------------------
@@ -132,12 +213,16 @@ async function createEvents(
   for (const org of organizations) {
     const eventCount = faker.number.int({ min: 0, max: 3 });
     for (let i = 0; i < eventCount; i++) {
+      const now = Date.now();
+      const daysUntilEvent = faker.number.int({ min: 2, max: 14 }); // Start from 2 days
+      const daysUntilRsvpClose = faker.number.int({ min: 1, max: daysUntilEvent - 1 });
+
       events.push({
         id: crypto.randomUUID(),
         title: faker.company.catchPhrase(),
         description: faker.lorem.sentence(),
-        dateOfEvent: new Date(Date.now() + faker.number.int({ min: 1, max: 14 }) * 86400000),
-        closeRsvpAt: new Date(Date.now() + faker.number.int({ min: 1, max: 13 }) * 86400000),
+        dateOfEvent: new Date(now + daysUntilEvent * 86400000),
+        closeRsvpAt: new Date(now + daysUntilRsvpClose * 86400000),
         maxAttendees: faker.number.int({ min: 10, max: 300 }),
         image: faker.image.urlPicsumPhotos(),
         organizationId: org.id!
@@ -145,7 +230,8 @@ async function createEvents(
     }
   }
 
-  await db.insert(schema.events).values(events).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.events, events, 10);
   return events;
 }
 
@@ -158,6 +244,8 @@ async function assignEventOrganizersAndAttendees(
 ) {
   const organizers: typeof schema.eventOrganizers.$inferInsert[] = [];
   const attendees: typeof schema.attendees.$inferInsert[] = [];
+  const organizerPairs = new Set<string>();
+  const attendeePairs = new Set<string>();
 
   for (const event of events) {
     const eligibleUsers = users.filter(
@@ -166,8 +254,16 @@ async function assignEventOrganizersAndAttendees(
         faker.datatype.boolean()
     );
 
-    const organizerCount = faker.number.int({ min: 1, max: 2 });
-    const attendeeCount = faker.number.int({ min: 1, max: 10 });
+    if (eligibleUsers.length === 0) continue;
+
+    const organizerCount = Math.min(
+      faker.number.int({ min: 1, max: 2 }),
+      eligibleUsers.length
+    );
+    const attendeeCount = Math.min(
+      faker.number.int({ min: 1, max: 10 }),
+      eligibleUsers.length
+    );
 
     const selectedOrganizers = faker.helpers.arrayElements(
       eligibleUsers,
@@ -179,16 +275,25 @@ async function assignEventOrganizersAndAttendees(
     );
 
     for (const user of selectedOrganizers) {
-      organizers.push({ eventId: event.id!, userId: user.id! });
+      const pairKey = `${event.id}-${user.id}`;
+      if (!organizerPairs.has(pairKey)) {
+        organizerPairs.add(pairKey);
+        organizers.push({ eventId: event.id!, userId: user.id! });
+      }
     }
 
     for (const user of selectedAttendees) {
-      attendees.push({ eventId: event.id!, userId: user.id! });
+      const pairKey = `${event.id}-${user.id}`;
+      if (!attendeePairs.has(pairKey)) {
+        attendeePairs.add(pairKey);
+        attendees.push({ eventId: event.id!, userId: user.id! });
+      }
     }
   }
 
-  await db.insert(schema.eventOrganizers).values(organizers).run();
-  await db.insert(schema.attendees).values(attendees).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.eventOrganizers, organizers, 10);
+  await insertInBatches(db, schema.attendees, attendees, 10);
 }
 
 // ----------------------------
@@ -209,5 +314,6 @@ async function createSessions(
     });
   }
 
-  await db.insert(schema.sessions).values(sessions).run();
+  // Insert in batches to avoid SQL limits
+  await insertInBatches(db, schema.sessions, sessions, 10);
 }
