@@ -39,6 +39,44 @@ export const organizationMembers = sqliteTable("organization_members", {
 	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
 )
 
+export const events = sqliteTable('events', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID())
+		.notNull(),
+	title: text('title').notNull(),
+	description: text('description'),
+	dateOfEvent: integer('date_of_event', { mode: 'timestamp_ms' }).notNull(),
+	closeRsvpAt: integer('close_rsvp_at', { mode: 'timestamp_ms' }),
+	maxAttendees: integer('max_attendees'),
+	image: text('image'),
+	organizationId: text('organization_id')
+		.notNull()
+		.references(() => organizations.id, { onDelete: 'cascade' }),
+});
+
+export const eventOrganizers = sqliteTable('event_organizers', {
+	eventId: text('event_id')
+		.notNull()
+		.references(() => events.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' })
+},
+	(t) => [primaryKey({ columns: [t.eventId, t.userId] })]
+);
+
+export const attendees = sqliteTable('attendees', {
+	eventId: text('event_id')
+		.notNull()
+		.references(() => events.id, { onDelete: 'cascade' }),
+	userId: text('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' })
+},
+	(t) => [primaryKey({ columns: [t.eventId, t.userId] })]
+);
+
 export const verificationTokens = sqliteTable(
 	'verificationTokens',
 	{
