@@ -3,6 +3,11 @@ import { generateSalt, hashPassword, generateSessionToken } from '$lib/utils/cry
 import * as schema from '$lib/db/schema';
 import { getDb } from '$lib/db';
 
+// prevent worker from hitting the CPU time limit
+const password = 'Pass!234';
+const salt = generateSalt();
+const hashedPassword = await hashPassword(password, salt);
+
 export async function seedDatabase(
   platform: App.Platform | undefined,
   opts: { users: number; sessions: number }
@@ -10,15 +15,12 @@ export async function seedDatabase(
   const db = getDb(platform);
 
   const users: typeof schema.users.$inferInsert[] = [];
-  const password = 'Pass!234';
 
   for (let i = 0; i < opts.users; i++) {
     const id = crypto.randomUUID();
     const name = faker.person.fullName();
     const email = faker.internet.email();
     const image = faker.image.avatarGitHub();
-    const salt = generateSalt();
-    const hashedPassword = await hashPassword(password, salt);
 
     users.push({
       id,
