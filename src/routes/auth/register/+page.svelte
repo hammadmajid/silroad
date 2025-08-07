@@ -21,7 +21,10 @@
 
 <div class="mx-auto w-xl space-y-2 py-4">
 	{#if $message}
-		<div class="w-full card preset-filled-error-700-300 p-4 text-center" data-testid="error-message">
+		<div
+			class="w-full card preset-filled-error-700-300 p-4 text-center"
+			data-testid="error-message"
+		>
 			<p>{$message}</p>
 		</div>
 	{/if}
@@ -94,7 +97,13 @@
 				<Control>
 					{#snippet children({ props })}
 						<Label class="label-text">Password</Label>
-						<input class="input" {...props} type="password" bind:value={$formData.password} data-testid="password-input" />
+						<input
+							class="input"
+							{...props}
+							type="password"
+							bind:value={$formData.password}
+							data-testid="password-input"
+						/>
 					{/snippet}
 				</Control>
 				<Description class="sr-only"
@@ -104,15 +113,36 @@
 			</Field>
 		</div>
 
-		<div class="flex items-center space-x-2">
-			<input class="checkbox" id="agree" type="checkbox" required data-testid="terms-checkbox" />
-			<label for="agree" class="label-text cursor-pointer select-none">
-				I agree to the <a href="/terms" class="anchor">Terms</a> and
-				<a href="/privacy" class="anchor">Privacy Policy</a>
-			</label>
-		</div>
+		<Field {form} name="agree">
+			<Control>
+				{#snippet children({ props })}
+					<div class="flex items-center space-x-2">
+						<input
+							class="checkbox"
+							{...props}
+							type="checkbox"
+							bind:checked={$formData.agree}
+							data-testid="terms-checkbox"
+						/>
+						<label for={props.id} class="label-text cursor-pointer select-none">
+							I agree to the <a href="/terms" class="anchor">Terms</a> and
+							<a href="/privacy" class="anchor">Privacy Policy</a>
+						</label>
+					</div>
+				{/snippet}
+			</Control>
+			<Description class="sr-only">
+				You must agree to our Terms of Service and Privacy Policy to create an account.
+			</Description>
+			<FieldErrors class="text-error-700-300" />
+		</Field>
 
-		<button type="submit" class="btn w-full preset-filled" disabled={$submitting} data-testid="register-submit-btn">
+		<button
+			type="submit"
+			class="btn w-full preset-filled"
+			disabled={$submitting}
+			data-testid="register-submit-btn"
+		>
 			Register
 			{#if $delayed}
 				<LoaderCircle class="animate-spin" />
