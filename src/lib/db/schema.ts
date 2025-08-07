@@ -10,7 +10,10 @@ export const users = sqliteTable('users', {
 	emailVerified: integer('emailVerified', { mode: 'timestamp_ms' }),
 	image: text('image'),
 	password: text('password').notNull(),
-	salt: text('salt').notNull()
+	salt: text('salt').notNull(),
+	organizationId: text('organization_id')
+		.unique()
+		.references(() => organizations.id, { onDelete: 'set null' })
 });
 
 export const organizations = sqliteTable('organizations', {
@@ -24,19 +27,6 @@ export const organizations = sqliteTable('organizations', {
 	avatar: text('avatar'),
 	backgroundImage: text('background_image'),
 });
-
-export const userOrganizations = sqliteTable(
-	'user_organizations',
-	{
-		userId: text('user_id')
-			.notNull()
-			.references(() => users.id, { onDelete: 'cascade' }),
-		organizationId: text('organization_id')
-			.notNull()
-			.references(() => organizations.id, { onDelete: 'cascade' })
-	},
-	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
-);
 
 export const organizationMembers = sqliteTable("organization_members", {
 	userId: text('user_id')
