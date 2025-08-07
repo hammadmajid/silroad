@@ -21,7 +21,7 @@
 
 <div class="mx-auto w-xl space-y-2 py-4">
 	{#if $message}
-		<div class="w-full card preset-filled-error-700-300 p-4 text-center">
+		<div class="w-full card preset-filled-error-700-300 p-4 text-center" data-testid="error-message">
 			<p>{$message}</p>
 		</div>
 	{/if}
@@ -38,6 +38,7 @@
 								type="text"
 								bind:value={$formData.firstName}
 								placeholder="John"
+								data-testid="first-name-input"
 							/>
 						{/snippet}
 					</Control>
@@ -58,6 +59,7 @@
 								type="text"
 								bind:value={$formData.lastName}
 								placeholder="Doe"
+								data-testid="last-name-input"
 							/>
 						{/snippet}
 					</Control>
@@ -77,6 +79,7 @@
 							type="email"
 							bind:value={$formData.email}
 							placeholder="john@example.com"
+							data-testid="email-input"
 						/>
 					{/snippet}
 				</Control>
@@ -91,7 +94,7 @@
 				<Control>
 					{#snippet children({ props })}
 						<Label class="label-text">Password</Label>
-						<input class="input" {...props} type="password" bind:value={$formData.password} />
+						<input class="input" {...props} type="password" bind:value={$formData.password} data-testid="password-input" />
 					{/snippet}
 				</Control>
 				<Description class="sr-only"
@@ -102,14 +105,14 @@
 		</div>
 
 		<div class="flex items-center space-x-2">
-			<input class="checkbox" id="agree" type="checkbox" required />
+			<input class="checkbox" id="agree" type="checkbox" required data-testid="terms-checkbox" />
 			<label for="agree" class="label-text cursor-pointer select-none">
 				I agree to the <a href="/terms" class="anchor">Terms</a> and
 				<a href="/privacy" class="anchor">Privacy Policy</a>
 			</label>
 		</div>
 
-		<button type="submit" class="btn w-full preset-filled" disabled={$submitting}>
+		<button type="submit" class="btn w-full preset-filled" disabled={$submitting} data-testid="register-submit-btn">
 			Register
 			{#if $delayed}
 				<LoaderCircle class="animate-spin" />
