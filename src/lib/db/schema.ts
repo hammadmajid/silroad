@@ -13,6 +13,42 @@ export const users = sqliteTable('users', {
 	salt: text('salt').notNull()
 });
 
+export const organizations = sqliteTable('organizations', {
+	id: text('id')
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID())
+		.notNull(),
+	name: text('name').notNull(),
+	slug: text('slug').unique().notNull(),
+	description: text('description'),
+	avatar: text('avatar'),
+	backgroundImage: text('background_image'),
+});
+
+export const userOrganizations = sqliteTable(
+	'user_organizations',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		organizationId: text('organization_id')
+			.notNull()
+			.references(() => organizations.id, { onDelete: 'cascade' })
+	},
+	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
+);
+
+export const organizationMembers = sqliteTable("organization_members", {
+	userId: text('user_id')
+		.notNull()
+		.references(() => users.id, { onDelete: 'cascade' }),
+	organizationId: text('organization_id')
+		.notNull()
+		.references(() => organizations.id, { onDelete: 'cascade' })
+},
+	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
+)
+
 export const verificationTokens = sqliteTable(
 	'verificationTokens',
 	{
