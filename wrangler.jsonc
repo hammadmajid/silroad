@@ -7,10 +7,22 @@
 	"name": "silroad",
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-08-02",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"vars": {
+		"NODE_ENV": "production"
+	},
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
+	},
+	"env": {
+		"dev": {
+			"vars": {
+				"NODE_ENV": "development"
+			}
+		}
 	},
 	"observability": {
 		"enabled": true
