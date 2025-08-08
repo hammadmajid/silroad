@@ -6,13 +6,15 @@ import { fail, redirect } from '@sveltejs/kit';
 import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
 import { UserRepo } from '$lib/repos/user';
 import { generateSalt, hashPassword } from '$lib/utils/crypto';
+import { isProduction } from '$lib/utils/env';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, platform }) => {
 	if (locals.user) {
 		throw redirect(303, '/explore');
 	}
 
 	return {
+		isProd: isProduction(platform),
 		form: await superValidate(zod4(schema))
 	};
 };
@@ -54,7 +56,7 @@ export const actions = {
 			path: '/',
 			expires: session.expiresAt,
 			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
+			secure: isProduction(platform),
 			sameSite: 'strict',
 			maxAge: Math.max((session.expiresAt.getTime() - Date.now()) / 1000)
 		});

@@ -83,5 +83,7 @@
 			{/if}
 		</button>
 	</form>
-	<SuperDebug data={$formData} />
+	{#if !data.isProd}
+		<SuperDebug data={$formData} />
+	{/if}
 </div>
