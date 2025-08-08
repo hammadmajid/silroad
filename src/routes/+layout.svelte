@@ -29,7 +29,7 @@
 				</li>
 			{:else}
 				<li>
-					<a href="/auth/login" class="btn preset-filled">Login</a>
+					<a href="/login" class="btn preset-filled">Login</a>
 				</li>
 			{/if}
 		</ul>

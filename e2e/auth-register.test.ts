@@ -21,7 +21,7 @@ test.describe('User Registration Flow', () => {
         await page.getByTestId('get-started-btn').click();
 
         // Verify we're on the registration page
-        await expect(page).toHaveURL('/auth/register');
+        await expect(page).toHaveURL('/register');
 
         // Fill out the registration form
         await page.getByTestId('first-name-input').fill(testUser.firstName);
@@ -40,7 +40,7 @@ test.describe('User Registration Flow', () => {
     });
 
     test('should show validation errors for invalid form data', async ({ page }) => {
-        await page.goto('/auth/register');
+        await page.goto('/register');
 
         // Try to submit form with invalid data
         await page.getByTestId('first-name-input').fill('');
@@ -58,7 +58,7 @@ test.describe('User Registration Flow', () => {
         await expect(page.locator('.text-error-700-300')).toHaveCount(5);
 
         // Verify we're still on the registration page (form didn't submit due to validation errors)
-        await expect(page).toHaveURL('/auth/register');
+        await expect(page).toHaveURL('/register');
     });
 
     test('should show error when trying to register with existing email', async ({ page, browser }) => {
@@ -70,7 +70,7 @@ test.describe('User Registration Flow', () => {
             password: 'TestPass123'
         };
 
-        await page.goto('/auth/register');
+        await page.goto('/register');
 
         // Fill form with existing email
         await page.getByTestId('first-name-input').fill(existingUser.firstName);
@@ -93,7 +93,7 @@ test.describe('User Registration Flow', () => {
             await page.context().clearCookies();
 
             // First registration was successful, now try to register again with same email
-            await page.goto('/auth/register');
+            await page.goto('/register');
             await page.getByTestId('first-name-input').fill('Another');
             await page.getByTestId('last-name-input').fill('User');
             await page.getByTestId('email-input').fill(existingUser.email);
@@ -103,7 +103,7 @@ test.describe('User Registration Flow', () => {
 
             // Should show error for duplicate email
             await expect(page.getByTestId('error-message')).toBeVisible();
-            await expect(page).toHaveURL('/auth/register');
+            await expect(page).toHaveURL('/register');
         }
     });
 
@@ -116,7 +116,7 @@ test.describe('User Registration Flow', () => {
             password: 'TestPass123'
         };
 
-        await page.goto('/auth/register');
+        await page.goto('/register');
 
         // Fill the form
         await page.getByTestId('first-name-input').fill(testUser.firstName);
@@ -145,7 +145,7 @@ test.describe('User Registration Flow', () => {
             password: 'TestPass123'
         };
 
-        await page.goto('/auth/register');
+        await page.goto('/register');
         await page.getByTestId('first-name-input').fill(testUser.firstName);
         await page.getByTestId('last-name-input').fill(testUser.lastName);
         await page.getByTestId('email-input').fill(testUser.email);
@@ -157,7 +157,7 @@ test.describe('User Registration Flow', () => {
         await expect(page).toHaveURL('/explore');
 
         // Now try to access registration page while authenticated
-        await page.goto('/auth/register');
+        await page.goto('/register');
 
         // Should be redirected back to explore since user is already authenticated
         await expect(page).toHaveURL('/explore');

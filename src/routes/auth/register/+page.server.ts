@@ -46,8 +46,8 @@ export const actions = {
 		const session = await sessionRepo.create(user);
 		if (!session) {
 			// TODO: handle this properly
-			console.error('/auth/register: failed to create session');
-			throw redirect(302, '/auth/login');
+			console.error('/register: failed to create session');
+			throw redirect(302, '/login');
 		}
 
 		cookies.set(SESSION_COOKIE_NAME, session.token, {
@@ -62,7 +62,7 @@ export const actions = {
 		locals.user = user;
 
 		// TODO: send the email verification code; then
-		// throw redirect(302, "/auth/register/verify-email")
+		// throw redirect(302, "/register/verify-email")
 
 		throw redirect(302, '/explore');
 	}
