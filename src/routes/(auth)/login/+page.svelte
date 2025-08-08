@@ -19,7 +19,7 @@
 	<title>Login | Silroad</title>
 </svelte:head>
 
-<div class="mx-auto w-xl space-y-2 py-4">
+<div class="space-y-4">
 	{#if $message}
 		<div
 			class="w-full card preset-filled-error-700-300 p-4 text-center"
@@ -28,7 +28,13 @@
 			<p>{$message}</p>
 		</div>
 	{/if}
-	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-4" method="POST" use:enhance>
+
+	<div class="text-center space-y-2 mb-6">
+		<h1 class="h2">Welcome Back</h1>
+		<p class="text-surface-600-300">Sign in to your account</p>
+	</div>
+
+	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-6" method="POST" use:enhance>
 		<div class="space-y-2">
 			<Field {form} name="email">
 				<Control>
@@ -83,6 +89,14 @@
 			{/if}
 		</button>
 	</form>
+
+	<div class="text-center">
+		<p class="text-sm text-surface-600-300">
+			Don't have an account?
+			<a href="/register" class="anchor">Sign up</a>
+		</p>
+	</div>
+
 	{#if !data.isProd}
 		<SuperDebug data={$formData} />
 	{/if}

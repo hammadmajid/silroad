@@ -19,7 +19,7 @@
 	<title>Register | Silroad</title>
 </svelte:head>
 
-<div class="mx-auto w-xl space-y-2 py-4">
+<div class="space-y-4">
 	{#if $message}
 		<div
 			class="w-full card preset-filled-error-700-300 p-4 text-center"
@@ -28,9 +28,15 @@
 			<p>{$message}</p>
 		</div>
 	{/if}
-	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-4" method="POST" use:enhance>
-		<div class="flex flex-col items-center justify-between gap-1 md:flex-row">
-			<div class="space-y-2">
+
+	<div class="text-center space-y-2 mb-6">
+		<h1 class="h2">Create Account</h1>
+		<p class="text-surface-600-300">Join Silroad today</p>
+	</div>
+
+	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-6" method="POST" use:enhance>
+		<div class="flex flex-col gap-4 md:flex-row">
+			<div class="flex-1 space-y-2">
 				<Field {form} name="firstName">
 					<Control>
 						{#snippet children({ props })}
@@ -51,7 +57,7 @@
 					<FieldErrors class="text-error-700-300" />
 				</Field>
 			</div>
-			<div class="space-y-2">
+			<div class="flex-1 space-y-2">
 				<Field {form} name="lastName">
 					<Control>
 						{#snippet children({ props })}
@@ -149,6 +155,14 @@
 			{/if}
 		</button>
 	</form>
+
+	<div class="text-center">
+		<p class="text-sm text-surface-600-300">
+			Already have an account?
+			<a href="/login" class="anchor">Sign in</a>
+		</p>
+	</div>
+
 	{#if !data.isProd}
 		<SuperDebug data={$formData} />
 	{/if}
