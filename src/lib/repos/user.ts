@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '$lib/db';
 import { users } from '$lib/db/schema';
+import { comparePassword, hashPassword } from '$lib/utils/crypto';
 
 export type User = {
 	id: string;
@@ -66,13 +67,38 @@ export class UserRepo {
 		}
 	}
 
+	async verify(inputEmail: string, inputPassword: string): Promise<User | null> {
+		try {
+			const user = await this.db.select().from(users).where(eq(users.email, inputEmail));
+
+			if (user.length === 0) {
+				return null;
+			}
+
+			const { email, id, image, name, password, salt } = user[0]
+
+			const validPass = await comparePassword(inputPassword, salt, password);
+
+			if (!validPass) {
+				return null;
+			}
+
+			return {
+				id,
+				email,
+				name,
+				image,
+			};
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
+
 	async update(user: User): Promise<User> {
 		throw 'not implemented';
 	}
 	async delete(userId: string): Promise<void> {
-		throw 'not implemented';
-	}
-	async verifyPassword(password: string): Promise<boolean> {
 		throw 'not implemented';
 	}
 	async updatePassword(oldPass: string, newPass: string): Promise<boolean> {
