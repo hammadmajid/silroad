@@ -6,7 +6,7 @@
 	import { userStore } from '$lib/stores/user.svelte.js';
 	import { onMount } from 'svelte';
 
-	import Building2 from '@lucide/svelte/icons/building-2';
+	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
 
 	let { data, children }: LayoutProps = $props();
@@ -27,7 +27,7 @@
 <AppBar>
 	{#snippet lead()}
 		<a href="/">
-			<Building2 size={24} />
+			<CalendarHeart size={24} />
 		</a>
 	{/snippet}
 	{#snippet trail()}
