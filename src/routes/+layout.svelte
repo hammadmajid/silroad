@@ -22,11 +22,13 @@
 			});
 		}
 	});
+
+	const homeLink = userStore.isLoggedIn ? '/explore' : '/';
 </script>
 
 <AppBar>
 	{#snippet lead()}
-		<a href="/">
+		<a href={homeLink}>
 			<CalendarHeart size={24} />
 		</a>
 	{/snippet}
@@ -52,7 +54,7 @@
 <main>
 	{@render children()}
 </main>
-<footer class="bg-surface-100-900 mt-16">
+<footer class="mt-16 bg-surface-100-900">
 	<div class="container mx-auto px-4 py-8">
 		<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 			<div>
@@ -81,8 +83,8 @@
 				</ul>
 			</div>
 		</div>
-		<div class="border-surface-400 mt-8 border-t pt-8 text-center">
-			<p class="text-surface-400 text-sm">
+		<div class="mt-8 border-t border-surface-400 pt-8 text-center">
+			<p class="text-sm text-surface-400">
 				© {new Date().getFullYear()} Silroad. All rights reserved.
 			</p>
 		</div>
