@@ -12,11 +12,11 @@ export type User = {
 
 export class UserRepo {
 	private db;
-	private looger;
+	private logger;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
-		this.looger = getLogger(platform);
+		this.logger = getLogger(platform);
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
@@ -34,7 +34,11 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			console.error(error);
+			this.logger.writeDataPoint({
+				blobs: ["error", "UserRepo", "getByEmail", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
 			return null;
 		}
 	}
@@ -64,7 +68,7 @@ export class UserRepo {
 				image: null
 			};
 		} catch (error) {
-			this.looger.writeDataPoint({
+			this.logger.writeDataPoint({
 				blobs: ["error", "UserRepo", "create", JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
@@ -96,7 +100,7 @@ export class UserRepo {
 				image,
 			};
 		} catch (error) {
-			this.looger.writeDataPoint({
+			this.logger.writeDataPoint({
 				blobs: ["error", "UserRepo", "verify", JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
