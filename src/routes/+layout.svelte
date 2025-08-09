@@ -3,13 +3,25 @@
 
 	import '../app.css';
 	import { AppBar } from '@skeletonlabs/skeleton-svelte';
+	import { userStore } from '$lib/stores/user.svelte.js';
+	import { onMount } from 'svelte';
 
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import User from '@lucide/svelte/icons/user';
 
 	let { data, children }: LayoutProps = $props();
 
-	const { id, image } = data;
+	// Initialize user store from server data if user is logged in and store is empty
+	onMount(() => {
+		if (data && data.id && !userStore.current) {
+			userStore.setUser({
+				id: data.id,
+				email: data.email,
+				name: data.name,
+				image: data.image
+			});
+		}
+	});
 </script>
 
 <AppBar>
@@ -23,9 +35,11 @@
 			<li>
 				<a href="/explore" class="anchor">Explore</a>
 			</li>
-			{#if id}
+			{#if userStore.isLoggedIn}
 				<li>
-					<a href="/settings/profile" class="btn-icon preset-filled"><User /></a>
+					<a href="/settings/profile" class="btn-icon preset-filled" title="Profile">
+						<User />
+					</a>
 				</li>
 			{:else}
 				<li>
