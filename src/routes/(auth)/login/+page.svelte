@@ -5,12 +5,29 @@
 	import { schema } from './schema.js';
 	import SuperDebug from 'sveltekit-superforms';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import { goto } from '$app/navigation';
+	import { userStore } from '$lib/stores/user.svelte.js';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 
+	// Redirect if user is already logged in
+	onMount(() => {
+		if (userStore.isLoggedIn) {
+			goto('/explore');
+		}
+	});
+
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
-		delayMs: 400
+		delayMs: 400,
+		onResult: async ({ result }) => {
+			if (result.type === 'success' && result.data?.user) {
+				// Set user in global store and redirect
+				userStore.setUser(result.data.user);
+				goto('/explore');
+			}
+		}
 	});
 	const { form: formData, enhance, submitting, delayed, message } = form;
 </script>
@@ -29,7 +46,7 @@
 		</div>
 	{/if}
 
-	<div class="text-center space-y-2 mb-6">
+	<div class="mb-6 space-y-2 text-center">
 		<h1 class="h2">Welcome Back</h1>
 		<p class="text-surface-600-300">Sign in to your account</p>
 	</div>
@@ -91,7 +108,7 @@
 	</form>
 
 	<div class="text-center">
-		<p class="text-sm text-surface-600-300">
+		<p class="text-surface-600-300 text-sm">
 			Don't have an account?
 			<a href="/register" class="anchor">Sign up</a>
 		</p>
