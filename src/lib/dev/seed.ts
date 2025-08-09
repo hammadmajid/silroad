@@ -126,6 +126,18 @@ async function createUsers(
   const usedEmails = new Set<string>();
   const usedOrganizationIds = new Set<string>();
 
+  // Always create the testing user with email u@test.it
+  users.push({
+    id: crypto.randomUUID(),
+    name: 'Test User',
+    email: 'u@test.it',
+    image: faker.image.avatarGitHub(),
+    password: hashedPassword,
+    salt,
+    organizationId: null
+  });
+  usedEmails.add('u@test.it');
+
   for (let i = 0; i < count; i++) {
     // Only assign organization if it hasn't been used (due to unique constraint)
     let organization: typeof schema.organizations.$inferInsert | undefined;
