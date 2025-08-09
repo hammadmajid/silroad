@@ -1,7 +1,16 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { useProtectedRoute } from '$lib/hooks/useProtectedRoute.svelte.js';
 
 	const userStore = useProtectedRoute();
+
+	async function handleLogout() {
+		await fetch('/api/logout', {
+			method: 'POST'
+		});
+		userStore.clearUser();
+		goto('/login');
+	}
 </script>
 
 <svelte:head>
@@ -9,32 +18,25 @@
 </svelte:head>
 
 {#if userStore.current}
-	<div class="space-y-6">
-		<div class="card preset-filled-surface-100-900 p-6">
-			<h1 class="h2 mb-4">Profile Settings</h1>
+	<div class="space-y-6 p-8">
+		<div class="mx-auto max-w-lg card preset-filled-surface-100-900 p-6">
+			<h1 class="mb-4 h2">Profile</h1>
 
 			<div class="space-y-4">
-				<div>
-					<p class="label-text">Name</p>
-					<p class="text-lg">{userStore.current.name}</p>
-				</div>
-
-				<div>
-					<p class="label-text">Email</p>
-					<p class="text-lg">{userStore.current.email}</p>
-				</div>
-
-				{#if userStore.current.image}
-					<div>
-						<p class="label-text">Profile Image</p>
-						<img
-							src={userStore.current.image}
-							alt="Profile"
-							class="w-16 h-16 rounded-full"
-						/>
+				<div class="flex items-center gap-4">
+					{#if userStore.current.image}
+						<img src={userStore.current.image} alt="Profile" class="h-16 w-16 rounded-full" />
+					{/if}
+					<div class="w-full">
+						<label for="profile-name" class="sr-only label-text">Name</label>
+						<input id="profile-name" class="input w-full" disabled value={userStore.current.name} />
 					</div>
-				{/if}
+				</div>
 			</div>
+		</div>
+		<div class="mx-auto max-w-lg card preset-filled-surface-100-900 p-6">
+			<button onclick={handleLogout} class="btn w-full preset-filled-warning-900-100">Logout</button
+			>
 		</div>
 	</div>
 {/if}
