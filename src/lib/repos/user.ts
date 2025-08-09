@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb, getLogger } from '$lib/db';
 import { users } from '$lib/db/schema';
-import { comparePassword, hashPassword } from '$lib/utils/crypto';
+import { comparePassword } from '$lib/utils/crypto';
 
 export type User = {
 	id: string;
@@ -75,12 +75,6 @@ export class UserRepo {
 
 	async verify(inputEmail: string, inputPassword: string): Promise<User | null> {
 		try {
-			throw {
-				"error": "example error",
-				"nested data": {
-					"foo": "bar"
-				}
-			};
 			const user = await this.db.select().from(users).where(eq(users.email, inputEmail));
 
 			if (user.length === 0) {
