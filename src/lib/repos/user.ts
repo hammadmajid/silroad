@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { getDb } from '$lib/db';
+import { getDb, getLogger } from '$lib/db';
 import { users } from '$lib/db/schema';
-import { comparePassword, hashPassword } from '$lib/utils/crypto';
+import { comparePassword } from '$lib/utils/crypto';
 
 export type User = {
 	id: string;
@@ -12,9 +12,11 @@ export type User = {
 
 export class UserRepo {
 	private db;
+	private logger;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
+		this.logger = getLogger(platform);
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
@@ -32,7 +34,11 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			console.error(error);
+			this.logger.writeDataPoint({
+				blobs: ["error", "UserRepo", "getByEmail", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
 			return null;
 		}
 	}
@@ -62,7 +68,11 @@ export class UserRepo {
 				image: null
 			};
 		} catch (error) {
-			console.error(error);
+			this.logger.writeDataPoint({
+				blobs: ["error", "UserRepo", "create", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
 			return null;
 		}
 	}
@@ -90,8 +100,11 @@ export class UserRepo {
 				image,
 			};
 		} catch (error) {
-			console.error(error);
-			return null;
+			this.logger.writeDataPoint({
+				blobs: ["error", "UserRepo", "verify", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			}); return null;
 		}
 	}
 

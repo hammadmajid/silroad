@@ -1,4 +1,4 @@
-import { getDb, getKV } from '$lib/db';
+import { getDb, getKV, getLogger } from '$lib/db';
 import { generateSessionToken } from '$lib/utils/crypto';
 import { and, eq, gt } from 'drizzle-orm';
 import { sessions, users } from '$lib/db/schema';
@@ -17,10 +17,12 @@ export type SerializableSession = {
 export class SessionRepo {
 	private db;
 	private kv;
+	private logger;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
 		this.kv = getKV(platform);
+		this.logger = getLogger(platform);
 	}
 
 	async getByToken(token: string): Promise<SerializableSession | null> {
@@ -63,7 +65,11 @@ export class SessionRepo {
 				};
 			}
 		} catch (error) {
-			console.error('SessionRepo.getByToken error', error);
+			this.logger.writeDataPoint({
+				blobs: ["error", "SessionRepo", "getByToken", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
 			return null;
 		}
 	}
@@ -97,8 +103,11 @@ export class SessionRepo {
 				expiresAt: new Date(expires)
 			};
 		} catch (error) {
-			console.error('SessionRepo.create error', error);
-			return null;
+			this.logger.writeDataPoint({
+				blobs: ["error", "SessionRepo", "create", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			}); return null;
 		}
 	}
 

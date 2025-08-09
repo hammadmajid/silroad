@@ -51,5 +51,11 @@
 			"id": "819395fc9c1c4e7c97cef038f7d4d88c",
 			"preview_id": "f022f4074ec9401c9d5d1e38df373360"
 		}
+	],
+	"analytics_engine_datasets": [
+		{
+			"binding": "LOGGER",
+			"dataset": "silroad_logs"
+		}
 	]
 }
