@@ -9,6 +9,8 @@ import { generateSalt, hashPassword } from '$lib/utils/crypto';
 import { isProduction } from '$lib/utils/env';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
+	// Note: We still check locals.user for server-side redirect
+	// The client will handle the user store initialization
 	if (locals.user) {
 		throw redirect(303, '/explore');
 	}
@@ -47,9 +49,7 @@ export const actions = {
 
 		const session = await sessionRepo.create(user);
 		if (!session) {
-			// TODO: handle this properly
-			console.error('/register: failed to create session');
-			throw redirect(302, '/login');
+			return message(form, 'Failed to create session');
 		}
 
 		cookies.set(SESSION_COOKIE_NAME, session.token, {
@@ -66,6 +66,6 @@ export const actions = {
 		// TODO: send the email verification code; then
 		// throw redirect(302, "/register/verify-email")
 
-		throw redirect(302, '/explore');
+		return { form, user };
 	}
 };

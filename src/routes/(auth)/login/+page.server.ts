@@ -8,6 +8,8 @@ import { UserRepo } from '$lib/repos/user';
 import { isProduction } from '$lib/utils/env';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
+	// Note: We still check locals.user for server-side redirect
+	// The client will handle the user store initialization
 	if (locals.user) {
 		throw redirect(303, '/explore');
 	}
@@ -37,7 +39,6 @@ export const actions = {
 
 		const session = await sessionRepo.create(user);
 		if (!session) {
-			console.error('/login: failed to create session');
 			return message(form, 'Failed to create session');
 		}
 
@@ -52,6 +53,6 @@ export const actions = {
 
 		locals.user = user;
 
-		throw redirect(302, '/explore');
+		return { form, user };
 	}
 };
