@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { getDb } from '$lib/db';
+import { getDb, getLogger } from '$lib/db';
 import { users } from '$lib/db/schema';
 import { comparePassword, hashPassword } from '$lib/utils/crypto';
 
@@ -12,9 +12,11 @@ export type User = {
 
 export class UserRepo {
 	private db;
+	private looger;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
+		this.looger = getLogger(platform);
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
@@ -62,13 +64,23 @@ export class UserRepo {
 				image: null
 			};
 		} catch (error) {
-			console.error(error);
+			this.looger.writeDataPoint({
+				blobs: ["error", "UserRepo", "create", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
 			return null;
 		}
 	}
 
 	async verify(inputEmail: string, inputPassword: string): Promise<User | null> {
 		try {
+			throw {
+				"error": "example error",
+				"nested data": {
+					"foo": "bar"
+				}
+			};
 			const user = await this.db.select().from(users).where(eq(users.email, inputEmail));
 
 			if (user.length === 0) {
@@ -90,8 +102,11 @@ export class UserRepo {
 				image,
 			};
 		} catch (error) {
-			console.error(error);
-			return null;
+			this.looger.writeDataPoint({
+				blobs: ["error", "UserRepo", "verify", JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			}); return null;
 		}
 	}
 
