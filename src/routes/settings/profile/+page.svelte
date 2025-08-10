@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { useProtectedRoute } from '$lib/hooks/useProtectedRoute.svelte.js';
 	import Card from '$lib/components/Card.svelte';
-
-	const userStore = useProtectedRoute();
+	import { userStore } from '$lib/stores/user.svelte.js';
 
 	async function handleLogout() {
 		await fetch('/api/logout', {
