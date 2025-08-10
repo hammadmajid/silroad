@@ -36,5 +36,8 @@ export default ts.config(
 				svelteConfig
 			}
 		}
+	},
+	{
+		ignores: ['src/worker-configuration.d.ts']
 	}
 );
