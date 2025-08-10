@@ -5,12 +5,20 @@
 	import { schema } from './schema.js';
 	import SuperDebug from 'sveltekit-superforms';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import { goto } from '$app/navigation';
 	import { userStore } from '$lib/stores/user.svelte.js';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
 
 	let { data } = $props();
+
+	function dismissError() {
+		const url = new URL($page.url);
+		url.searchParams.delete('msg');
+		goto(url.pathname + url.search, { replaceState: true });
+	}
 
 	// Redirect if user is already logged in
 	onMount(() => {
@@ -38,14 +46,17 @@
 </svelte:head>
 
 <div class="space-y-4">
-	{#if $message}
-		<Card
-			variant="form"
-			class="preset-filled-error-700-300 text-center"
-			data-testid="error-message"
-		>
-			<p>{$message}</p>
-		</Card>
+	{#if $message || $page.url.searchParams.get('msg')}
+		<div class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]">
+			<TriangleAlert />
+			<div>
+				<p class="font-bold">Error</p>
+				<p class="text-xs opacity-60">{$message || $page.url.searchParams.get('msg')}</p>
+			</div>
+			<div class="flex gap-1">
+				<button class="btn preset-tonal hover:preset-filled" onclick={dismissError}>Dismiss</button>
+			</div>
+		</div>
 	{/if}
 
 	<div class="mb-6 space-y-2 text-center">
