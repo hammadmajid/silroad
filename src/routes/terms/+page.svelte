@@ -2,7 +2,7 @@
 	<div class="space-y-8">
 		<header class="text-center">
 			<h1 class="mb-4 text-4xl font-bold">Terms of Service</h1>
-			<p class="text-xl text-surface-600-300">
+			<p class="text-surface-600-300 text-xl">
 				Last updated: {new Date().toLocaleDateString()}
 			</p>
 		</header>
@@ -30,7 +30,9 @@
 				<h2 class="mb-4 text-2xl font-semibold">User Accounts and Registration</h2>
 				<ul class="list-disc pl-6">
 					<li>You must provide accurate and complete information when creating an account</li>
-					<li>You are responsible for maintaining the confidentiality of your account credentials</li>
+					<li>
+						You are responsible for maintaining the confidentiality of your account credentials
+					</li>
 					<li>You must be at least 13 years old to use our platform</li>
 					<li>One person may not maintain multiple accounts</li>
 					<li>You are responsible for all activities that occur under your account</li>
@@ -43,7 +45,9 @@
 				<ul class="list-disc pl-6">
 					<li>Provide accurate event information including dates, times, and locations</li>
 					<li>Ensure events comply with local laws and regulations</li>
-					<li>Not create events for illegal activities or those that violate our community guidelines</li>
+					<li>
+						Not create events for illegal activities or those that violate our community guidelines
+					</li>
 					<li>Update event information promptly if changes occur</li>
 					<li>Handle attendee communication and event logistics responsibly</li>
 					<li>Respect intellectual property rights in event content</li>
@@ -89,8 +93,8 @@
 			<section class="card p-6">
 				<h2 class="mb-4 text-2xl font-semibold">Privacy and Data Protection</h2>
 				<p>
-					Your privacy is important to us. Our collection and use of personal information is governed
-					by our Privacy Policy, which is incorporated into these terms by reference.
+					Your privacy is important to us. Our collection and use of personal information is
+					governed by our Privacy Policy, which is incorporated into these terms by reference.
 				</p>
 			</section>
 

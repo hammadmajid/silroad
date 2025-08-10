@@ -1,9 +1,8 @@
 import { getDb } from '$lib/db';
 import { events, organizations } from '$lib/db/schema';
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
 
-export const load: PageServerLoad = async ({ locals, platform }) => {
+export const load: PageServerLoad = async ({ platform }) => {
 	const db = getDb(platform);
 
 	// Return promises instead of awaited results to allow component-level loading states

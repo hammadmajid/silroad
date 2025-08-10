@@ -2,7 +2,7 @@
 	<div class="space-y-8">
 		<header class="text-center">
 			<h1 class="mb-4 text-4xl font-bold">About Silroad</h1>
-			<p class="text-xl text-surface-600-300">
+			<p class="text-surface-600-300 text-xl">
 				Connecting communities through meaningful events and experiences
 			</p>
 		</header>
@@ -82,7 +82,7 @@
 			</p>
 			<div class="flex justify-center gap-4">
 				<a href="/register" class="btn preset-filled">Create Account</a>
-				<a href="/explore" class="btn preset-ghost">Explore Events</a>
+				<a href="/explore" class="preset-ghost btn">Explore Events</a>
 			</div>
 		</section>
 	</div>

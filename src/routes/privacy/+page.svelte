@@ -2,7 +2,7 @@
 	<div class="space-y-8">
 		<header class="text-center">
 			<h1 class="mb-4 text-4xl font-bold">Privacy Policy</h1>
-			<p class="text-xl text-surface-600-300">
+			<p class="text-surface-600-300 text-xl">
 				Last updated: {new Date().toLocaleDateString()}
 			</p>
 		</header>
@@ -11,15 +11,15 @@
 			<section class="card p-6">
 				<h2 class="mb-4 text-2xl font-semibold">Introduction</h2>
 				<p>
-					At Silroad, we respect your privacy and are committed to protecting your personal data. This
-					privacy policy explains how we collect, use, and safeguard your information when you use our
-					event organizer platform.
+					At Silroad, we respect your privacy and are committed to protecting your personal data.
+					This privacy policy explains how we collect, use, and safeguard your information when you
+					use our event organizer platform.
 				</p>
 			</section>
 
 			<section class="card p-6">
 				<h2 class="mb-4 text-2xl font-semibold">Information We Collect</h2>
-				
+
 				<h3 class="mb-3 text-lg font-medium">Personal Information</h3>
 				<ul class="mb-4 list-disc pl-6">
 					<li>Name and email address when you create an account</li>
@@ -64,7 +64,9 @@
 					<li>Event information you choose to make public on our platform</li>
 					<li>Organization details for events you organize</li>
 					<li>When required by law or to protect our rights and safety</li>
-					<li>With service providers who assist in platform operations (under strict confidentiality)</li>
+					<li>
+						With service providers who assist in platform operations (under strict confidentiality)
+					</li>
 				</ul>
 			</section>
 
