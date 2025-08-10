@@ -1,3 +1,12 @@
+<script lang="ts">
+	import { Accordion } from '@skeletonlabs/skeleton-svelte';
+
+	let gettingStartedValue = $state<string[]>([]);
+	let eventsValue = $state<string[]>([]);
+	let accountValue = $state<string[]>([]);
+	let techValue = $state<string[]>([]);
+</script>
+
 <div class="container mx-auto max-w-4xl px-4 py-12">
 	<div class="space-y-8">
 		<header class="text-center">
@@ -11,135 +20,116 @@
 			<section class="card p-6">
 				<h2 class="mb-6 text-2xl font-semibold">Getting Started</h2>
 				
-				<div class="space-y-4">
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I create an account?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+				<Accordion value={gettingStartedValue} onValueChange={(e) => (gettingStartedValue = e.value)}>
+					<Accordion.Item value="create-account">
+						{#snippet control()}How do I create an account?{/snippet}
+						{#snippet panel()}
 							Click the "Login" button in the top navigation, then select "Create Account" on the login page. You'll need to provide your name, email address, and create a secure password.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I reset my password?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="reset-password">
+						{#snippet control()}How do I reset my password?{/snippet}
+						{#snippet panel()}
 							On the login page, click "Forgot Password" and enter your email address. We'll send you instructions to reset your password securely.
-						</div>
-					</details>
-				</div>
+						{/snippet}
+					</Accordion.Item>
+				</Accordion>
 			</section>
 
 			<section class="card p-6">
 				<h2 class="mb-6 text-2xl font-semibold">Events & Organizations</h2>
 				
-				<div class="space-y-4">
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I create an event?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+				<Accordion value={eventsValue} onValueChange={(e) => (eventsValue = e.value)}>
+					<Accordion.Item value="create-event">
+						{#snippet control()}How do I create an event?{/snippet}
+						{#snippet panel()}
 							After logging in, navigate to your organization profile and look for the "Create Event" button. Fill out the event details including title, description, date, time, and location.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I find events to attend?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="find-events">
+						{#snippet control()}How do I find events to attend?{/snippet}
+						{#snippet panel()}
 							Visit the "Explore" page to browse all available events. You can filter by date, location, category, or search for specific keywords to find events that interest you.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I register an organization?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="register-org">
+						{#snippet control()}How do I register an organization?{/snippet}
+						{#snippet panel()}
 							Organizations can be registered through your profile settings. Provide your organization's name, description, and contact information to get started with event creation.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">Can I edit or cancel an event after creating it?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="edit-event">
+						{#snippet control()}Can I edit or cancel an event after creating it?{/snippet}
+						{#snippet panel()}
 							Yes, you can edit event details or cancel events from your organization's dashboard. Be sure to notify attendees of any changes through the platform's communication tools.
-						</div>
-					</details>
-				</div>
+						{/snippet}
+					</Accordion.Item>
+				</Accordion>
 			</section>
 
 			<section class="card p-6">
 				<h2 class="mb-6 text-2xl font-semibold">Account & Privacy</h2>
 				
-				<div class="space-y-4">
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I update my profile information?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+				<Accordion value={accountValue} onValueChange={(e) => (accountValue = e.value)}>
+					<Accordion.Item value="update-profile">
+						{#snippet control()}How do I update my profile information?{/snippet}
+						{#snippet panel()}
 							Click on your profile icon in the top navigation and select "Profile Settings". You can update your name, email, profile picture, and other personal information from there.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">Is my personal information secure?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="security">
+						{#snippet control()}Is my personal information secure?{/snippet}
+						{#snippet panel()}
 							Yes, we take privacy and security seriously. All personal data is encrypted and stored securely. See our Privacy Policy for detailed information about how we protect your data.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">How do I delete my account?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="delete-account">
+						{#snippet control()}How do I delete my account?{/snippet}
+						{#snippet panel()}
 							Account deletion can be requested through your profile settings. Please note that this action is permanent and will remove all your data from our platform.
-						</div>
-					</details>
-				</div>
+						{/snippet}
+					</Accordion.Item>
+				</Accordion>
 			</section>
 
 			<section class="card p-6">
 				<h2 class="mb-6 text-2xl font-semibold">Technical Support</h2>
 				
-				<div class="space-y-4">
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">What browsers are supported?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+				<Accordion value={techValue} onValueChange={(e) => (techValue = e.value)}>
+					<Accordion.Item value="browsers">
+						{#snippet control()}What browsers are supported?{/snippet}
+						{#snippet panel()}
 							Silroad works best on modern browsers including Chrome, Firefox, Safari, and Edge. We recommend keeping your browser updated for the best experience.
-						</div>
-					</details>
-
-					<details class="group">
-						<summary class="flex cursor-pointer items-center justify-between rounded p-2 hover:bg-surface-100-900">
-							<span class="font-medium">I'm experiencing technical issues. What should I do?</span>
-							<span class="transition-transform group-open:rotate-180">▼</span>
-						</summary>
-						<div class="mt-2 p-2 text-surface-600-300">
+						{/snippet}
+					</Accordion.Item>
+					
+					<hr class="hr" />
+					
+					<Accordion.Item value="tech-issues">
+						{#snippet control()}I'm experiencing technical issues. What should I do?{/snippet}
+						{#snippet panel()}
 							Try refreshing the page or clearing your browser cache first. If issues persist, please check our status page or report the issue through our support channels.
-						</div>
-					</details>
-				</div>
+						{/snippet}
+					</Accordion.Item>
+				</Accordion>
 			</section>
 		</div>
 
