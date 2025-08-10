@@ -66,6 +66,6 @@ export const actions = {
 		// TODO: send the email verification code; then
 		// throw redirect(302, "/register/verify-email")
 
-		return { form, user };
+		throw redirect(303, '/explore');
 	}
 };

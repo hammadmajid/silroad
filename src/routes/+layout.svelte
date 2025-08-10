@@ -4,22 +4,23 @@
 	import '../app.css';
 	import { AppBar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
-	import { onMount } from 'svelte';
 
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
 
 	let { data, children }: LayoutProps = $props();
 
-	// Initialize user store from server data if user is logged in and store is empty
-	onMount(() => {
-		if (data && data.id && !userStore.current) {
+	// Update user store when server data changes
+	$effect(() => {
+		if (data && data.id) {
 			userStore.setUser({
 				id: data.id,
 				email: data.email,
 				name: data.name,
 				image: data.image
 			});
+		} else {
+			userStore.clearUser();
 		}
 	});
 

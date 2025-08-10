@@ -1,6 +1,5 @@
 import { userStore } from '$lib/stores/user.svelte.js';
 import { goto } from '$app/navigation';
-import { onMount } from 'svelte';
 
 /**
  * Hook to protect pages that require authentication
@@ -9,11 +8,10 @@ import { onMount } from 'svelte';
 export function useProtectedRoute(redirectTo = '/login') {
     // TODO: redirect back to requested page after successfull login
 
-	onMount(() => {
-		if (!userStore.isLoggedIn) {
-			goto(redirectTo);
-		}
-	});
+	// Check if user is authenticated, redirect if not
+	if (!userStore.isLoggedIn) {
+		goto(redirectTo);
+	}
 
 	return userStore;
 }

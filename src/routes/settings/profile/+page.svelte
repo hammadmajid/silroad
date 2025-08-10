@@ -9,7 +9,9 @@
 			method: 'POST'
 		});
 		userStore.clearUser();
-		goto('/login');
+		goto('/login', {
+			invalidateAll: true
+		});
 	}
 </script>
 

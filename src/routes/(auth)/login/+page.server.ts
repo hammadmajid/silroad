@@ -53,6 +53,6 @@ export const actions = {
 
 		locals.user = user;
 
-		return { form, user };
+		throw redirect(303, '/explore');
 	}
 };
