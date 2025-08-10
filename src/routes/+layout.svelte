@@ -58,7 +58,7 @@
 		{@render children()}
 	</main>
 
-	<footer class="mt-16 bg-surface-100-900">
+	<footer class="bg-surface-100-900">
 		<div class="container mx-auto px-4 py-8">
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 				<div>
