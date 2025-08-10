@@ -8,6 +8,7 @@
 	import { goto } from '$app/navigation';
 	import { userStore } from '$lib/stores/user.svelte.js';
 	import { onMount } from 'svelte';
+	import Card from '$lib/components/Card.svelte';
 
 	let { data } = $props();
 
@@ -38,12 +39,13 @@
 
 <div class="space-y-4">
 	{#if $message}
-		<div
-			class="w-full card preset-filled-error-700-300 p-4 text-center"
+		<Card
+			variant="form"
+			class="preset-filled-error-700-300 text-center"
 			data-testid="error-message"
 		>
 			<p>{$message}</p>
-		</div>
+		</Card>
 	{/if}
 
 	<div class="mb-6 space-y-2 text-center">
@@ -51,61 +53,63 @@
 		<p class="text-surface-600-300">Sign in to your account</p>
 	</div>
 
-	<form class="w-full space-y-4 card preset-filled-surface-100-900 p-6" method="POST" use:enhance>
-		<div class="space-y-2">
-			<Field {form} name="email">
-				<Control>
-					{#snippet children({ props })}
-						<Label class="label-text">Email</Label>
-						<input
-							class="input"
-							{...props}
-							type="email"
-							bind:value={$formData.email}
-							placeholder="john@example.com"
-							data-testid="email-input"
-						/>
-					{/snippet}
-				</Control>
-				<Description class="sr-only"
-					>Provide a valid email address for account verification and communication.</Description
-				>
-				<FieldErrors class="text-error-700-300" />
-			</Field>
-		</div>
-		<div class="space-y-2">
-			<Field {form} name="password">
-				<Control>
-					{#snippet children({ props })}
-						<Label class="label-text">Password</Label>
-						<input
-							class="input"
-							{...props}
-							type="password"
-							bind:value={$formData.password}
-							data-testid="password-input"
-						/>
-					{/snippet}
-				</Control>
-				<Description class="sr-only"
-					>Choose a strong password with at least 8 characters, including letters and numbers.</Description
-				>
-				<FieldErrors class="text-error-700-300" />
-			</Field>
-		</div>
+	<Card variant="form">
+		<form class="w-full space-y-4" method="POST" use:enhance>
+			<div class="space-y-2">
+				<Field {form} name="email">
+					<Control>
+						{#snippet children({ props })}
+							<Label class="label-text">Email</Label>
+							<input
+								class="input"
+								{...props}
+								type="email"
+								bind:value={$formData.email}
+								placeholder="john@example.com"
+								data-testid="email-input"
+							/>
+						{/snippet}
+					</Control>
+					<Description class="sr-only"
+						>Provide a valid email address for account verification and communication.</Description
+					>
+					<FieldErrors class="text-error-700-300" />
+				</Field>
+			</div>
+			<div class="space-y-2">
+				<Field {form} name="password">
+					<Control>
+						{#snippet children({ props })}
+							<Label class="label-text">Password</Label>
+							<input
+								class="input"
+								{...props}
+								type="password"
+								bind:value={$formData.password}
+								data-testid="password-input"
+							/>
+						{/snippet}
+					</Control>
+					<Description class="sr-only"
+						>Choose a strong password with at least 8 characters, including letters and numbers.</Description
+					>
+					<FieldErrors class="text-error-700-300" />
+				</Field>
+			</div>
 
-		<button
-			type="submit"
-			class="btn w-full preset-filled"
-			disabled={$submitting}
-			data-testid="login-submit-btn"
-		>
-			Login
-			{#if $delayed}
-				<LoaderCircle class="animate-spin" />
-			{/if}
-		</button>
-	</form>
+			<button
+				type="submit"
+				class="btn w-full preset-filled"
+				disabled={$submitting}
+				data-testid="login-submit-btn"
+			>
+				Login
+				{#if $delayed}
+					<LoaderCircle class="animate-spin" />
+				{/if}
+			</button>
+		</form>
+	</Card>
 
 	<div class="text-center">
 		<p class="text-surface-600-300 text-sm">

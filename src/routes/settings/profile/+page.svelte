@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { useProtectedRoute } from '$lib/hooks/useProtectedRoute.svelte.js';
+	import Card from '$lib/components/Card.svelte';
 
 	const userStore = useProtectedRoute();
 
@@ -21,7 +22,7 @@
 
 {#if userStore.current}
 	<div class="space-y-6 p-8">
-		<div class="mx-auto max-w-lg card preset-filled-surface-100-900 p-6">
+		<Card variant="form" class="mx-auto max-w-lg">
 			<h1 class="mb-4 h2">Profile</h1>
 
 			<div class="space-y-4">
@@ -35,10 +36,10 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="mx-auto max-w-lg card preset-filled-surface-100-900 p-6">
+		</Card>
+		<Card variant="form" class="mx-auto max-w-lg">
 			<button onclick={handleLogout} class="btn w-full preset-filled-warning-900-100">Logout</button
 			>
-		</div>
+		</Card>
 	</div>
 {/if}
