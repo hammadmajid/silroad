@@ -7,7 +7,7 @@ export const schema = z.object({
 	password: z
 		.string()
 		.regex(
-			/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{8,}$/,
+			/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{8,}$/,
 			'Password must be 8+ chars, with letters, numbers and special.'
 		),
 	agree: z.boolean().refine((val) => val === true, {

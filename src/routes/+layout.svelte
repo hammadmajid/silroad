@@ -27,7 +27,7 @@
 	const homeLink = userStore.isLoggedIn ? '/explore' : '/';
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex h-full flex-col">
 	<AppBar>
 		{#snippet lead()}
 			<a href={homeLink}>

@@ -1,6 +1,7 @@
 ---
 applyTo: '**'
 ---
+
 # Silroad
 
 An event organizer platform that helps organizations create, manage, and promote events while connecting people through shared experiences.

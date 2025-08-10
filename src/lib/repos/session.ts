@@ -66,7 +66,7 @@ export class SessionRepo {
 			}
 		} catch (error) {
 			this.logger.writeDataPoint({
-				blobs: ["error", "SessionRepo", "getByToken", JSON.stringify(error)],
+				blobs: ['error', 'SessionRepo', 'getByToken', JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
 			});
@@ -104,31 +104,39 @@ export class SessionRepo {
 			};
 		} catch (error) {
 			this.logger.writeDataPoint({
-				blobs: ["error", "SessionRepo", "create", JSON.stringify(error)],
+				blobs: ['error', 'SessionRepo', 'create', JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
-			}); return null;
+			});
+			return null;
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async getByUserId(userId: string): Promise<SerializableSession[]> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async update(session: SerializableSession): Promise<SerializableSession> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async delete(sessionToken: string): Promise<void> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async deleteByUserId(userId: string): Promise<number> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async invalidate(sessionToken: string): Promise<void> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async refresh(sessionToken: string): Promise<SerializableSession> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async getExpired(before: Date): Promise<SerializableSession[]> {
 		throw 'not implemented';
 	}

@@ -14,5 +14,5 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	return {
 		events: db.select().from(events).limit(5),
 		orgs: db.select().from(organizations).limit(5)
-	}
+	};
 };

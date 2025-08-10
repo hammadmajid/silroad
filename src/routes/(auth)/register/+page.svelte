@@ -46,7 +46,7 @@
 		</div>
 	{/if}
 
-	<div class="text-center space-y-2 mb-6">
+	<div class="mb-6 space-y-2 text-center">
 		<h1 class="h2">Create Account</h1>
 		<p class="text-surface-600-300">Join Silroad today</p>
 	</div>
@@ -174,7 +174,7 @@
 	</form>
 
 	<div class="text-center">
-		<p class="text-sm text-surface-600-300">
+		<p class="text-surface-600-300 text-sm">
 			Already have an account?
 			<a href="/login" class="anchor">Sign in</a>
 		</p>

@@ -1,6 +1,7 @@
 ---
 applyTo: '**'
 ---
+
 # Development Guidelines
 
 ## Philosophy
@@ -27,11 +28,13 @@ Break complex work into 3-5 stages. Document in GitHub issue using `gh` CLI:
 
 ```markdown
 ## Stage N: [Name]
+
 **Goal**: [Specific deliverable]
 **Success Criteria**: [Testable outcomes]
 **Tests**: [Specific test cases]
 **Status**: [Not Started|In Progress|Complete]
 ```
+
 - Update GitHub issue status as you progress
 - Close issue when all stages are done
 
@@ -143,12 +146,14 @@ When multiple valid approaches exist, choose based on:
 ## Important Reminders
 
 **NEVER**:
+
 - Use `--no-verify` to bypass commit hooks
 - Disable tests instead of fixing them
 - Commit code that doesn't compile
 - Make assumptions - verify with existing code
 
 **ALWAYS**:
+
 - Commit working code incrementally
 - Update plan documentation as you go
 - Learn from existing implementations

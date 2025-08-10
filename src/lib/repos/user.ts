@@ -35,7 +35,7 @@ export class UserRepo {
 			return result[0] ?? null;
 		} catch (error) {
 			this.logger.writeDataPoint({
-				blobs: ["error", "UserRepo", "getByEmail", JSON.stringify(error)],
+				blobs: ['error', 'UserRepo', 'getByEmail', JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
 			});
@@ -69,7 +69,7 @@ export class UserRepo {
 			};
 		} catch (error) {
 			this.logger.writeDataPoint({
-				blobs: ["error", "UserRepo", "create", JSON.stringify(error)],
+				blobs: ['error', 'UserRepo', 'create', JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
 			});
@@ -85,7 +85,7 @@ export class UserRepo {
 				return null;
 			}
 
-			const { email, id, image, name, password, salt } = user[0]
+			const { email, id, image, name, password, salt } = user[0];
 
 			const validPass = await comparePassword(inputPassword, salt, password);
 
@@ -97,23 +97,27 @@ export class UserRepo {
 				id,
 				email,
 				name,
-				image,
+				image
 			};
 		} catch (error) {
 			this.logger.writeDataPoint({
-				blobs: ["error", "UserRepo", "verify", JSON.stringify(error)],
+				blobs: ['error', 'UserRepo', 'verify', JSON.stringify(error)],
 				doubles: [1],
 				indexes: [crypto.randomUUID()]
-			}); return null;
+			});
+			return null;
 		}
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async update(user: User): Promise<User> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async delete(userId: string): Promise<void> {
 		throw 'not implemented';
 	}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async updatePassword(oldPass: string, newPass: string): Promise<boolean> {
 		throw 'not implemented';
 	}

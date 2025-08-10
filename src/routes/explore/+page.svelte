@@ -10,7 +10,7 @@
 <div class="container mx-auto max-w-7xl px-4 py-8">
 	<!-- Hero Section -->
 	<div class="mb-12 text-center">
-		<h1 class="h1 mb-4">Explore</h1>
+		<h1 class="mb-4 h1">Explore</h1>
 		<p class="text-lg opacity-80">Find events and organizations near you</p>
 	</div>
 
@@ -18,12 +18,12 @@
 	<section class="mb-16">
 		<div class="mb-8 flex items-center justify-between">
 			<div>
-				<h2 class="h2 mb-2">Upcoming Events</h2>
+				<h2 class="mb-2 h2">Upcoming Events</h2>
 				<p class="opacity-70">Discover exciting events happening around you</p>
 			</div>
 			<a
 				href="/explore/events"
-				class="btn preset-outlined-primary-500 hover:preset-filled-primary-500 transition-all duration-200"
+				class="btn preset-outlined-primary-500 transition-all duration-200 hover:preset-filled-primary-500"
 			>
 				View all events
 			</a>
@@ -40,7 +40,7 @@
 			</div>
 		{:then events}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{#each events as event}
+				{#each events as event (event.id)}
 					<a
 						href="/event/{event.id}"
 						class="block max-w-md divide-y divide-surface-200-800 overflow-hidden card border-[1px] border-surface-200-800 preset-filled-surface-100-900 card-hover transition-all duration-200 hover:scale-105"
@@ -82,12 +82,12 @@
 	<section class="mb-16">
 		<div class="mb-8 flex items-center justify-between">
 			<div>
-				<h2 class="h2 mb-2">Featured Organizations</h2>
+				<h2 class="mb-2 h2">Featured Organizations</h2>
 				<p class="opacity-70">Connect with organizations making a difference</p>
 			</div>
 			<a
 				href="/explore/orgs"
-				class="btn preset-outlined-primary-500 hover:preset-filled-primary-500 transition-all duration-200"
+				class="btn preset-outlined-primary-500 transition-all duration-200 hover:preset-filled-primary-500"
 			>
 				View all organizations
 			</a>
@@ -104,14 +104,18 @@
 			</div>
 		{:then orgs}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{#each orgs as org}
+				{#each orgs as org (org.id)}
 					<a
 						href="/org/{org.slug}"
 						class="block max-w-md divide-y divide-surface-200-800 overflow-hidden card border-[1px] border-surface-200-800 preset-filled-surface-100-900 card-hover transition-all duration-200 hover:scale-105"
 					>
 						<!-- Header -->
 						<header>
-							<img src={org.avatar} alt={org.description} class="aspect-[21/9] w-full object-cover" />
+							<img
+								src={org.avatar}
+								alt={org.description}
+								class="aspect-[21/9] w-full object-cover"
+							/>
 						</header>
 						<!-- Article -->
 						<article class="space-y-4 p-4">
