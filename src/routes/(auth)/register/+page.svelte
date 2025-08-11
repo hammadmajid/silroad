@@ -185,7 +185,7 @@
 				disabled={$submitting}
 				data-testid="register-submit-btn"
 			>
-				{#if $delayed}
+				{#if $submitting}
 					<LoaderCircle class="animate-spin" size={20} />
 				{:else}
 					<UserPlus size={20} />
