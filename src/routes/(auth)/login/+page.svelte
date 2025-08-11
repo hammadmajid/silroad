@@ -47,7 +47,7 @@
 
 <div class="space-y-4">
 	{#if $message || $page.url.searchParams.get('msg')}
-		<div class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]">
+		<div class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]" data-testid="error-message">
 			<TriangleAlert />
 			<div>
 				<p class="font-bold">Error</p>
