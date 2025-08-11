@@ -84,7 +84,7 @@
 					<ul class="space-y-2">
 						<li><a href="/explore" class="anchor text-sm">Explore Events</a></li>
 						<li>
-							<a href="/explore?filter=organizations" class="anchor text-sm">Find Organizations</a>
+							<a href="/explore/orgs" class="anchor text-sm">Find Organizations</a>
 						</li>
 						<li><a href="/about" class="anchor text-sm">About</a></li>
 						<li><a href="/help" class="anchor text-sm">Help & Support</a></li>
