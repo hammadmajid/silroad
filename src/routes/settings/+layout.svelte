@@ -7,6 +7,7 @@
 	import CreditCard from '@lucide/svelte/icons/credit-card';
 	import Palette from '@lucide/svelte/icons/palette';
 	import Bell from '@lucide/svelte/icons/bell';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 
 	const navigation = [
 		{
@@ -84,7 +85,8 @@
 	<!-- Redirect will happen server-side or client-side -->
 	<div class="flex h-screen items-center justify-center">
 		<div class="text-center">
-			<div class="animate-pulse">Loading...</div>
+			<LoaderCircle class="animate-spin mx-auto mb-2" size={32} />
+			<div>Loading...</div>
 		</div>
 	</div>
 {/if}

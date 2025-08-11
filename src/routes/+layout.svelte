@@ -7,6 +7,7 @@
 
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
+	import LogIn from '@lucide/svelte/icons/log-in';
 
 	let { data, children }: LayoutProps = $props();
 
@@ -47,7 +48,10 @@
 					</li>
 				{:else}
 					<li>
-						<a href="/login" class="btn preset-filled">Login</a>
+						<a href="/login" class="btn preset-filled flex items-center gap-2">
+							<LogIn size={20} />
+							Login
+						</a>
 					</li>
 				{/if}
 			</ul>

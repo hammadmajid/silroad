@@ -6,6 +6,8 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import X from '@lucide/svelte/icons/x';
 	import { goto } from '$app/navigation';
 	import { userStore } from '$lib/stores/user.svelte.js';
 	import { onMount } from 'svelte';
@@ -54,7 +56,10 @@
 				<p class="text-xs opacity-60">{$message || $page.url.searchParams.get('msg')}</p>
 			</div>
 			<div class="flex gap-1">
-				<button class="btn preset-tonal hover:preset-filled" onclick={dismissError}>Dismiss</button>
+				<button class="btn preset-tonal hover:preset-filled flex items-center gap-2" onclick={dismissError}>
+					<X size={16} />
+					Dismiss
+				</button>
 			</div>
 		</div>
 	{/if}
@@ -176,14 +181,16 @@
 
 			<button
 				type="submit"
-				class="btn w-full preset-filled"
+				class="btn w-full preset-filled flex items-center justify-center gap-2"
 				disabled={$submitting}
 				data-testid="register-submit-btn"
 			>
-				Register
 				{#if $delayed}
-					<LoaderCircle class="animate-spin" />
+					<LoaderCircle class="animate-spin" size={20} />
+				{:else}
+					<UserPlus size={20} />
 				{/if}
+				Register
 			</button>
 		</form>
 	</Card>

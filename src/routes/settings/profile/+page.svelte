@@ -3,6 +3,13 @@
 	import Card from '$lib/components/Card.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
 	import Camera from '@lucide/svelte/icons/camera';
+	import Edit from '@lucide/svelte/icons/edit';
+	import Save from '@lucide/svelte/icons/save';
+	import X from '@lucide/svelte/icons/x';
+	import Key from '@lucide/svelte/icons/key';
+	import Download from '@lucide/svelte/icons/download';
+	import LogOut from '@lucide/svelte/icons/log-out';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	let isEditing = $state(false);
 	let editedName = $state('');
@@ -88,7 +95,10 @@
 							<Camera class="h-4 w-4" />
 						</button>
 					</div>
-					<button class="btn preset-outlined btn-sm"> Change photo </button>
+					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+						<Camera size={16} />
+						Change photo
+					</button>
 				</div>
 
 				<!-- Profile Info -->
@@ -139,12 +149,17 @@
 					<!-- Action Buttons -->
 					<div class="flex gap-3 pt-4">
 						{#if isEditing}
-							<button onclick={saveProfile} class="btn preset-filled-primary-500">
+							<button onclick={saveProfile} class="btn preset-filled-primary-500 flex items-center gap-2">
+								<Save size={16} />
 								Save Changes
 							</button>
-							<button onclick={cancelEditing} class="btn preset-outlined"> Cancel </button>
+							<button onclick={cancelEditing} class="btn preset-outlined flex items-center gap-2">
+								<X size={16} />
+								Cancel
+							</button>
 						{:else}
-							<button onclick={startEditing} class="btn preset-filled-primary-500">
+							<button onclick={startEditing} class="btn preset-filled-primary-500 flex items-center gap-2">
+								<Edit size={16} />
 								Edit Profile
 							</button>
 						{/if}
@@ -166,7 +181,10 @@
 							Update your password to keep your account secure
 						</p>
 					</div>
-					<button class="btn preset-outlined btn-sm"> Change </button>
+					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+						<Key size={16} />
+						Change
+					</button>
 				</div>
 
 				<div
@@ -176,7 +194,10 @@
 						<h3 class="font-medium">Download Data</h3>
 						<p class="text-surface-600-300-token text-sm">Download a copy of all your data</p>
 					</div>
-					<button class="btn preset-outlined btn-sm"> Download </button>
+					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+						<Download size={16} />
+						Download
+					</button>
 				</div>
 			</div>
 		</Card>
@@ -194,7 +215,8 @@
 							Sign out of your account on this device
 						</p>
 					</div>
-					<button onclick={handleLogout} class="btn preset-filled-error-500 btn-sm">
+					<button onclick={handleLogout} class="btn preset-filled-error-500 btn-sm flex items-center gap-2">
+						<LogOut size={16} />
 						Sign Out
 					</button>
 				</div>
@@ -208,7 +230,10 @@
 							Permanently delete your account and all data
 						</p>
 					</div>
-					<button class="btn preset-filled-error-500 btn-sm" disabled> Delete Account </button>
+					<button class="btn preset-filled-error-500 btn-sm flex items-center gap-2" disabled>
+						<Trash2 size={16} />
+						Delete Account
+					</button>
 				</div>
 			</div>
 		</Card>

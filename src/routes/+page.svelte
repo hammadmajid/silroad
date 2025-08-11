@@ -1,3 +1,13 @@
+<script lang="ts">
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Users from '@lucide/svelte/icons/users';
+	import Building2 from '@lucide/svelte/icons/building-2';
+	import UserPlus from '@lucide/svelte/icons/user-plus';
+	import Search from '@lucide/svelte/icons/search';
+	import Heart from '@lucide/svelte/icons/heart';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+</script>
+
 <svelte:head>
 	<title>Silroad</title>
 </svelte:head>
@@ -11,98 +21,23 @@
 				while connecting people through shared experiences.
 			</p>
 			<div class="flex flex-col gap-4 sm:flex-row">
-				<a href="/register" class="btn preset-filled" data-testid="get-started-btn">Get Started</a>
-				<a href="/explore" class="btn preset-outlined">Explore Events</a>
+				<a href="/register" class="btn preset-filled flex items-center gap-2" data-testid="get-started-btn">
+					<UserPlus size={20} />
+					Get Started
+				</a>
+				<a href="/explore" class="btn preset-outlined flex items-center gap-2">
+					<Search size={20} />
+					Explore Events
+				</a>
 			</div>
 		</div>
 
 		<div class="flex justify-center">
-			<svg
-				width="300"
-				height="240"
-				viewBox="0 0 300 240"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				class="text-primary-500"
-			>
-				<circle cx="150" cy="120" r="80" fill="currentColor" opacity="0.1" />
-				<circle cx="150" cy="120" r="60" fill="currentColor" opacity="0.2" />
-				<circle cx="150" cy="120" r="40" fill="currentColor" opacity="0.3" />
-
-				<circle cx="90" cy="80" r="12" fill="currentColor" />
-				<circle cx="210" cy="80" r="12" fill="currentColor" />
-				<circle cx="150" cy="60" r="12" fill="currentColor" />
-				<circle cx="120" cy="160" r="12" fill="currentColor" />
-				<circle cx="180" cy="160" r="12" fill="currentColor" />
-				<circle cx="70" cy="140" r="12" fill="currentColor" />
-				<circle cx="230" cy="140" r="12" fill="currentColor" />
-
-				<line
-					x1="150"
-					y1="120"
-					x2="90"
-					y2="80"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="210"
-					y2="80"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="150"
-					y2="60"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="120"
-					y2="160"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="180"
-					y2="160"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="70"
-					y2="140"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-				<line
-					x1="150"
-					y1="120"
-					x2="230"
-					y2="140"
-					stroke="currentColor"
-					stroke-width="2"
-					opacity="0.6"
-				/>
-
-				<circle cx="150" cy="120" r="16" fill="currentColor" />
-			</svg>
+			<div class="flex h-60 w-60 items-center justify-center rounded-full bg-primary-500/10">
+				<div class="flex h-40 w-40 items-center justify-center rounded-full bg-primary-500/20">
+					<Calendar size={64} class="text-primary-500" />
+				</div>
+			</div>
 		</div>
 	</div>
 </section>
@@ -119,12 +54,7 @@
 		<div class="grid gap-8 md:grid-cols-3">
 			<div class="card p-6 text-center">
 				<div class="mb-4 flex justify-center">
-					<svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="text-primary-500">
-						<rect x="8" y="12" width="32" height="24" rx="4" fill="currentColor" opacity="0.2" />
-						<rect x="12" y="16" width="24" height="4" fill="currentColor" />
-						<rect x="12" y="24" width="16" height="2" fill="currentColor" opacity="0.6" />
-						<rect x="12" y="28" width="20" height="2" fill="currentColor" opacity="0.6" />
-					</svg>
+					<Calendar size={48} class="text-primary-500" />
 				</div>
 				<h3 class="mb-2 text-xl font-semibold">Easy Event Creation</h3>
 				<p class="text-surface-600-300">
@@ -135,19 +65,7 @@
 
 			<div class="card p-6 text-center">
 				<div class="mb-4 flex justify-center">
-					<svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="text-primary-500">
-						<circle cx="24" cy="24" r="16" fill="currentColor" opacity="0.2" />
-						<circle cx="18" cy="20" r="3" fill="currentColor" />
-						<circle cx="30" cy="20" r="3" fill="currentColor" />
-						<circle cx="24" cy="32" r="3" fill="currentColor" />
-						<circle cx="12" cy="28" r="3" fill="currentColor" />
-						<circle cx="36" cy="28" r="3" fill="currentColor" />
-						<line x1="24" y1="24" x2="18" y2="20" stroke="currentColor" stroke-width="1.5" />
-						<line x1="24" y1="24" x2="30" y2="20" stroke="currentColor" stroke-width="1.5" />
-						<line x1="24" y1="24" x2="24" y2="32" stroke="currentColor" stroke-width="1.5" />
-						<line x1="24" y1="24" x2="12" y2="28" stroke="currentColor" stroke-width="1.5" />
-						<line x1="24" y1="24" x2="36" y2="28" stroke="currentColor" stroke-width="1.5" />
-					</svg>
+					<Users size={48} class="text-primary-500" />
 				</div>
 				<h3 class="mb-2 text-xl font-semibold">Connect Communities</h3>
 				<p class="text-surface-600-300">
@@ -158,12 +76,7 @@
 
 			<div class="card p-6 text-center">
 				<div class="mb-4 flex justify-center">
-					<svg width="48" height="48" viewBox="0 0 48 48" fill="none" class="text-primary-500">
-						<rect x="6" y="8" width="36" height="32" rx="4" fill="currentColor" opacity="0.2" />
-						<circle cx="16" cy="20" r="4" fill="currentColor" />
-						<circle cx="32" cy="20" r="4" fill="currentColor" />
-						<rect x="12" y="28" width="24" height="8" rx="2" fill="currentColor" opacity="0.6" />
-					</svg>
+					<Building2 size={48} class="text-primary-500" />
 				</div>
 				<h3 class="mb-2 text-xl font-semibold">Organization Management</h3>
 				<p class="text-surface-600-300">
@@ -237,8 +150,14 @@
 			stronger communities.
 		</p>
 		<div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
-			<a href="/register" class="btn preset-filled">Create Your Account</a>
-			<a href="/explore" class="btn preset-outlined">Browse Events</a>
+			<a href="/register" class="btn preset-filled flex items-center gap-2">
+				<UserPlus size={20} />
+				Create Your Account
+			</a>
+			<a href="/explore" class="btn preset-outlined flex items-center gap-2">
+				<Search size={20} />
+				Browse Events
+			</a>
 		</div>
 	</div>
 </section>
