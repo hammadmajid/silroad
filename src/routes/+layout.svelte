@@ -2,7 +2,7 @@
 	import type { LayoutProps } from './$types';
 
 	import '../app.css';
-	import { AppBar } from '@skeletonlabs/skeleton-svelte';
+	import { AppBar, Avatar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
 
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
@@ -31,8 +31,9 @@
 <div class="flex h-full flex-col">
 	<AppBar>
 		{#snippet lead()}
-			<a href={homeLink}>
+			<a href={homeLink} class="flex justify-center items-center gap-2">
 				<CalendarHeart size={24} />
+				<span class="font-bold text-lg">Silroad</span>
 			</a>
 		{/snippet}
 		{#snippet trail()}
@@ -42,8 +43,15 @@
 				</li>
 				{#if userStore.isLoggedIn}
 					<li>
-						<a href="/settings/profile" class="btn-icon preset-filled" title="Profile">
-							<User />
+						<a href="/settings/profile" title="Profile">
+							<Avatar 
+								src={userStore.current?.image} 
+								name={userStore.current?.name || 'User'} 
+								size="w-8"
+								background="preset-filled-primary-500"
+							>
+								<User size={16} />
+							</Avatar>
 						</a>
 					</li>
 				{:else}
