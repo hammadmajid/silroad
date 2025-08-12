@@ -1,6 +1,6 @@
 import { getDb, getKV, getLogger } from '$lib/db';
 import { generateSessionToken } from '$lib/utils/crypto';
-import { and, eq, gt } from 'drizzle-orm';
+import { and, eq, gt, lt } from 'drizzle-orm';
 import { sessions, users } from '$lib/db/schema';
 import type { User } from './user';
 
@@ -112,35 +112,215 @@ export class SessionRepo {
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async getByUserId(userId: string): Promise<SerializableSession[]> {
-		throw 'not implemented';
+		try {
+			const now = new Date(Date.now());
+
+			const userSessions = await this.db
+				.select({
+					sessionToken: sessions.sessionToken,
+					userId: sessions.userId,
+					userEmail: users.email,
+					userName: users.name,
+					userImage: users.image,
+					sessionExpiresAt: sessions.expires
+				})
+				.from(sessions)
+				.innerJoin(users, eq(sessions.userId, users.id))
+				.where(and(eq(sessions.userId, userId), gt(sessions.expires, now)));
+
+			return userSessions.map((session) => ({
+				userId: session.userId,
+				userEmail: session.userEmail,
+				userName: session.userName,
+				userImage: session.userImage,
+				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
+			}));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'getByUserId', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async update(session: SerializableSession): Promise<SerializableSession> {
-		throw 'not implemented';
+	async update(session: SerializableSession): Promise<SerializableSession | null> {
+		try {
+			const sessionToken = await this.db
+				.select({ sessionToken: sessions.sessionToken })
+				.from(sessions)
+				.where(eq(sessions.userId, session.userId))
+				.limit(1);
+
+			if (!sessionToken[0]) {
+				return null;
+			}
+
+			await this.kv.put(sessionToken[0].sessionToken, JSON.stringify(session));
+			return session;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'update', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async delete(sessionToken: string): Promise<void> {
-		throw 'not implemented';
+		try {
+			await this.db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
+			await this.kv.delete(sessionToken);
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'delete', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async deleteByUserId(userId: string): Promise<number> {
-		throw 'not implemented';
+		try {
+			const userSessions = await this.db
+				.select({ sessionToken: sessions.sessionToken })
+				.from(sessions)
+				.where(eq(sessions.userId, userId));
+
+			await this.db.delete(sessions).where(eq(sessions.userId, userId));
+
+			for (const session of userSessions) {
+				await this.kv.delete(session.sessionToken);
+			}
+
+			return userSessions.length;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'deleteByUserId', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return 0;
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async invalidate(sessionToken: string): Promise<void> {
-		throw 'not implemented';
+		try {
+			await this.db
+				.update(sessions)
+				.set({ expires: new Date(Date.now() - 1000) })
+				.where(eq(sessions.sessionToken, sessionToken));
+			await this.kv.delete(sessionToken);
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'invalidate', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async refresh(sessionToken: string): Promise<SerializableSession> {
-		throw 'not implemented';
+	async refresh(sessionToken: string): Promise<SerializableSession | null> {
+		try {
+			const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; // 30 days
+			const newExpiry = new Date(expires);
+
+			const [session] = await this.db
+				.update(sessions)
+				.set({ expires: newExpiry })
+				.where(eq(sessions.sessionToken, sessionToken))
+				.returning();
+
+			if (!session) {
+				return null;
+			}
+
+			const user = await this.db
+				.select({
+					id: users.id,
+					email: users.email,
+					name: users.name,
+					image: users.image
+				})
+				.from(users)
+				.where(eq(users.id, session.userId))
+				.limit(1);
+
+			if (!user[0]) {
+				return null;
+			}
+
+			const refreshedSession: SerializableSession = {
+				userId: user[0].id,
+				userEmail: user[0].email,
+				userName: user[0].name,
+				userImage: user[0].image,
+				sessionExpiresAt: newExpiry.toISOString()
+			};
+
+			await this.kv.put(sessionToken, JSON.stringify(refreshedSession));
+
+			return refreshedSession;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'refresh', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async getExpired(before: Date): Promise<SerializableSession[]> {
-		throw 'not implemented';
+		try {
+			const expiredSessions = await this.db
+				.select({
+					userId: users.id,
+					userEmail: users.email,
+					userName: users.name,
+					userImage: users.image,
+					sessionExpiresAt: sessions.expires
+				})
+				.from(sessions)
+				.innerJoin(users, eq(sessions.userId, users.id))
+				.where(and(lt(sessions.expires, before)));
+
+			return expiredSessions.map((session) => ({
+				userId: session.userId,
+				userEmail: session.userEmail,
+				userName: session.userName,
+				userImage: session.userImage,
+				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
+			}));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'getExpired', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 	async deleteExpired(): Promise<number> {
-		throw 'not implemented';
+		try {
+			const now = new Date(Date.now());
+
+			const expiredSessions = await this.db
+				.select({ sessionToken: sessions.sessionToken })
+				.from(sessions)
+				.where(and(lt(sessions.expires, now)));
+
+			const result = await this.db.delete(sessions).where(and(lt(sessions.expires, now)));
+
+			for (const session of expiredSessions) {
+				await this.kv.delete(session.sessionToken);
+			}
+
+			return expiredSessions.length;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'SessionRepo', 'deleteExpired', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return 0;
+		}
 	}
 }
