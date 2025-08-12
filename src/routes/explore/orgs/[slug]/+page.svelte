@@ -33,12 +33,6 @@
 </svelte:head>
 
 <div class="space-y-8">
-	<nav>
-		<a href="/explore" class="btn preset-outlined-surface-500 hover:preset-filled-surface-500">
-			← Back to Explore
-		</a>
-	</nav>
-
 	<section class="space-y-6">
 		{#if organization.backgroundImage}
 			<img
