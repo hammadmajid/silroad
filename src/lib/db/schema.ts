@@ -47,6 +47,7 @@ export const events = sqliteTable('events', {
 		.$defaultFn(() => crypto.randomUUID())
 		.notNull(),
 	title: text('title').notNull(),
+	slug: text('slug').unique().notNull(),
 	description: text('description'),
 	dateOfEvent: integer('date_of_event', { mode: 'timestamp_ms' }).notNull(),
 	closeRsvpAt: integer('close_rsvp_at', { mode: 'timestamp_ms' }),
