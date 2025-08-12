@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { userStore } from '$lib/stores/user.svelte.js';
+	import { Navigation } from '@skeletonlabs/skeleton-svelte';
 	import User from '@lucide/svelte/icons/user';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Users from '@lucide/svelte/icons/users';
@@ -50,21 +51,21 @@
 </svelte:head>
 
 {#if userStore.current}
-	<div class="bg-surface-50-900-token min-h-screen">
+	<div class="bg-surface-50-900 min-h-screen">
 		<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 			<div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
 				<!-- Sidebar -->
 				<div class="lg:col-span-1">
-					<div class="card p-6">
+					<div class="card preset-filled-surface-100-900 p-6">
 						<h2 class="mb-6 h3">Settings</h2>
-						<nav class="space-y-2">
+						<nav class="space-y-1">
 							{#each navigation as item (item.href)}
 								<a
 									href={item.href}
-									class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors {currentPath ===
+									class="flex items-center gap-3 rounded-container px-3 py-2 text-sm font-medium transition-colors {currentPath ===
 									item.href
-										? 'bg-primary-100-800-token text-primary-900-50-token'
-										: 'text-surface-600-300-token hover:bg-surface-100-800-token hover:text-surface-900-50-token'}"
+										? 'preset-filled-primary-500'
+										: 'text-surface-600-300 hover:preset-tonal-surface'}"
 								>
 									<svelte:component this={item.icon} class="h-4 w-4" />
 									{item.name}

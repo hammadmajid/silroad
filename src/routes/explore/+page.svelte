@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
 	import Card from '$lib/components/Card.svelte';
+	import Loading from '$lib/components/Loading.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	let { data } = $props();
 </script>
 
@@ -31,21 +32,13 @@
 		</div>
 
 		{#await data.events}
-			<div class="flex justify-center py-12">
-				<ProgressRing
-					value={null}
-					size="size-14"
-					meterStroke="stroke-tertiary-600-400"
-					trackStroke="stroke-tertiary-50-950"
-				/>
-			</div>
+			<Loading text="Loading events..." />
 		{:then events}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 				{#each events as event (event.id)}
 					<Card
 						variant="interactive"
 						href="/event/{event.slug}"
-						padding={false}
 						data-testid="event-card"
 					>
 						{#snippet header()}
@@ -72,9 +65,9 @@
 				{/each}
 			</div>
 		{:catch error}
-			<div class="alert preset-filled-error-500">
-				<p>Failed to load events: {error.message}</p>
-			</div>
+			<Alert type="error" title="Failed to load events">
+				{error.message}
+			</Alert>
 		{/await}
 	</section>
 
@@ -94,18 +87,11 @@
 		</div>
 
 		{#await data.orgs}
-			<div class="flex justify-center py-12">
-				<ProgressRing
-					value={null}
-					size="size-14"
-					meterStroke="stroke-tertiary-600-400"
-					trackStroke="stroke-tertiary-50-950"
-				/>
-			</div>
+			<Loading text="Loading organizations..." />
 		{:then orgs}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 				{#each orgs as org (org.id)}
-					<Card variant="interactive" href="/org/{org.slug}" padding={false} data-testid="org-card">
+					<Card variant="interactive" href="/org/{org.slug}" data-testid="org-card">
 						{#snippet header()}
 							<img
 								src={org.avatar}
@@ -130,9 +116,9 @@
 				{/each}
 			</div>
 		{:catch error}
-			<div class="alert preset-filled-error-500">
-				<p>Failed to load organizations: {error.message}</p>
-			</div>
+			<Alert type="error" title="Failed to load organizations">
+				{error.message}
+			</Alert>
 		{/await}
 	</section>
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import Badge from '$lib/components/Badge.svelte';
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 	let { data } = $props();
 
@@ -50,7 +51,7 @@
 		{/if}
 
 		<div class="mb-4">
-			<span class="mb-2 badge preset-filled-primary-500">Event</span>
+			<Badge variant="filled" color="primary" class="mb-2">Event</Badge>
 			<h1 class="h1">{event.title}</h1>
 		</div>
 

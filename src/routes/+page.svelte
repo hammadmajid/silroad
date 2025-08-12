@@ -28,7 +28,7 @@
 					<UserPlus size={20} />
 					Get Started
 				</a>
-				<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
+				<a href="/explore" class="btn flex items-center gap-2 preset-outlined-primary-500">
 					<Search size={20} />
 					Explore Events
 					<ChevronRight size={16} />
@@ -46,7 +46,7 @@
 	</div>
 </section>
 
-<section class="bg-surface-100-800 py-16">
+<section class="bg-surface-100-900 py-16">
 	<div class="container mx-auto px-4">
 		<div class="mb-12 text-center">
 			<h2 class="mb-4 text-3xl font-bold">Why Choose Silroad?</h2>
@@ -56,7 +56,7 @@
 		</div>
 
 		<div class="grid gap-8 md:grid-cols-3">
-			<div class="card p-6 text-center">
+			<div class="card preset-filled-surface-100-900 p-6 text-center">
 				<div class="mb-4 flex justify-center">
 					<Calendar size={48} class="text-primary-500" />
 				</div>
@@ -67,7 +67,7 @@
 				</p>
 			</div>
 
-			<div class="card p-6 text-center">
+			<div class="card preset-filled-surface-100-900 p-6 text-center">
 				<div class="mb-4 flex justify-center">
 					<Heart size={48} class="text-primary-500" />
 				</div>
@@ -78,7 +78,7 @@
 				</p>
 			</div>
 
-			<div class="card p-6 text-center">
+			<div class="card preset-filled-surface-100-900 p-6 text-center">
 				<div class="mb-4 flex justify-center">
 					<Building2 size={48} class="text-primary-500" />
 				</div>
