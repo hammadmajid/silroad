@@ -6,13 +6,14 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, platform }) => {
 	const db = getDb(platform);
-	const { id } = params;
+	const { slug } = params;
 
 	// Get event with organization and attendee count
 	const [event] = await db
 		.select({
 			id: events.id,
 			title: events.title,
+			slug: events.slug,
 			description: events.description,
 			dateOfEvent: events.dateOfEvent,
 			closeRsvpAt: events.closeRsvpAt,
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 		})
 		.from(events)
 		.leftJoin(organizations, eq(events.organizationId, organizations.id))
-		.where(eq(events.id, id));
+		.where(eq(events.slug, slug));
 
 	if (!event) {
 		throw error(404, 'Event not found');
@@ -35,7 +36,7 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 	const attendeeCount = await db
 		.select({ count: attendees.userId })
 		.from(attendees)
-		.where(eq(attendees.eventId, id));
+		.where(eq(attendees.eventId, event.id));
 
 	// Get organizers
 	const eventOrganizersList = await db
@@ -46,7 +47,7 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 		})
 		.from(eventOrganizers)
 		.leftJoin(users, eq(eventOrganizers.userId, users.id))
-		.where(eq(eventOrganizers.eventId, id));
+		.where(eq(eventOrganizers.eventId, event.id));
 
 	return {
 		event,
