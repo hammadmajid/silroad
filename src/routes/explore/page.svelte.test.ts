@@ -8,6 +8,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -20,6 +21,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -32,6 +34,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -44,6 +47,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -56,6 +60,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -69,6 +74,7 @@ describe('/explore/+page.svelte', () => {
 		const mockData = {
 			events: Promise.resolve([]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -89,6 +95,7 @@ describe('/explore/+page.svelte', () => {
 				}
 			]),
 			orgs: Promise.resolve([])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });
@@ -112,6 +119,7 @@ describe('/explore/+page.svelte', () => {
 					avatar: '/test-avatar.jpg'
 				}
 			])
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any;
 
 		render(Page, { data: mockData });

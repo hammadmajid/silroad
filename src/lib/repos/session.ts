@@ -218,7 +218,10 @@ export class SessionRepo {
 			});
 		}
 	}
-	async refresh(sessionToken: string, session: SerializableSession): Promise<SerializableSession | null> {
+	async refresh(
+		sessionToken: string,
+		session: SerializableSession
+	): Promise<SerializableSession | null> {
 		try {
 			const now = Date.now();
 			const sessionExpiry = new Date(session.sessionExpiresAt).getTime();
@@ -301,7 +304,7 @@ export class SessionRepo {
 				.from(sessions)
 				.where(and(lt(sessions.expires, now)));
 
-			const result = await this.db.delete(sessions).where(and(lt(sessions.expires, now)));
+			await this.db.delete(sessions).where(and(lt(sessions.expires, now)));
 
 			for (const session of expiredSessions) {
 				await this.kv.delete(session.sessionToken);

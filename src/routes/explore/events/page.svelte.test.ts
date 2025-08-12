@@ -9,6 +9,7 @@ describe('/explore/events/+page.svelte', () => {
 			{
 				id: '1',
 				title: 'Test Event 1',
+				slug: 'test-event-1',
 				description: 'Test event description',
 				dateOfEvent: new Date(),
 				closeRsvpAt: null,
@@ -19,6 +20,7 @@ describe('/explore/events/+page.svelte', () => {
 			{
 				id: '2',
 				title: 'Test Event 2',
+				slug: 'test-event-2',
 				description: 'Another test event',
 				dateOfEvent: new Date(),
 				closeRsvpAt: null,

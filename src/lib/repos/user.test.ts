@@ -14,7 +14,9 @@ vi.mock('$lib/utils/crypto', () => ({
 
 describe('UserRepo', () => {
 	let userRepo: UserRepo;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockDb: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockLogger: any;
 
 	beforeEach(async () => {
@@ -104,7 +106,12 @@ describe('UserRepo', () => {
 			mockDb.values.mockReturnValue(mockDb);
 			mockDb.returning.mockResolvedValue([mockUser]);
 
-			const result = await userRepo.create('test@example.com', 'Test User', 'hashedpassword', 'salt123');
+			const result = await userRepo.create(
+				'test@example.com',
+				'Test User',
+				'hashedpassword',
+				'salt123'
+			);
 
 			expect(result).toEqual({
 				id: 'user-1',
@@ -119,7 +126,12 @@ describe('UserRepo', () => {
 			mockDb.values.mockReturnValue(mockDb);
 			mockDb.returning.mockRejectedValue(new Error('Database error'));
 
-			const result = await userRepo.create('test@example.com', 'Test User', 'hashedpassword', 'salt123');
+			const result = await userRepo.create(
+				'test@example.com',
+				'Test User',
+				'hashedpassword',
+				'salt123'
+			);
 
 			expect(result).toBeNull();
 			expect(mockLogger.writeDataPoint).toHaveBeenCalledWith({

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { userStore } from '$lib/stores/user.svelte.js';
-	import { Navigation } from '@skeletonlabs/skeleton-svelte';
 	import User from '@lucide/svelte/icons/user';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Users from '@lucide/svelte/icons/users';
