@@ -21,7 +21,7 @@ An event organizer platform that helps organizations create, manage, and promote
 
 - **Build**: `pnpm build`
 - **Lint/Format**: `pnpm lint` (prettier + eslint)
-- **Tests**: `pnpm test` (unit + e2e), `pnpm test:unit`, `pnpm test:e2e`
+- **Tests**: `pnpm test` (unit + e2e), `pnpm test:unit`, `pnpm test:e2e` (Build before running tests)
 - **Single test**: `pnpm test:unit path/to/test.ts` or `npx playwright test path/to/test.ts`
 - **Dev server**: `pnpm dev`
 - **Type check**: `pnpm check`
