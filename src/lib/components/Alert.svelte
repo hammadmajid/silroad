@@ -10,6 +10,7 @@
 		onDismiss?: () => void;
 		classes?: string;
 		icon?: Snippet;
+		[key: string]: any;
 	}
 
 	let {
@@ -19,7 +20,8 @@
 		children,
 		onDismiss,
 		classes = '',
-		icon
+		icon,
+		...restProps
 	}: Props = $props();
 
 	const typeClasses = {
@@ -37,7 +39,7 @@
 	};
 </script>
 
-<div class="w-full card {typeClasses[type]} grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto] {classes}">
+<div class="w-full card {typeClasses[type]} grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto] {classes}" {...restProps}>
 	{#if icon}
 		<div class={iconColors[type]}>
 			{@render icon()}
