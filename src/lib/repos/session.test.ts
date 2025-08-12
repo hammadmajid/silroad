@@ -392,15 +392,17 @@ describe('SessionRepo', () => {
 	});
 
 	describe('refresh', () => {
-		it('should refresh session expiry and update KV', async () => {
+		it('should refresh session expiry and update KV when close to expiring', async () => {
+			const session: SerializableSession = {
+				userId: 'user-1',
+				userEmail: 'test@example.com',
+				userName: 'Test User',
+				userImage: null,
+				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
+			};
+
 			const dbSession = {
 				userId: 'user-1'
-			};
-			const user = {
-				id: 'user-1',
-				email: 'test@example.com',
-				name: 'Test User',
-				image: null
 			};
 
 			mockDb.update.mockReturnValue(mockDb);
@@ -408,13 +410,9 @@ describe('SessionRepo', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.returning.mockResolvedValueOnce([dbSession]);
 
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([user]);
-
 			mockKV.put.mockResolvedValue(undefined);
 
-			const result = await sessionRepo.refresh('token123');
+			const result = await sessionRepo.refresh('token123', session);
 
 			expect(result).toMatchObject({
 				userId: 'user-1',
@@ -426,43 +424,56 @@ describe('SessionRepo', () => {
 			expect(mockKV.put).toHaveBeenCalledWith('token123', expect.any(String));
 		});
 
-		it('should return null when session not found', async () => {
-			mockDb.update.mockReturnValue(mockDb);
-			mockDb.set.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([]);
+		it('should return session unchanged when not close to expiring', async () => {
+			const session: SerializableSession = {
+				userId: 'user-1',
+				userEmail: 'test@example.com',
+				userName: 'Test User',
+				userImage: null,
+				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString() // 7 days
+			};
 
-			const result = await sessionRepo.refresh('token123');
+			const result = await sessionRepo.refresh('token123', session);
 
-			expect(result).toBeNull();
+			expect(result).toEqual(session);
+			expect(mockDb.update).not.toHaveBeenCalled();
+			expect(mockKV.put).not.toHaveBeenCalled();
 		});
 
-		it('should return null when user not found', async () => {
-			const dbSession = {
-				userId: 'user-1'
+		it('should return null when session not found in database', async () => {
+			const session: SerializableSession = {
+				userId: 'user-1',
+				userEmail: 'test@example.com',
+				userName: 'Test User',
+				userImage: null,
+				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
 			};
 
 			mockDb.update.mockReturnValue(mockDb);
 			mockDb.set.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValueOnce([dbSession]);
+			mockDb.returning.mockResolvedValue([]);
 
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await sessionRepo.refresh('token123');
+			const result = await sessionRepo.refresh('token123', session);
 
 			expect(result).toBeNull();
 		});
 
 		it('should return null and log error on database error', async () => {
+			const session: SerializableSession = {
+				userId: 'user-1',
+				userEmail: 'test@example.com',
+				userName: 'Test User',
+				userImage: null,
+				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
+			};
+
 			mockDb.update.mockReturnValue(mockDb);
 			mockDb.set.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.returning.mockRejectedValue(new Error('Database error'));
 
-			const result = await sessionRepo.refresh('token123');
+			const result = await sessionRepo.refresh('token123', session);
 
 			expect(result).toBeNull();
 			expect(mockLogger.writeDataPoint).toHaveBeenCalledWith({

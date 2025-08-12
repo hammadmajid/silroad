@@ -218,41 +218,35 @@ export class SessionRepo {
 			});
 		}
 	}
-	async refresh(sessionToken: string): Promise<SerializableSession | null> {
+	async refresh(sessionToken: string, session: SerializableSession): Promise<SerializableSession | null> {
 		try {
-			const expires = Date.now() + 1000 * 60 * 60 * 24 * 30; // 30 days
+			const now = Date.now();
+			const sessionExpiry = new Date(session.sessionExpiresAt).getTime();
+			const hoursUntilExpiry = (sessionExpiry - now) / (1000 * 60 * 60);
+
+			// Only refresh if session expires within 48 hours
+			if (hoursUntilExpiry > 48) {
+				return session;
+			}
+
+			const expires = now + 1000 * 60 * 60 * 24 * 30; // 30 days
 			const newExpiry = new Date(expires);
 
-			const [session] = await this.db
+			const [updatedSession] = await this.db
 				.update(sessions)
 				.set({ expires: newExpiry })
 				.where(eq(sessions.sessionToken, sessionToken))
 				.returning();
 
-			if (!session) {
-				return null;
-			}
-
-			const user = await this.db
-				.select({
-					id: users.id,
-					email: users.email,
-					name: users.name,
-					image: users.image
-				})
-				.from(users)
-				.where(eq(users.id, session.userId))
-				.limit(1);
-
-			if (!user[0]) {
+			if (!updatedSession) {
 				return null;
 			}
 
 			const refreshedSession: SerializableSession = {
-				userId: user[0].id,
-				userEmail: user[0].email,
-				userName: user[0].name,
-				userImage: user[0].image,
+				userId: session.userId,
+				userEmail: session.userEmail,
+				userName: session.userName,
+				userImage: session.userImage,
 				sessionExpiresAt: newExpiry.toISOString()
 			};
 
