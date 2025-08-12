@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { getDb, getLogger } from '$lib/db';
 import { users } from '$lib/db/schema';
-import { comparePassword } from '$lib/utils/crypto';
+import { comparePassword, hashPassword } from '$lib/utils/crypto';
 
 export type User = {
 	id: string;
@@ -109,16 +109,70 @@ export class UserRepo {
 		}
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async update(user: User): Promise<User> {
-		throw 'not implemented';
+	async update(user: User): Promise<User | null> {
+		try {
+			const [updatedUser] = await this.db
+				.update(users)
+				.set({
+					name: user.name,
+					email: user.email
+				})
+				.where(eq(users.id, user.id))
+				.returning({
+					id: users.id,
+					email: users.email,
+					name: users.name,
+					image: users.image
+				});
+
+			return updatedUser ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'UserRepo', 'update', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async delete(userId: string): Promise<void> {
-		throw 'not implemented';
+		try {
+			await this.db.delete(users).where(eq(users.id, userId));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'UserRepo', 'delete', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+		}
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async updatePassword(oldPass: string, newPass: string): Promise<boolean> {
-		throw 'not implemented';
+	async updatePassword(userId: string, oldPass: string, newPass: string): Promise<boolean> {
+		try {
+			const user = await this.db.select().from(users).where(eq(users.id, userId)).limit(1);
+
+			if (user.length === 0) {
+				return false;
+			}
+
+			const { password, salt } = user[0];
+			const validOldPass = await comparePassword(oldPass, salt, password);
+
+			if (!validOldPass) {
+				return false;
+			}
+
+			const newHashedPassword = await hashPassword(newPass, salt);
+
+			await this.db.update(users).set({ password: newHashedPassword }).where(eq(users.id, userId));
+
+			return true;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'UserRepo', 'updatePassword', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 }
