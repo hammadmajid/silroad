@@ -4,6 +4,9 @@
 	import '../app.css';
 	import { AppBar, Avatar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
+	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import { generateBreadcrumbs } from '$lib/utils/breadcrumbs.js';
+	import { page } from '$app/stores';
 
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
@@ -26,6 +29,10 @@
 	});
 
 	const homeLink = userStore.isLoggedIn ? '/explore' : '/';
+
+	// Generate breadcrumbs based on current page
+	const breadcrumbs = $derived(generateBreadcrumbs($page, data));
+	const showBreadcrumbs = $derived($page.url.pathname !== '/');
 </script>
 
 <div class="flex h-full flex-col">
@@ -67,6 +74,9 @@
 	</AppBar>
 
 	<main class="container mx-auto px-4 py-8">
+		{#if showBreadcrumbs}
+			<Breadcrumb items={breadcrumbs} />
+		{/if}
 		{@render children()}
 	</main>
 
