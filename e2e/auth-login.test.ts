@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { faker } from '@faker-js/faker';
+import type { Page } from '@playwright/test';
 
 test.describe('User Login Flow', () => {
 	// Helper function to create a test user for login tests
-	async function createTestUser(page) {
+	async function createTestUser(page: Page) {
 		const testUser = {
 			firstName: faker.person.firstName(),
 			lastName: faker.person.lastName(),
