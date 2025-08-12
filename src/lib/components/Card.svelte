@@ -48,7 +48,7 @@
 	};
 
 	const overrides = variantOverrides[variant];
-	
+
 	const finalClasses = [
 		base,
 		overrides.background || background,
@@ -58,7 +58,9 @@
 		overrides.shadow || shadow,
 		overrides.hover || hover,
 		classes
-	].filter(Boolean).join(' ');
+	]
+		.filter(Boolean)
+		.join(' ');
 </script>
 
 {#if href}

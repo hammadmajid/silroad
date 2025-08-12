@@ -21,7 +21,7 @@
 					while connecting people through shared experiences.
 				</p>
 			</header>
-			
+
 			<div class="flex flex-col gap-4 sm:flex-row">
 				<a
 					href="/register"
@@ -49,8 +49,8 @@
 	</div>
 </section>
 
-<section class="bg-surface-100-900 space-y-8">
-	<header class="text-center space-y-4">
+<section class="space-y-8 bg-surface-100-900">
+	<header class="space-y-4 text-center">
 		<h2 class="text-3xl font-bold">Why Choose Silroad?</h2>
 		<p class="text-surface-600-300 text-lg">
 			Everything you need to create and manage successful events
@@ -58,7 +58,7 @@
 	</header>
 
 	<div class="grid gap-8 md:grid-cols-3">
-		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+		<div class="space-y-4 card preset-filled-surface-100-900 p-6 text-center">
 			<div class="flex justify-center">
 				<Calendar size={48} class="text-primary-500" />
 			</div>
@@ -71,7 +71,7 @@
 			</div>
 		</div>
 
-		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+		<div class="space-y-4 card preset-filled-surface-100-900 p-6 text-center">
 			<div class="flex justify-center">
 				<Heart size={48} class="text-primary-500" />
 			</div>
@@ -84,7 +84,7 @@
 			</div>
 		</div>
 
-		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+		<div class="space-y-4 card preset-filled-surface-100-900 p-6 text-center">
 			<div class="flex justify-center">
 				<Building2 size={48} class="text-primary-500" />
 			</div>
@@ -100,13 +100,13 @@
 </section>
 
 <section class="space-y-8">
-	<header class="text-center space-y-4">
+	<header class="space-y-4 text-center">
 		<h2 class="text-3xl font-bold">How It Works</h2>
 		<p class="text-surface-600-300 text-lg">Get started in just a few simple steps</p>
 	</header>
 
 	<div class="grid gap-8 md:grid-cols-3">
-		<div class="text-center space-y-4">
+		<div class="space-y-4 text-center">
 			<div class="flex justify-center">
 				<div
 					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
@@ -122,7 +122,7 @@
 			</div>
 		</div>
 
-		<div class="text-center space-y-4">
+		<div class="space-y-4 text-center">
 			<div class="flex justify-center">
 				<div
 					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
@@ -138,7 +138,7 @@
 			</div>
 		</div>
 
-		<div class="text-center space-y-4">
+		<div class="space-y-4 text-center">
 			<div class="flex justify-center">
 				<div
 					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
@@ -157,15 +157,15 @@
 	</div>
 </section>
 
-<section class="bg-primary-500 text-black space-y-6">
-	<header class="text-center space-y-4">
+<section class="space-y-6 bg-primary-500 text-black">
+	<header class="space-y-4 text-center">
 		<h2 class="text-3xl font-bold">Ready to Start Connecting?</h2>
 		<p class="text-lg opacity-90">
 			Join thousands of organizations already using Silroad to create amazing events and build
 			stronger communities.
 		</p>
 	</header>
-	
+
 	<div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
 		<a href="/register" class="btn flex items-center gap-2 preset-filled">
 			<UserPlus size={20} />

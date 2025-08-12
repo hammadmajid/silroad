@@ -1,23 +1,18 @@
 <script lang="ts">
 	import { ProgressRing } from '@skeletonlabs/skeleton-svelte';
-	
+
 	interface Props {
 		text?: string;
 		size?: string;
 		centered?: boolean;
 		classes?: string;
 	}
-	
-	let {
-		text = 'Loading...',
-		size = 'size-14',
-		centered = true,
-		classes = ''
-	}: Props = $props();
+
+	let { text = 'Loading...', size = 'size-14', centered = true, classes = '' }: Props = $props();
 </script>
 
-<div class="flex {centered ? 'justify-center items-center' : ''} py-12 {classes}">
-	<div class="text-center space-y-4">
+<div class="flex {centered ? 'items-center justify-center' : ''} py-12 {classes}">
+	<div class="space-y-4 text-center">
 		<ProgressRing
 			value={null}
 			{size}

@@ -39,13 +39,18 @@
 	};
 </script>
 
-<div class="w-full card {typeClasses[type]} grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto] {classes}" {...restProps}>
+<div
+	class="w-full card {typeClasses[
+		type
+	]} grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto] {classes}"
+	{...restProps}
+>
 	{#if icon}
 		<div class={iconColors[type]}>
 			{@render icon()}
 		</div>
 	{/if}
-	
+
 	<div>
 		{#if title}
 			<p class="font-bold">{title}</p>
@@ -54,14 +59,10 @@
 			{@render children()}
 		</div>
 	</div>
-	
+
 	{#if dismissible && onDismiss}
 		<div class="flex gap-1">
-			<button
-				class="btn preset-tonal hover:preset-filled"
-				onclick={onDismiss}
-				type="button"
-			>
+			<button class="btn preset-tonal hover:preset-filled" onclick={onDismiss} type="button">
 				<X size={16} />
 				Dismiss
 			</button>

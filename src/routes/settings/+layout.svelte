@@ -55,7 +55,7 @@
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
 			<!-- Sidebar -->
 			<div class="lg:col-span-1">
-				<section class="card preset-filled-surface-100-900 p-6 space-y-6">
+				<section class="space-y-6 card preset-filled-surface-100-900 p-6">
 					<header>
 						<h2 class="h3">Settings</h2>
 					</header>
@@ -84,7 +84,7 @@
 	</div>
 {:else}
 	<div class="flex h-screen items-center justify-center">
-		<div class="text-center space-y-4">
+		<div class="space-y-4 text-center">
 			<LoaderCircle class="mx-auto animate-spin" size={32} />
 			<div>Loading...</div>
 		</div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { userStore } from '$lib/stores/user.svelte.js';
-	
+
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import Search from '@lucide/svelte/icons/search';
 	import Building from '@lucide/svelte/icons/building';
@@ -27,7 +27,7 @@
 	];
 
 	$: currentPath = $page.url.pathname;
-	$: filteredItems = navItems.filter(item => !item.requiresAuth || userStore.isLoggedIn);
+	$: filteredItems = navItems.filter((item) => !item.requiresAuth || userStore.isLoggedIn);
 
 	function isActive(href: string): boolean {
 		if (href === '/explore') {
@@ -37,7 +37,7 @@
 	}
 </script>
 
-<nav class="w-64 bg-surface-50-950 h-full p-4">
+<nav class="h-full w-64 bg-surface-50-950 p-4">
 	<div class="space-y-6">
 		<!-- Logo/Brand -->
 		<div class="flex items-center gap-2 px-2">
@@ -49,10 +49,12 @@
 		<ul class="space-y-1">
 			{#each filteredItems as item}
 				<li>
-					<a 
-						href={item.href} 
-						class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 {isActive(item.href) 
-							? 'bg-primary-500 text-white' 
+					<a
+						href={item.href}
+						class="flex items-center gap-3 rounded-lg px-3 py-2 transition-colors duration-200 {isActive(
+							item.href
+						)
+							? 'bg-primary-500 text-white'
 							: 'text-surface-700-200 hover:bg-surface-200-800'}"
 					>
 						<svelte:component this={item.icon} size={18} />
@@ -66,13 +68,11 @@
 		{#if userStore.isLoggedIn}
 			<div class="border-t border-surface-300-700 pt-4">
 				<div class="px-3 py-2">
-					<p class="text-xs text-surface-500-400 uppercase font-semibold tracking-wide">
-						Account
-					</p>
-					<p class="text-sm font-medium text-surface-700-200 mt-1">
+					<p class="text-surface-500-400 text-xs font-semibold tracking-wide uppercase">Account</p>
+					<p class="text-surface-700-200 mt-1 text-sm font-medium">
 						{userStore.current?.name || 'User'}
 					</p>
-					<p class="text-xs text-surface-500-400">
+					<p class="text-surface-500-400 text-xs">
 						{userStore.current?.email || ''}
 					</p>
 				</div>

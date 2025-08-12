@@ -5,7 +5,6 @@
 	import { AppBar, Avatar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
 
-
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
 	import LogIn from '@lucide/svelte/icons/log-in';
@@ -71,7 +70,7 @@
 		{@render children()}
 	</main>
 
-	<footer class="bg-surface-100-900 border-t border-surface-300-700">
+	<footer class="border-t border-surface-300-700 bg-surface-100-900">
 		<div class="container mx-auto px-4 py-8">
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 				<div class="space-y-4">

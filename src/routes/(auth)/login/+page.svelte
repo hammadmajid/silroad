@@ -53,10 +53,10 @@
 
 <section class="space-y-8">
 	{#if $message || $page.url.searchParams.get('msg')}
-		<Alert 
-			type="error" 
-			title="Error" 
-			dismissible={true} 
+		<Alert
+			type="error"
+			title="Error"
+			dismissible={true}
 			onDismiss={dismissError}
 			data-testid="error-message"
 		>
@@ -67,7 +67,7 @@
 		</Alert>
 	{/if}
 
-	<header class="text-center space-y-2">
+	<header class="space-y-2 text-center">
 		<h1 class="h2">Welcome Back</h1>
 		<p class="text-surface-600-300">Sign in to your account</p>
 	</header>
@@ -95,7 +95,7 @@
 				>
 				<FieldErrors class="text-error-700-300" />
 			</Field>
-			
+
 			<Field {form} name="password">
 				<Control>
 					{#snippet children({ props })}

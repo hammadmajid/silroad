@@ -56,7 +56,7 @@
 			<TriangleAlert />
 			<div class="space-y-1">
 				<p class="font-bold">Error</p>
-				<p class="text-xs text-surface-600-300">{$message || $page.url.searchParams.get('msg')}</p>
+				<p class="text-surface-600-300 text-xs">{$message || $page.url.searchParams.get('msg')}</p>
 			</div>
 			<div class="flex gap-1">
 				<button
@@ -70,7 +70,7 @@
 		</div>
 	{/if}
 
-	<header class="text-center space-y-2">
+	<header class="space-y-2 text-center">
 		<h1 class="h2">Create Account</h1>
 		<p class="text-surface-600-300">Join Silroad today</p>
 	</header>

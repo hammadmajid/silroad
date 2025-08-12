@@ -72,7 +72,7 @@
 				<h1 class="h2">Profile</h1>
 			</header>
 
-			<Card class="p-6 space-y-6">
+			<Card class="space-y-6 p-6">
 				<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
 					<!-- Avatar Section -->
 					<div class="flex flex-col items-center gap-4">
@@ -176,11 +176,9 @@
 			<header>
 				<h2 class="h3">Account Actions</h2>
 			</header>
-			
-			<Card class="p-6 space-y-4">
-				<div
-					class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4"
-				>
+
+			<Card class="space-y-4 p-6">
+				<div class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4">
 					<div class="space-y-1">
 						<h3 class="font-medium">Change Password</h3>
 						<p class="text-surface-600-300 text-sm">
@@ -193,9 +191,7 @@
 					</button>
 				</div>
 
-				<div
-					class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4"
-				>
+				<div class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4">
 					<div class="space-y-1">
 						<h3 class="font-medium">Download Data</h3>
 						<p class="text-surface-600-300 text-sm">Download a copy of all your data</p>
@@ -212,8 +208,8 @@
 			<header>
 				<h2 class="h3 text-error-500">Danger Zone</h2>
 			</header>
-			
-			<Card variant="form" class="border-error-500 p-6 space-y-4">
+
+			<Card variant="form" class="space-y-4 border-error-500 p-6">
 				<div
 					class="flex items-center justify-between rounded-lg border border-error-300 bg-error-50 p-4 dark:border-error-600 dark:bg-error-900/20"
 				>

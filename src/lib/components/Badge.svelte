@@ -33,12 +33,9 @@
 		lg: 'text-base px-3 py-1.5'
 	};
 
-	const finalClasses = [
-		base,
-		variantClasses[variant],
-		sizeClasses[size],
-		classes
-	].filter(Boolean).join(' ');
+	const finalClasses = [base, variantClasses[variant], sizeClasses[size], classes]
+		.filter(Boolean)
+		.join(' ');
 </script>
 
 <span class={finalClasses}>
