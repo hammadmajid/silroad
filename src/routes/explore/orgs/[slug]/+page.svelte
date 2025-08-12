@@ -55,7 +55,7 @@
 					<h1 class="h1">{organization.name}</h1>
 				</header>
 
-				<div class="flex flex-wrap gap-4 text-sm text-surface-600-300">
+				<div class="text-surface-600-300 flex flex-wrap gap-4 text-sm">
 					<div class="flex items-center gap-2">
 						<span>👥</span>
 						<span>{memberCount} members</span>
@@ -67,7 +67,7 @@
 				</div>
 
 				{#if organization.description}
-					<p class="text-lg text-surface-600-300">{organization.description}</p>
+					<p class="text-surface-600-300 text-lg">{organization.description}</p>
 				{/if}
 			</div>
 
@@ -89,7 +89,7 @@
 
 	<div class="grid gap-8 lg:grid-cols-3">
 		<!-- Main Content -->
-		<section class="lg:col-span-2 space-y-6">
+		<section class="space-y-6 lg:col-span-2">
 			<!-- Upcoming Events -->
 			{#if upcomingEvents.length > 0}
 				<Card class="space-y-4">
@@ -99,14 +99,14 @@
 					<div class="space-y-4">
 						{#each upcomingEvents as event (event.id)}
 							<a
-								href="/event/{event.slug}"
+								href="/explore/events/{event.slug}"
 								class="block rounded border border-surface-200-800 p-4 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
 									<div class="flex-1 space-y-2">
 										<h3 class="font-semibold">{event.title}</h3>
 										{#if event.description}
-											<p class="line-clamp-2 text-sm text-surface-600-300">{event.description}</p>
+											<p class="text-surface-600-300 line-clamp-2 text-sm">{event.description}</p>
 										{/if}
 										<p class="text-sm text-primary-500">
 											{formatDate(new Date(event.dateOfEvent).getTime())}
@@ -131,16 +131,18 @@
 					<div class="space-y-4">
 						{#each pastEvents.slice(0, 5) as event (event.id)}
 							<a
-								href="/event/{event.slug}"
+								href="/explore/events/{event.slug}"
 								class="block rounded border border-surface-200-800 p-4 opacity-60 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
 									<div class="flex-1 space-y-2">
 										<h3 class="font-semibold">{event.title}</h3>
 										{#if event.description}
-											<p class="line-clamp-2 text-sm text-surface-600-300">{event.description}</p>
+											<p class="text-surface-600-300 line-clamp-2 text-sm">{event.description}</p>
 										{/if}
-										<p class="text-sm text-surface-600-300">{formatDate(new Date(event.dateOfEvent).getTime())}</p>
+										<p class="text-surface-600-300 text-sm">
+											{formatDate(new Date(event.dateOfEvent).getTime())}
+										</p>
 									</div>
 									{#if event.image}
 										<img src={event.image} alt={event.title} class="size-16 rounded object-cover" />
@@ -149,7 +151,7 @@
 							</a>
 						{/each}
 						{#if pastEvents.length > 5}
-							<p class="text-center text-sm text-surface-600-300">
+							<p class="text-surface-600-300 text-center text-sm">
 								and {pastEvents.length - 5} more past events...
 							</p>
 						{/if}
@@ -208,7 +210,7 @@
 							</div>
 						{/each}
 						{#if memberCount > members.length}
-							<p class="text-sm text-surface-600-300">
+							<p class="text-surface-600-300 text-sm">
 								and {memberCount - members.length} more members...
 							</p>
 						{/if}
@@ -224,7 +226,7 @@
 				{#if organization.description}
 					<p class="text-sm whitespace-pre-wrap">{organization.description}</p>
 				{:else}
-					<p class="text-sm text-surface-600-300">No description provided for this organization.</p>
+					<p class="text-surface-600-300 text-sm">No description provided for this organization.</p>
 				{/if}
 			</Card>
 		</aside>

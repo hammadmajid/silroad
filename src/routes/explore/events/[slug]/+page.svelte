@@ -54,7 +54,7 @@
 				<h1 class="h1">{event.title}</h1>
 			</div>
 
-			<div class="flex flex-wrap gap-4 text-sm text-surface-600-300">
+			<div class="text-surface-600-300 flex flex-wrap gap-4 text-sm">
 				<div class="flex items-center gap-2">
 					<span>📅</span>
 					<span>{formatDate(new Date(event.dateOfEvent).getTime())}</span>
@@ -93,7 +93,7 @@
 
 	<div class="grid gap-8 lg:grid-cols-3">
 		<!-- Main Content -->
-		<section class="lg:col-span-2 space-y-6">
+		<section class="space-y-6 lg:col-span-2">
 			<Card class="space-y-4">
 				<header>
 					<h2 class="h3">About this Event</h2>
@@ -114,7 +114,7 @@
 					<header>
 						<h3 class="h4">Hosted by</h3>
 					</header>
-					<a href="/org/{event.organizationSlug}" class="block hover:opacity-80">
+					<a href="/explore/orgs/{event.organizationSlug}" class="block hover:opacity-80">
 						<div class="flex items-center gap-3 overflow-hidden">
 							<Avatar
 								src={event.organizationAvatar || undefined}
@@ -124,7 +124,7 @@
 							/>
 							<div class="min-w-0 flex-1 space-y-1">
 								<h4 class="truncate font-semibold">{event.organizationName}</h4>
-								<p class="truncate text-sm text-surface-600-300">View organization →</p>
+								<p class="text-surface-600-300 truncate text-sm">View organization →</p>
 							</div>
 						</div>
 					</a>
