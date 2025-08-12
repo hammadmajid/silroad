@@ -11,9 +11,9 @@
 			<enhanced:img
 				src="./placeholder.png"
 				alt="Silroad Platform"
-				class="absolute inset-0 h-full w-full object-cover"
+				class="absolute inset-0 h-full w-full rounded-lg object-cover"
 			/>
-			<div class="absolute inset-0 bg-gradient-to-br from-primary-500/20 to-secondary-500/20"></div>
+			<div class="absolute rounded-lg inset-0 bg-gradient-to-br from-primary-500/20 to-secondary-500/20"></div>
 		</div>
 	</div>
 

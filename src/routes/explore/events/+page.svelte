@@ -37,7 +37,7 @@
 						<img
 							src={event.image}
 							alt={event.description}
-							class="aspect-[21/9] w-full object-cover"
+							class="aspect-[21/9] w-full rounded-lg object-cover"
 						/>
 					{/snippet}
 
