@@ -4,7 +4,6 @@
 	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import Search from '@lucide/svelte/icons/search';
 	import Heart from '@lucide/svelte/icons/heart';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 </script>
 
 <svelte:head>
@@ -37,7 +36,6 @@
 					<a href="/explore" class="btn flex items-center gap-2 preset-outlined-primary-500">
 						<Search size={20} />
 						Explore Events
-						<ChevronRight size={16} />
 					</a>
 				</div>
 			</div>
