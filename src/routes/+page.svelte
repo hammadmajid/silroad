@@ -11,14 +11,17 @@
 	<title>Silroad</title>
 </svelte:head>
 
-<section class="container mx-auto px-4 py-16">
+<section class="space-y-8">
 	<div class="grid items-center gap-12 md:grid-cols-2">
-		<div class="text-center md:text-left">
-			<h1 class="mb-4 h1">Welcome to Silroad</h1>
-			<p class="text-surface-600-300 mb-8 text-xl">
-				An event organizer platform that helps organizations create, manage, and promote events
-				while connecting people through shared experiences.
-			</p>
+		<div class="space-y-6 text-center md:text-left">
+			<header class="space-y-4">
+				<h1 class="h1">Welcome to Silroad</h1>
+				<p class="text-surface-600-300 text-xl">
+					An event organizer platform that helps organizations create, manage, and promote events
+					while connecting people through shared experiences.
+				</p>
+			</header>
+			
 			<div class="flex flex-col gap-4 sm:flex-row">
 				<a
 					href="/register"
@@ -46,43 +49,47 @@
 	</div>
 </section>
 
-<section class="bg-surface-100-900 py-16">
-	<div class="container mx-auto px-4">
-		<div class="mb-12 text-center">
-			<h2 class="mb-4 text-3xl font-bold">Why Choose Silroad?</h2>
-			<p class="text-surface-600-300 text-lg">
-				Everything you need to create and manage successful events
-			</p>
-		</div>
+<section class="bg-surface-100-900 space-y-8">
+	<header class="text-center space-y-4">
+		<h2 class="text-3xl font-bold">Why Choose Silroad?</h2>
+		<p class="text-surface-600-300 text-lg">
+			Everything you need to create and manage successful events
+		</p>
+	</header>
 
-		<div class="grid gap-8 md:grid-cols-3">
-			<div class="card preset-filled-surface-100-900 p-6 text-center">
-				<div class="mb-4 flex justify-center">
-					<Calendar size={48} class="text-primary-500" />
-				</div>
-				<h3 class="mb-2 text-xl font-semibold">Easy Event Creation</h3>
+	<div class="grid gap-8 md:grid-cols-3">
+		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+			<div class="flex justify-center">
+				<Calendar size={48} class="text-primary-500" />
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-xl font-semibold">Easy Event Creation</h3>
 				<p class="text-surface-600-300">
 					Create and manage events with our intuitive interface. Set dates, locations, and manage
 					RSVPs effortlessly.
 				</p>
 			</div>
+		</div>
 
-			<div class="card preset-filled-surface-100-900 p-6 text-center">
-				<div class="mb-4 flex justify-center">
-					<Heart size={48} class="text-primary-500" />
-				</div>
-				<h3 class="mb-2 text-xl font-semibold">Connect Communities</h3>
+		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+			<div class="flex justify-center">
+				<Heart size={48} class="text-primary-500" />
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-xl font-semibold">Connect Communities</h3>
 				<p class="text-surface-600-300">
 					Bring people together through shared experiences. Build lasting connections within your
 					community.
 				</p>
 			</div>
+		</div>
 
-			<div class="card preset-filled-surface-100-900 p-6 text-center">
-				<div class="mb-4 flex justify-center">
-					<Building2 size={48} class="text-primary-500" />
-				</div>
-				<h3 class="mb-2 text-xl font-semibold">Organization Management</h3>
+		<div class="card preset-filled-surface-100-900 p-6 text-center space-y-4">
+			<div class="flex justify-center">
+				<Building2 size={48} class="text-primary-500" />
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-xl font-semibold">Organization Management</h3>
 				<p class="text-surface-600-300">
 					Manage multiple events, track memberships, and handle all aspects of your organization in
 					one place.
@@ -92,51 +99,55 @@
 	</div>
 </section>
 
-<section class="py-16">
-	<div class="container mx-auto px-4">
-		<div class="mb-12 text-center">
-			<h2 class="mb-4 text-3xl font-bold">How It Works</h2>
-			<p class="text-surface-600-300 text-lg">Get started in just a few simple steps</p>
-		</div>
+<section class="space-y-8">
+	<header class="text-center space-y-4">
+		<h2 class="text-3xl font-bold">How It Works</h2>
+		<p class="text-surface-600-300 text-lg">Get started in just a few simple steps</p>
+	</header>
 
-		<div class="grid gap-8 md:grid-cols-3">
-			<div class="text-center">
-				<div class="mb-4 flex justify-center">
-					<div
-						class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
-					>
-						1
-					</div>
+	<div class="grid gap-8 md:grid-cols-3">
+		<div class="text-center space-y-4">
+			<div class="flex justify-center">
+				<div
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
+				>
+					1
 				</div>
-				<h3 class="mb-2 text-lg font-semibold">Create Your Account</h3>
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-lg font-semibold">Create Your Account</h3>
 				<p class="text-surface-600-300">
 					Sign up with your email and set up your profile to get started with Silroad.
 				</p>
 			</div>
+		</div>
 
-			<div class="text-center">
-				<div class="mb-4 flex justify-center">
-					<div
-						class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
-					>
-						2
-					</div>
+		<div class="text-center space-y-4">
+			<div class="flex justify-center">
+				<div
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
+				>
+					2
 				</div>
-				<h3 class="mb-2 text-lg font-semibold">Join or Create Events</h3>
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-lg font-semibold">Join or Create Events</h3>
 				<p class="text-surface-600-300">
 					Explore existing events in your area or create your own to bring your community together.
 				</p>
 			</div>
+		</div>
 
-			<div class="text-center">
-				<div class="mb-4 flex justify-center">
-					<div
-						class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
-					>
-						3
-					</div>
+		<div class="text-center space-y-4">
+			<div class="flex justify-center">
+				<div
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-primary-500 text-lg font-bold text-white"
+				>
+					3
 				</div>
-				<h3 class="mb-2 text-lg font-semibold">Connect & Engage</h3>
+			</div>
+			<div class="space-y-2">
+				<h3 class="text-lg font-semibold">Connect & Engage</h3>
 				<p class="text-surface-600-300">
 					Meet new people, share experiences, and build lasting connections through meaningful
 					events.
@@ -146,22 +157,23 @@
 	</div>
 </section>
 
-<section class="bg-primary-500 py-16 text-black">
-	<div class="container mx-auto px-4 text-center">
-		<h2 class="mb-4 text-3xl font-bold">Ready to Start Connecting?</h2>
-		<p class="mb-8 text-lg opacity-90">
+<section class="bg-primary-500 text-black space-y-6">
+	<header class="text-center space-y-4">
+		<h2 class="text-3xl font-bold">Ready to Start Connecting?</h2>
+		<p class="text-lg opacity-90">
 			Join thousands of organizations already using Silroad to create amazing events and build
 			stronger communities.
 		</p>
-		<div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
-			<a href="/register" class="btn flex items-center gap-2 preset-filled">
-				<UserPlus size={20} />
-				Create Your Account
-			</a>
-			<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
-				<Search size={20} />
-				Browse Events
-			</a>
-		</div>
+	</header>
+	
+	<div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
+		<a href="/register" class="btn flex items-center gap-2 preset-filled">
+			<UserPlus size={20} />
+			Create Your Account
+		</a>
+		<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
+			<Search size={20} />
+			Browse Events
+		</a>
 	</div>
 </section>
