@@ -209,11 +209,37 @@ async function assignOrganizationMembers(
 
 // ----------------------------
 
+// Helper function to create slug from title
+function createSlug(title: string): string {
+	return title
+		.toLowerCase()
+		.replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+		.replace(/\s+/g, '-')         // Replace spaces with hyphens
+		.replace(/-+/g, '-')          // Replace multiple hyphens with single
+		.trim();
+}
+
+// Helper function to create unique slug
+function createUniqueSlug(title: string, usedSlugs: Set<string>): string {
+	let baseSlug = createSlug(title);
+	let slug = baseSlug;
+	let counter = 1;
+	
+	while (usedSlugs.has(slug)) {
+		slug = `${baseSlug}-${counter}`;
+		counter++;
+	}
+	
+	usedSlugs.add(slug);
+	return slug;
+}
+
 async function createEvents(
 	db: ReturnType<typeof getDb>,
 	organizations: (typeof schema.organizations.$inferInsert)[]
 ) {
 	const events: (typeof schema.events.$inferInsert)[] = [];
+	const usedSlugs = new Set<string>();
 
 	for (const org of organizations) {
 		const eventCount = faker.number.int({ min: 0, max: 3 });
@@ -221,10 +247,12 @@ async function createEvents(
 			const now = Date.now();
 			const daysUntilEvent = faker.number.int({ min: 2, max: 14 }); // Start from 2 days
 			const daysUntilRsvpClose = faker.number.int({ min: 1, max: daysUntilEvent - 1 });
+			const title = faker.company.catchPhrase();
 
 			events.push({
 				id: crypto.randomUUID(),
-				title: faker.company.catchPhrase(),
+				title,
+				slug: createUniqueSlug(title, usedSlugs),
 				description: faker.lorem.sentence(),
 				dateOfEvent: new Date(now + daysUntilEvent * 86400000),
 				closeRsvpAt: new Date(now + daysUntilRsvpClose * 86400000),
