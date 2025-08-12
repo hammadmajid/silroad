@@ -14,6 +14,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			email: session.userEmail,
 			image: session.userImage
 		};
+
+		repo.refresh(sessionToken!, session);
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {
@@ -22,7 +24,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		event.locals.user = undefined;
 	}
 
-	// TODO: if session is about to expire refresh it with repo.refresh()
 
 	return resolve(event);
 };
