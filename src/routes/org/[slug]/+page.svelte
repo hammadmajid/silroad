@@ -32,32 +32,30 @@
 	<title>{organization.name} | Silroad</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-6xl px-4 py-8">
-	<!-- Back Navigation -->
-	<nav class="mb-6">
+<div class="space-y-8">
+	<nav>
 		<a href="/explore" class="btn preset-outlined-surface-500 hover:preset-filled-surface-500">
 			← Back to Explore
 		</a>
 	</nav>
 
-	<!-- Organization Hero -->
-	<div class="mb-8">
+	<section class="space-y-6">
 		{#if organization.backgroundImage}
 			<img
 				src={organization.backgroundImage}
 				alt={organization.name}
-				class="mb-6 aspect-[21/9] w-full rounded-lg object-cover"
+				class="aspect-[21/9] w-full rounded-lg object-cover"
 			/>
 		{/if}
 
-		<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start">
-			<div class="flex-1">
-				<div class="mb-4">
-					<span class="mb-2 badge preset-filled-primary-500">Organization</span>
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-start">
+			<div class="flex-1 space-y-4">
+				<header class="space-y-2">
+					<span class="badge preset-filled-primary-500">Organization</span>
 					<h1 class="h1">{organization.name}</h1>
-				</div>
+				</header>
 
-				<div class="mb-4 flex flex-wrap gap-4 text-sm opacity-70">
+				<div class="flex flex-wrap gap-4 text-sm text-surface-600-300">
 					<div class="flex items-center gap-2">
 						<span>👥</span>
 						<span>{memberCount} members</span>
@@ -69,7 +67,7 @@
 				</div>
 
 				{#if organization.description}
-					<p class="mb-6 text-lg opacity-80">{organization.description}</p>
+					<p class="text-lg text-surface-600-300">{organization.description}</p>
 				{/if}
 			</div>
 
@@ -82,20 +80,22 @@
 		</div>
 
 		<!-- Join Button -->
-		<div class="mb-8">
+		<div>
 			<button class="btn preset-filled-primary-500" onclick={handleJoin}>
 				Join Organization
 			</button>
 		</div>
-	</div>
+	</section>
 
 	<div class="grid gap-8 lg:grid-cols-3">
 		<!-- Main Content -->
-		<div class="lg:col-span-2">
+		<section class="lg:col-span-2 space-y-6">
 			<!-- Upcoming Events -->
 			{#if upcomingEvents.length > 0}
-				<Card class="mb-6">
-					<h2 class="mb-4 h3">Upcoming Events</h2>
+				<Card class="space-y-4">
+					<header>
+						<h2 class="h3">Upcoming Events</h2>
+					</header>
 					<div class="space-y-4">
 						{#each upcomingEvents as event (event.id)}
 							<a
@@ -103,12 +103,12 @@
 								class="block rounded border border-surface-200-800 p-4 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
-									<div class="flex-1">
+									<div class="flex-1 space-y-2">
 										<h3 class="font-semibold">{event.title}</h3>
 										{#if event.description}
-											<p class="mt-1 line-clamp-2 text-sm opacity-60">{event.description}</p>
+											<p class="line-clamp-2 text-sm text-surface-600-300">{event.description}</p>
 										{/if}
-										<p class="mt-2 text-sm text-primary-500">
+										<p class="text-sm text-primary-500">
 											{formatDate(new Date(event.dateOfEvent).getTime())}
 										</p>
 									</div>
@@ -124,8 +124,10 @@
 
 			<!-- Past Events -->
 			{#if pastEvents.length > 0}
-				<Card class="mb-6">
-					<h2 class="mb-4 h3">Past Events</h2>
+				<Card class="space-y-4">
+					<header>
+						<h2 class="h3">Past Events</h2>
+					</header>
 					<div class="space-y-4">
 						{#each pastEvents.slice(0, 5) as event (event.id)}
 							<a
@@ -133,12 +135,12 @@
 								class="block rounded border border-surface-200-800 p-4 opacity-60 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
-									<div class="flex-1">
+									<div class="flex-1 space-y-2">
 										<h3 class="font-semibold">{event.title}</h3>
 										{#if event.description}
-											<p class="mt-1 line-clamp-2 text-sm opacity-60">{event.description}</p>
+											<p class="line-clamp-2 text-sm text-surface-600-300">{event.description}</p>
 										{/if}
-										<p class="mt-2 text-sm">{formatDate(new Date(event.dateOfEvent).getTime())}</p>
+										<p class="text-sm text-surface-600-300">{formatDate(new Date(event.dateOfEvent).getTime())}</p>
 									</div>
 									{#if event.image}
 										<img src={event.image} alt={event.title} class="size-16 rounded object-cover" />
@@ -147,7 +149,7 @@
 							</a>
 						{/each}
 						{#if pastEvents.length > 5}
-							<p class="text-center text-sm opacity-60">
+							<p class="text-center text-sm text-surface-600-300">
 								and {pastEvents.length - 5} more past events...
 							</p>
 						{/if}
@@ -158,28 +160,30 @@
 			{#if events.length === 0}
 				<Card>
 					<div class="py-8 text-center">
-						<p class="opacity-60">This organization hasn't hosted any events yet.</p>
+						<p class="text-surface-600-300">This organization hasn't hosted any events yet.</p>
 					</div>
 				</Card>
 			{/if}
-		</div>
+		</section>
 
 		<!-- Sidebar -->
-		<div class="space-y-6">
+		<aside class="space-y-6">
 			<!-- Organization Stats -->
-			<Card>
-				<h3 class="mb-4 h4">Organization Stats</h3>
+			<Card class="space-y-4">
+				<header>
+					<h3 class="h4">Organization Stats</h3>
+				</header>
 				<div class="space-y-2 text-sm">
 					<div class="flex justify-between">
-						<span class="opacity-60">Members:</span>
+						<span class="text-surface-600-300">Members:</span>
 						<span>{memberCount}</span>
 					</div>
 					<div class="flex justify-between">
-						<span class="opacity-60">Total Events:</span>
+						<span class="text-surface-600-300">Total Events:</span>
 						<span>{events.length}</span>
 					</div>
 					<div class="flex justify-between">
-						<span class="opacity-60">Upcoming Events:</span>
+						<span class="text-surface-600-300">Upcoming Events:</span>
 						<span>{upcomingEvents.length}</span>
 					</div>
 				</div>
@@ -187,8 +191,10 @@
 
 			<!-- Members Preview -->
 			{#if members.length > 0}
-				<Card>
-					<h3 class="mb-4 h4">Members</h3>
+				<Card class="space-y-4">
+					<header>
+						<h3 class="h4">Members</h3>
+					</header>
 					<div class="space-y-3">
 						{#each members as member (member.userId)}
 							<div class="flex items-center gap-3 overflow-hidden">
@@ -202,7 +208,7 @@
 							</div>
 						{/each}
 						{#if memberCount > members.length}
-							<p class="text-sm opacity-60">
+							<p class="text-sm text-surface-600-300">
 								and {memberCount - members.length} more members...
 							</p>
 						{/if}
@@ -211,14 +217,16 @@
 			{/if}
 
 			<!-- Organization Details -->
-			<Card>
-				<h3 class="mb-4 h4">About</h3>
+			<Card class="space-y-4">
+				<header>
+					<h3 class="h4">About</h3>
+				</header>
 				{#if organization.description}
 					<p class="text-sm whitespace-pre-wrap">{organization.description}</p>
 				{:else}
-					<p class="text-sm opacity-60">No description provided for this organization.</p>
+					<p class="text-sm text-surface-600-300">No description provided for this organization.</p>
 				{/if}
 			</Card>
-		</div>
+		</aside>
 	</div>
 </div>
