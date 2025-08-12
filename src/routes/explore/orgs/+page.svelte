@@ -24,15 +24,15 @@
 </svelte:head>
 
 <div class="space-y-12">
-	<header class="text-center space-y-4">
+	<header class="space-y-4 text-center">
 		<h1 class="h1">All Organizations</h1>
-		<p class="text-lg text-surface-600-300">Connect with all organizations making a difference</p>
+		<p class="text-surface-600-300 text-lg">Connect with all organizations making a difference</p>
 	</header>
 
 	<section class="space-y-8">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.orgs as org (org.id)}
-				<Card variant="interactive" href="/org/{org.slug}" padding={false}>
+				<Card variant="interactive" href="/explore/orgs/{org.slug}" padding={false}>
 					{#snippet header()}
 						<img src={org.avatar} alt={org.description} class="aspect-[21/9] w-full object-cover" />
 					{/snippet}
@@ -55,7 +55,7 @@
 
 		{#if data.orgs.length === 0}
 			<div class="py-12 text-center">
-				<p class="text-lg text-surface-600-300">No organizations found.</p>
+				<p class="text-surface-600-300 text-lg">No organizations found.</p>
 			</div>
 		{/if}
 	</section>

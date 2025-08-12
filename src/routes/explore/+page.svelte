@@ -10,9 +10,9 @@
 </svelte:head>
 
 <div class="space-y-16">
-	<header class="text-center space-y-4">
+	<header class="space-y-4 text-center">
 		<h1 class="h1">Explore</h1>
-		<p class="text-lg text-surface-600-300">Find events and organizations near you</p>
+		<p class="text-surface-600-300 text-lg">Find events and organizations near you</p>
 	</header>
 
 	<section class="space-y-8">
@@ -34,11 +34,7 @@
 		{:then events}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 				{#each events as event (event.id)}
-					<Card
-						variant="interactive"
-						href="/event/{event.slug}"
-						data-testid="event-card"
-					>
+					<Card variant="interactive" href="/explore/events/{event.slug}" data-testid="event-card">
 						{#snippet header()}
 							<img
 								src={event.image}
@@ -88,7 +84,7 @@
 		{:then orgs}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 				{#each orgs as org (org.id)}
-					<Card variant="interactive" href="/org/{org.slug}" data-testid="org-card">
+					<Card variant="interactive" href="/explore/orgs/{org.slug}" data-testid="org-card">
 						{#snippet header()}
 							<img
 								src={org.avatar}
