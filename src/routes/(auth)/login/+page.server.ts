@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 };
 
 export const actions = {
-	default: async ({ request, platform, cookies, locals }) => {
+	default: async ({ request, platform, cookies, locals, url }) => {
 		const form = await superValidate(request, zod4(schema));
 		const sessionRepo = new SessionRepo(platform);
 		const userRepo = new UserRepo(platform);
@@ -53,6 +53,10 @@ export const actions = {
 
 		locals.user = user;
 
-		throw redirect(303, '/explore');
+		// Check for redirectTo parameter and redirect accordingly
+		const redirectTo = url.searchParams.get('redirectTo');
+		const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+
+		throw redirect(303, redirectUrl);
 	}
 };

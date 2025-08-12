@@ -25,7 +25,9 @@
 	// Redirect if user is already logged in
 	onMount(() => {
 		if (userStore.isLoggedIn) {
-			goto('/explore');
+			const redirectTo = $page.url.searchParams.get('redirectTo');
+			const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+			goto(redirectUrl);
 		}
 	});
 
@@ -36,7 +38,9 @@
 			if (result.type === 'success' && result.data?.user) {
 				// Set user in global store and redirect
 				userStore.setUser(result.data.user);
-				goto('/explore');
+				const redirectTo = $page.url.searchParams.get('redirectTo');
+				const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+				goto(redirectUrl);
 			}
 		}
 	});
