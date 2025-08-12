@@ -9,19 +9,17 @@
 	<title>Explore | Silroad</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-7xl px-4 py-8">
-	<!-- Hero Section -->
-	<div class="mb-12 text-center">
-		<h1 class="mb-4 h1">Explore</h1>
-		<p class="text-lg opacity-80">Find events and organizations near you</p>
-	</div>
+<div class="space-y-16">
+	<header class="text-center space-y-4">
+		<h1 class="h1">Explore</h1>
+		<p class="text-lg text-surface-600-300">Find events and organizations near you</p>
+	</header>
 
-	<!-- Events Section -->
-	<section class="mb-16">
-		<div class="mb-8 flex items-center justify-between">
-			<div>
-				<h2 class="mb-2 h2">Upcoming Events</h2>
-				<p class="opacity-70">Discover exciting events happening around you</p>
+	<section class="space-y-8">
+		<header class="flex items-center justify-between">
+			<div class="space-y-2">
+				<h2 class="h2">Upcoming Events</h2>
+				<p class="text-surface-600-300">Discover exciting events happening around you</p>
 			</div>
 			<a
 				href="/explore/events"
@@ -29,7 +27,7 @@
 			>
 				View all events
 			</a>
-		</div>
+		</header>
 
 		{#await data.events}
 			<Loading text="Loading events..." />
@@ -49,17 +47,17 @@
 							/>
 						{/snippet}
 
-						<div>
+						<div class="space-y-2">
 							<h2 class="h6 text-primary-500">Event</h2>
 							<h3 class="h3">{event.title}</h3>
 						</div>
-						<p class="opacity-60">
+						<p class="text-surface-600-300">
 							{event.description}
 						</p>
 
 						{#snippet footer()}
-							<small class="opacity-60">Learn more</small>
-							<small class="opacity-60">→</small>
+							<small class="text-surface-600-300">Learn more</small>
+							<small class="text-surface-600-300">→</small>
 						{/snippet}
 					</Card>
 				{/each}
@@ -71,12 +69,11 @@
 		{/await}
 	</section>
 
-	<!-- Organizations Section -->
-	<section class="mb-16">
-		<div class="mb-8 flex items-center justify-between">
-			<div>
-				<h2 class="mb-2 h2">Featured Organizations</h2>
-				<p class="opacity-70">Connect with organizations making a difference</p>
+	<section class="space-y-8">
+		<header class="flex items-center justify-between">
+			<div class="space-y-2">
+				<h2 class="h2">Featured Organizations</h2>
+				<p class="text-surface-600-300">Connect with organizations making a difference</p>
 			</div>
 			<a
 				href="/explore/orgs"
@@ -84,7 +81,7 @@
 			>
 				View all organizations
 			</a>
-		</div>
+		</header>
 
 		{#await data.orgs}
 			<Loading text="Loading organizations..." />
@@ -100,17 +97,17 @@
 							/>
 						{/snippet}
 
-						<div>
+						<div class="space-y-2">
 							<h2 class="h6 text-primary-500">Organization</h2>
 							<h3 class="h3">{org.name}</h3>
 						</div>
-						<p class="opacity-60">
+						<p class="text-surface-600-300">
 							{org.description}
 						</p>
 
 						{#snippet footer()}
-							<small class="opacity-60">Learn more</small>
-							<small class="opacity-60">→</small>
+							<small class="text-surface-600-300">Learn more</small>
+							<small class="text-surface-600-300">→</small>
 						{/snippet}
 					</Card>
 				{/each}

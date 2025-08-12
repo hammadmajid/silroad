@@ -23,15 +23,13 @@
 	<title>Events | Silroad</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-7xl px-4 py-8">
-	<!-- Hero Section -->
-	<div class="mb-12 text-center">
-		<h1 class="mb-4 h1">All Events</h1>
-		<p class="text-lg opacity-80">Discover all exciting events happening around you</p>
-	</div>
+<div class="space-y-12">
+	<header class="text-center space-y-4">
+		<h1 class="h1">All Events</h1>
+		<p class="text-lg text-surface-600-300">Discover all exciting events happening around you</p>
+	</header>
 
-	<!-- Events Grid -->
-	<section class="mb-16">
+	<section class="space-y-8">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.events as event (event.id)}
 				<Card variant="interactive" href="/event/{event.slug}" padding={false}>
@@ -43,17 +41,17 @@
 						/>
 					{/snippet}
 
-					<div>
+					<div class="space-y-2">
 						<h2 class="h6 text-primary-500">Event</h2>
 						<h3 class="h3">{event.title}</h3>
 					</div>
-					<p class="opacity-60">
+					<p class="text-surface-600-300">
 						{event.description}
 					</p>
 
 					{#snippet footer()}
-						<small class="opacity-60">Learn more</small>
-						<small class="opacity-60">→</small>
+						<small class="text-surface-600-300">Learn more</small>
+						<small class="text-surface-600-300">→</small>
 					{/snippet}
 				</Card>
 			{/each}
@@ -61,12 +59,11 @@
 
 		{#if data.events.length === 0}
 			<div class="py-12 text-center">
-				<p class="text-lg opacity-60">No events found.</p>
+				<p class="text-lg text-surface-600-300">No events found.</p>
 			</div>
 		{/if}
 	</section>
 
-	<!-- Pagination -->
 	{#if data.pagination.totalPages > 1}
 		<footer class="flex justify-center">
 			<Pagination

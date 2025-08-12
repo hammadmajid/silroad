@@ -23,15 +23,13 @@
 	<title>Organizations | Silroad</title>
 </svelte:head>
 
-<div class="container mx-auto max-w-7xl px-4 py-8">
-	<!-- Hero Section -->
-	<div class="mb-12 text-center">
-		<h1 class="mb-4 h1">All Organizations</h1>
-		<p class="text-lg opacity-80">Connect with all organizations making a difference</p>
-	</div>
+<div class="space-y-12">
+	<header class="text-center space-y-4">
+		<h1 class="h1">All Organizations</h1>
+		<p class="text-lg text-surface-600-300">Connect with all organizations making a difference</p>
+	</header>
 
-	<!-- Organizations Grid -->
-	<section class="mb-16">
+	<section class="space-y-8">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.orgs as org (org.id)}
 				<Card variant="interactive" href="/org/{org.slug}" padding={false}>
@@ -39,17 +37,17 @@
 						<img src={org.avatar} alt={org.description} class="aspect-[21/9] w-full object-cover" />
 					{/snippet}
 
-					<div>
+					<div class="space-y-2">
 						<h2 class="h6 text-primary-500">Organization</h2>
 						<h3 class="h3">{org.name}</h3>
 					</div>
-					<p class="opacity-60">
+					<p class="text-surface-600-300">
 						{org.description}
 					</p>
 
 					{#snippet footer()}
-						<small class="opacity-60">Learn more</small>
-						<small class="opacity-60">→</small>
+						<small class="text-surface-600-300">Learn more</small>
+						<small class="text-surface-600-300">→</small>
 					{/snippet}
 				</Card>
 			{/each}
@@ -57,12 +55,11 @@
 
 		{#if data.orgs.length === 0}
 			<div class="py-12 text-center">
-				<p class="text-lg opacity-60">No organizations found.</p>
+				<p class="text-lg text-surface-600-300">No organizations found.</p>
 			</div>
 		{/if}
 	</section>
 
-	<!-- Pagination -->
 	{#if data.pagination.totalPages > 1}
 		<footer class="flex justify-center">
 			<Pagination
