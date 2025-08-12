@@ -227,6 +227,33 @@ test.describe('User Login Flow', () => {
 		await expect(emailErrors).toHaveCount(0);
 	});
 
+	test('should preserve redirect URL after successful login', async ({ page }) => {
+		// Create a test user
+		const testUser = await createTestUser(page);
+
+		// Try to access protected route without being logged in
+		await page.goto('/settings/profile');
+
+		// Should be redirected to login page with redirectTo parameter and error message
+		await expect(page).toHaveURL(/\/login\?redirectTo=%2Fsettings%2Fprofile&msg=.*/);
+
+		// Verify error message is shown
+		await expect(page.getByTestId('error-message')).toBeVisible();
+		await expect(page.getByTestId('error-message')).toContainText(
+			'You must be logged in to access this page'
+		);
+
+		// Fill login form
+		await page.getByTestId('email-input').fill(testUser.email);
+		await page.getByTestId('password-input').fill(testUser.password);
+
+		// Submit the form
+		await page.getByTestId('login-submit-btn').click();
+
+		// Should be redirected back to the original protected route
+		await expect(page).toHaveURL('/settings/profile');
+	});
+
 	test('should handle case-insensitive email login', async ({ page }) => {
 		// Create a test user
 		const testUser = await createTestUser(page);
