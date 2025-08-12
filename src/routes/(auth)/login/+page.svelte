@@ -51,7 +51,7 @@
 	<title>Login | Silroad</title>
 </svelte:head>
 
-<div class="space-y-4">
+<section class="space-y-8">
 	{#if $message || $page.url.searchParams.get('msg')}
 		<Alert 
 			type="error" 
@@ -67,10 +67,10 @@
 		</Alert>
 	{/if}
 
-	<div class="mb-6 space-y-2 text-center">
+	<header class="text-center space-y-2">
 		<h1 class="h2">Welcome Back</h1>
 		<p class="text-surface-600-300">Sign in to your account</p>
-	</div>
+	</header>
 
 	<Card variant="form">
 		<form class="w-full space-y-4" method="POST" use:enhance>
@@ -133,14 +133,14 @@
 		</form>
 	</Card>
 
-	<div class="text-center">
+	<footer class="text-center">
 		<p class="text-surface-600-300 text-sm">
 			Don't have an account?
 			<a href="/register" class="anchor">Sign up</a>
 		</p>
-	</div>
+	</footer>
 
 	{#if !data.isProd}
 		<SuperDebug data={$formData} />
 	{/if}
-</div>
+</section>

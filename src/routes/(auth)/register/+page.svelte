@@ -47,16 +47,16 @@
 	<title>Register | Silroad</title>
 </svelte:head>
 
-<div class="space-y-4">
+<section class="space-y-8">
 	{#if $message || $page.url.searchParams.get('msg')}
 		<div
 			class="grid grid-cols-1 items-center gap-4 card preset-outlined-error-500 p-4 lg:grid-cols-[auto_1fr_auto]"
 			data-testid="error-message"
 		>
 			<TriangleAlert />
-			<div>
+			<div class="space-y-1">
 				<p class="font-bold">Error</p>
-				<p class="text-xs opacity-60">{$message || $page.url.searchParams.get('msg')}</p>
+				<p class="text-xs text-surface-600-300">{$message || $page.url.searchParams.get('msg')}</p>
 			</div>
 			<div class="flex gap-1">
 				<button
@@ -70,10 +70,10 @@
 		</div>
 	{/if}
 
-	<div class="mb-6 space-y-2 text-center">
+	<header class="text-center space-y-2">
 		<h1 class="h2">Create Account</h1>
 		<p class="text-surface-600-300">Join Silroad today</p>
-	</div>
+	</header>
 
 	<Card variant="form">
 		<form class="w-full space-y-4" method="POST" use:enhance>
@@ -201,14 +201,14 @@
 		</form>
 	</Card>
 
-	<div class="text-center">
+	<footer class="text-center">
 		<p class="text-surface-600-300 text-sm">
 			Already have an account?
 			<a href="/login" class="anchor">Sign in</a>
 		</p>
-	</div>
+	</footer>
 
 	{#if !data.isProd}
 		<SuperDebug data={$formData} />
 	{/if}
-</div>
+</section>
