@@ -10,10 +10,12 @@
 	import Users from '@lucide/svelte/icons/users';
 	import HelpCircle from '@lucide/svelte/icons/help-circle';
 
+	import type { Component } from 'svelte';
+
 	interface NavItem {
 		href: string;
 		label: string;
-		icon: any;
+		icon: Component;
 		requiresAuth?: boolean;
 	}
 
@@ -26,8 +28,10 @@
 		{ href: '/help', label: 'Help & Support', icon: HelpCircle }
 	];
 
-	$: currentPath = $page.url.pathname;
-	$: filteredItems = navItems.filter((item) => !item.requiresAuth || userStore.isLoggedIn);
+	const currentPath = $derived($page.url.pathname);
+	const filteredItems = $derived(
+		navItems.filter((item) => !item.requiresAuth || userStore.isLoggedIn)
+	);
 
 	function isActive(href: string): boolean {
 		if (href === '/explore') {
@@ -47,7 +51,7 @@
 
 		<!-- Navigation Links -->
 		<ul class="space-y-1">
-			{#each filteredItems as item}
+			{#each filteredItems as item (item.href)}
 				<li>
 					<a
 						href={item.href}
@@ -57,7 +61,7 @@
 							? 'bg-primary-500 text-white'
 							: 'text-surface-700-200 hover:bg-surface-200-800'}"
 					>
-						<svelte:component this={item.icon} size={18} />
+						<item.icon size={18} />
 						<span class="text-sm font-medium">{item.label}</span>
 					</a>
 				</li>

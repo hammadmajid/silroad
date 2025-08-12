@@ -10,7 +10,7 @@
 		onDismiss?: () => void;
 		classes?: string;
 		icon?: Snippet;
-		[key: string]: any;
+		[key: string]: unknown;
 	}
 
 	let {
