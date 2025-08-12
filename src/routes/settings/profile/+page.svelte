@@ -54,7 +54,7 @@
 			.toUpperCase();
 	}
 
-	function formatJoinDate(userId: string): string {
+	function formatJoinDate(): string {
 		// Extract timestamp from UUID v7 (first 48 bits are timestamp)
 		// This is a simplified version - in reality you'd want proper date tracking
 		return 'Member since 2024';
@@ -137,12 +137,7 @@
 
 						<div>
 							<label for="join-date" class="mb-2 label-text block">Member Since</label>
-							<input
-								id="join-date"
-								value={formatJoinDate(userStore.current.id)}
-								class="input w-full"
-								disabled
-							/>
+							<input id="join-date" value={formatJoinDate()} class="input w-full" disabled />
 						</div>
 					</div>
 

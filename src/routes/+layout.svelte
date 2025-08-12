@@ -45,7 +45,7 @@
 					<li>
 						<a href="/settings/profile" title="Profile">
 							<Avatar
-								src={userStore.current?.image}
+								src={userStore.current?.image || undefined}
 								name={userStore.current?.name || 'User'}
 								size="w-8"
 								background="preset-filled-primary-500"

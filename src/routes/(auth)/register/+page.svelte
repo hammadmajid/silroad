@@ -40,7 +40,7 @@
 			}
 		}
 	});
-	const { form: formData, enhance, submitting, delayed, message } = form;
+	const { form: formData, enhance, submitting, message } = form;
 </script>
 
 <svelte:head>

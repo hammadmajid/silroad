@@ -221,7 +221,7 @@ function createSlug(title: string): string {
 
 // Helper function to create unique slug
 function createUniqueSlug(title: string, usedSlugs: Set<string>): string {
-	let baseSlug = createSlug(title);
+	const baseSlug = createSlug(title);
 	let slug = baseSlug;
 	let counter = 1;
 

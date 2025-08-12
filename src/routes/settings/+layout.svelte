@@ -58,7 +58,7 @@
 					<div class="card p-6">
 						<h2 class="mb-6 h3">Settings</h2>
 						<nav class="space-y-2">
-							{#each navigation as item}
+							{#each navigation as item (item.href)}
 								<a
 									href={item.href}
 									class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors {currentPath ===

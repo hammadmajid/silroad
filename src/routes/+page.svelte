@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Calendar from '@lucide/svelte/icons/calendar';
-	import Users from '@lucide/svelte/icons/users';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import UserPlus from '@lucide/svelte/icons/user-plus';
 	import Search from '@lucide/svelte/icons/search';
@@ -32,6 +31,7 @@
 				<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
 					<Search size={20} />
 					Explore Events
+					<ChevronRight size={16} />
 				</a>
 			</div>
 		</div>
@@ -69,7 +69,7 @@
 
 			<div class="card p-6 text-center">
 				<div class="mb-4 flex justify-center">
-					<Users size={48} class="text-primary-500" />
+					<Heart size={48} class="text-primary-500" />
 				</div>
 				<h3 class="mb-2 text-xl font-semibold">Connect Communities</h3>
 				<p class="text-surface-600-300">
