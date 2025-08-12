@@ -42,7 +42,7 @@
 		{:then events}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each events as event (event.id)}
-				<Card variant="interactive" href="/event/{event.id}" padding={false} data-testid="event-card">
+				<Card variant="interactive" href="/event/{event.slug}" padding={false} data-testid="event-card">
 					{#snippet header()}
 						<img
 							src={event.image}

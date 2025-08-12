@@ -35,7 +35,7 @@
 	<section class="mb-16">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.events as event (event.id)}
-				<Card variant="interactive" href="/event/{event.id}" padding={false}>
+				<Card variant="interactive" href="/event/{event.slug}" padding={false}>
 					{#snippet header()}
 						<img
 							src={event.image}

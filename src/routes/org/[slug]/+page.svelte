@@ -99,7 +99,7 @@
 					<div class="space-y-4">
 						{#each upcomingEvents as event (event.id)}
 							<a
-								href="/event/{event.id}"
+								href="/event/{event.slug}"
 								class="block rounded border border-surface-200-800 p-4 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
@@ -129,7 +129,7 @@
 					<div class="space-y-4">
 						{#each pastEvents.slice(0, 5) as event (event.id)}
 							<a
-								href="/event/{event.id}"
+								href="/event/{event.slug}"
 								class="block rounded border border-surface-200-800 p-4 opacity-60 transition-colors hover:bg-surface-50-950"
 							>
 								<div class="flex items-start justify-between gap-4">
