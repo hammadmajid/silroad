@@ -4,8 +4,14 @@
 	interface Props {
 		variant?: 'default' | 'interactive' | 'form';
 		href?: string;
-		class?: string;
-		padding?: boolean;
+		base?: string;
+		background?: string;
+		border?: string;
+		padding?: string;
+		rounded?: string;
+		shadow?: string;
+		hover?: string;
+		classes?: string;
 		header?: Snippet;
 		children: Snippet;
 		footer?: Snippet;
@@ -16,36 +22,54 @@
 	let {
 		variant = 'default',
 		href,
-		class: className = '',
-		padding = true,
+		base = 'card',
+		background = 'preset-filled-surface-100-900',
+		border = '',
+		padding = 'p-6',
+		rounded = 'rounded-container',
+		shadow = '',
+		hover = '',
+		classes = '',
 		header,
 		children,
 		footer,
 		...restProps
 	}: Props = $props();
 
-	const baseClasses = 'card';
-
-	const variantClasses = {
-		default: 'preset-filled-surface-100-900',
-		interactive:
-			'max-w-md divide-y divide-surface-200-800 overflow-hidden border-[1px] border-surface-200-800 preset-filled-surface-100-900 card-hover transition-all duration-200 hover:scale-105',
-		form: 'preset-filled-surface-100-900'
+	// Variant-specific overrides
+	const variantOverrides = {
+		default: {},
+		interactive: {
+			border: 'border-[1px] border-surface-200-800',
+			hover: 'card-hover transition-all duration-200 hover:scale-105',
+			padding: '' // Will be applied to inner sections instead
+		},
+		form: {}
 	};
 
-	const paddingClass = padding ? 'p-6' : '';
-	const classes = `${baseClasses} ${variantClasses[variant]} ${paddingClass} ${className}`.trim();
+	const overrides = variantOverrides[variant];
+	
+	const finalClasses = [
+		base,
+		overrides.background || background,
+		overrides.border || border,
+		overrides.padding || padding,
+		overrides.rounded || rounded,
+		overrides.shadow || shadow,
+		overrides.hover || hover,
+		classes
+	].filter(Boolean).join(' ');
 </script>
 
 {#if href}
-	<a {href} class="block {classes}" {...restProps}>
+	<a {href} class="block {finalClasses}" {...restProps}>
 		{#if header}
 			<header>
 				{@render header()}
 			</header>
 		{/if}
 
-		<article class={header || footer ? 'space-y-4 p-4' : ''}>
+		<article class={header || footer ? 'space-y-4 p-4' : variant === 'interactive' ? 'p-4' : ''}>
 			{@render children()}
 		</article>
 
@@ -56,14 +80,14 @@
 		{/if}
 	</a>
 {:else}
-	<div class={classes} {...restProps}>
+	<div class={finalClasses} {...restProps}>
 		{#if header}
 			<header>
 				{@render header()}
 			</header>
 		{/if}
 
-		<div class={header || footer ? 'space-y-4 p-4' : ''}>
+		<div class={header || footer ? 'space-y-4 p-4' : variant === 'interactive' ? 'p-4' : ''}>
 			{@render children()}
 		</div>
 
