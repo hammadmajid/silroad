@@ -100,7 +100,10 @@
 				<Control>
 					{#snippet children({ props })}
 						<label class="label">
-							<span class="label-text">Password</span>
+							<div class="flex justify-between items-center">
+								<span class="label-text">Password</span>
+								<a href="/password-reset" class="anchor text-sm">Forgot password?</a>
+							</div>
 							<input
 								class="input"
 								{...props}
