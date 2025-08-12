@@ -5,6 +5,7 @@
 	import { AppBar, Avatar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
 
+
 	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
 	import LogIn from '@lucide/svelte/icons/log-in';
@@ -66,21 +67,21 @@
 		{/snippet}
 	</AppBar>
 
-	<main class="grow">
+	<main class="container mx-auto px-4 py-8">
 		{@render children()}
 	</main>
 
-	<footer class="bg-surface-100-900">
+	<footer class="bg-surface-100-900 border-t border-surface-300-700">
 		<div class="container mx-auto px-4 py-8">
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-				<div>
-					<h3 class="mb-4 text-lg font-semibold">Silroad</h3>
-					<p>
+				<div class="space-y-4">
+					<h3 class="text-lg font-semibold">Silroad</h3>
+					<p class="text-surface-600-300">
 						An event organizer platform that helps organizations create, manage, and promote events.
 					</p>
 				</div>
-				<div>
-					<h4 class="mb-4 font-semibold">Platform</h4>
+				<div class="space-y-4">
+					<h4 class="font-semibold">Platform</h4>
 					<ul class="space-y-2">
 						<li><a href="/explore" class="anchor text-sm">Explore Events</a></li>
 						<li>
@@ -90,8 +91,8 @@
 						<li><a href="/help" class="anchor text-sm">Help & Support</a></li>
 					</ul>
 				</div>
-				<div>
-					<h4 class="mb-4 font-semibold">Legal</h4>
+				<div class="space-y-4">
+					<h4 class="font-semibold">Legal</h4>
 					<ul class="space-y-2">
 						<li><a href="/privacy" class="anchor text-sm">Privacy Policy</a></li>
 						<li><a href="/terms" class="anchor text-sm">Terms of Service</a></li>
