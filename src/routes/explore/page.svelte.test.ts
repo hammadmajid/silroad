@@ -94,7 +94,7 @@ describe('/explore/+page.svelte', () => {
 		render(Page, { data: mockData });
 
 		// Wait a bit for the promise to resolve
-		await new Promise(resolve => setTimeout(resolve, 10));
+		await new Promise((resolve) => setTimeout(resolve, 10));
 
 		const eventTitle = page.getByText('Test Event 1');
 		await expect.element(eventTitle).toBeInTheDocument();
@@ -117,7 +117,7 @@ describe('/explore/+page.svelte', () => {
 		render(Page, { data: mockData });
 
 		// Wait a bit for the promise to resolve
-		await new Promise(resolve => setTimeout(resolve, 10));
+		await new Promise((resolve) => setTimeout(resolve, 10));
 
 		const orgName = page.getByRole('heading', { name: 'Test Organization' });
 		await expect.element(orgName).toBeInTheDocument();

@@ -49,14 +49,20 @@
 
 <div class="space-y-4">
 	{#if $message || $page.url.searchParams.get('msg')}
-		<div class="card preset-outlined-error-500 grid grid-cols-1 items-center gap-4 p-4 lg:grid-cols-[auto_1fr_auto]" data-testid="error-message">
+		<div
+			class="grid grid-cols-1 items-center gap-4 card preset-outlined-error-500 p-4 lg:grid-cols-[auto_1fr_auto]"
+			data-testid="error-message"
+		>
 			<TriangleAlert />
 			<div>
 				<p class="font-bold">Error</p>
 				<p class="text-xs opacity-60">{$message || $page.url.searchParams.get('msg')}</p>
 			</div>
 			<div class="flex gap-1">
-				<button class="btn preset-tonal hover:preset-filled flex items-center gap-2" onclick={dismissError}>
+				<button
+					class="btn flex items-center gap-2 preset-tonal hover:preset-filled"
+					onclick={dismissError}
+				>
 					<X size={16} />
 					Dismiss
 				</button>
@@ -181,7 +187,7 @@
 
 			<button
 				type="submit"
-				class="btn w-full preset-filled flex items-center justify-center gap-2"
+				class="btn flex w-full items-center justify-center gap-2 preset-filled"
 				disabled={$submitting}
 				data-testid="register-submit-btn"
 			>

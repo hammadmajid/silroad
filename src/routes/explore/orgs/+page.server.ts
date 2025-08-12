@@ -4,7 +4,7 @@ import { count } from 'drizzle-orm';
 
 export const load = async ({ platform, url }) => {
 	const db = getDb(platform);
-	
+
 	const page = parseInt(url.searchParams.get('page') || '1');
 	const pageSize = 10;
 	const offset = (page - 1) * pageSize;

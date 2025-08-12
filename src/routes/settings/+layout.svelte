@@ -85,7 +85,7 @@
 	<!-- Redirect will happen server-side or client-side -->
 	<div class="flex h-screen items-center justify-center">
 		<div class="text-center">
-			<LoaderCircle class="animate-spin mx-auto mb-2" size={32} />
+			<LoaderCircle class="mx-auto mb-2 animate-spin" size={32} />
 			<div>Loading...</div>
 		</div>
 	</div>

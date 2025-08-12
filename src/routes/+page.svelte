@@ -21,11 +21,15 @@
 				while connecting people through shared experiences.
 			</p>
 			<div class="flex flex-col gap-4 sm:flex-row">
-				<a href="/register" class="btn preset-filled flex items-center gap-2" data-testid="get-started-btn">
+				<a
+					href="/register"
+					class="btn flex items-center gap-2 preset-filled"
+					data-testid="get-started-btn"
+				>
 					<UserPlus size={20} />
 					Get Started
 				</a>
-				<a href="/explore" class="btn preset-outlined flex items-center gap-2">
+				<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
 					<Search size={20} />
 					Explore Events
 				</a>
@@ -150,11 +154,11 @@
 			stronger communities.
 		</p>
 		<div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
-			<a href="/register" class="btn preset-filled flex items-center gap-2">
+			<a href="/register" class="btn flex items-center gap-2 preset-filled">
 				<UserPlus size={20} />
 				Create Your Account
 			</a>
-			<a href="/explore" class="btn preset-outlined flex items-center gap-2">
+			<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
 				<Search size={20} />
 				Browse Events
 			</a>

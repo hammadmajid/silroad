@@ -95,7 +95,7 @@
 							<Camera class="h-4 w-4" />
 						</button>
 					</div>
-					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
 						<Camera size={16} />
 						Change photo
 					</button>
@@ -149,16 +149,22 @@
 					<!-- Action Buttons -->
 					<div class="flex gap-3 pt-4">
 						{#if isEditing}
-							<button onclick={saveProfile} class="btn preset-filled-primary-500 flex items-center gap-2">
+							<button
+								onclick={saveProfile}
+								class="btn flex items-center gap-2 preset-filled-primary-500"
+							>
 								<Save size={16} />
 								Save Changes
 							</button>
-							<button onclick={cancelEditing} class="btn preset-outlined flex items-center gap-2">
+							<button onclick={cancelEditing} class="btn flex items-center gap-2 preset-outlined">
 								<X size={16} />
 								Cancel
 							</button>
 						{:else}
-							<button onclick={startEditing} class="btn preset-filled-primary-500 flex items-center gap-2">
+							<button
+								onclick={startEditing}
+								class="btn flex items-center gap-2 preset-filled-primary-500"
+							>
 								<Edit size={16} />
 								Edit Profile
 							</button>
@@ -181,7 +187,7 @@
 							Update your password to keep your account secure
 						</p>
 					</div>
-					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
 						<Key size={16} />
 						Change
 					</button>
@@ -194,7 +200,7 @@
 						<h3 class="font-medium">Download Data</h3>
 						<p class="text-surface-600-300-token text-sm">Download a copy of all your data</p>
 					</div>
-					<button class="btn preset-outlined btn-sm flex items-center gap-2">
+					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
 						<Download size={16} />
 						Download
 					</button>
@@ -215,7 +221,10 @@
 							Sign out of your account on this device
 						</p>
 					</div>
-					<button onclick={handleLogout} class="btn preset-filled-error-500 btn-sm flex items-center gap-2">
+					<button
+						onclick={handleLogout}
+						class="btn flex items-center gap-2 preset-filled-error-500 btn-sm"
+					>
 						<LogOut size={16} />
 						Sign Out
 					</button>
@@ -230,7 +239,7 @@
 							Permanently delete your account and all data
 						</p>
 					</div>
-					<button class="btn preset-filled-error-500 btn-sm flex items-center gap-2" disabled>
+					<button class="btn flex items-center gap-2 preset-filled-error-500 btn-sm" disabled>
 						<Trash2 size={16} />
 						Delete Account
 					</button>

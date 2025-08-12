@@ -18,7 +18,7 @@ describe('/explore/events/+page.svelte', () => {
 			},
 			{
 				id: '2',
-				title: 'Test Event 2', 
+				title: 'Test Event 2',
 				description: 'Another test event',
 				dateOfEvent: new Date(),
 				closeRsvpAt: null,
@@ -54,7 +54,7 @@ describe('/explore/events/+page.svelte', () => {
 
 		const event1Title = page.getByText('Test Event 1');
 		const event2Title = page.getByText('Test Event 2');
-		
+
 		await expect.element(event1Title).toBeInTheDocument();
 		await expect.element(event2Title).toBeInTheDocument();
 	});
@@ -64,7 +64,7 @@ describe('/explore/events/+page.svelte', () => {
 
 		const description1 = page.getByText('Test event description');
 		const description2 = page.getByText('Another test event');
-		
+
 		await expect.element(description1).toBeInTheDocument();
 		await expect.element(description2).toBeInTheDocument();
 	});

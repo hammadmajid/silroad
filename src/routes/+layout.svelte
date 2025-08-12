@@ -31,9 +31,9 @@
 <div class="flex h-full flex-col">
 	<AppBar>
 		{#snippet lead()}
-			<a href={homeLink} class="flex justify-center items-center gap-2">
+			<a href={homeLink} class="flex items-center justify-center gap-2">
 				<CalendarHeart size={24} />
-				<span class="font-bold text-lg">Silroad</span>
+				<span class="text-lg font-bold">Silroad</span>
 			</a>
 		{/snippet}
 		{#snippet trail()}
@@ -44,9 +44,9 @@
 				{#if userStore.isLoggedIn}
 					<li>
 						<a href="/settings/profile" title="Profile">
-							<Avatar 
-								src={userStore.current?.image} 
-								name={userStore.current?.name || 'User'} 
+							<Avatar
+								src={userStore.current?.image}
+								name={userStore.current?.name || 'User'}
 								size="w-8"
 								background="preset-filled-primary-500"
 							>
@@ -56,7 +56,7 @@
 					</li>
 				{:else}
 					<li>
-						<a href="/login" class="btn preset-filled flex items-center gap-2">
+						<a href="/login" class="btn flex items-center gap-2 preset-filled">
 							<LogIn size={20} />
 							Login
 						</a>

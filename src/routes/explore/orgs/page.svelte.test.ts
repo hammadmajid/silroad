@@ -17,7 +17,7 @@ describe('/explore/orgs/+page.svelte', () => {
 			{
 				id: '2',
 				name: 'Test Organization 2',
-				slug: 'test-org-2', 
+				slug: 'test-org-2',
 				description: 'Another test organization',
 				avatar: '/test-avatar2.jpg',
 				backgroundImage: null
@@ -50,7 +50,7 @@ describe('/explore/orgs/+page.svelte', () => {
 
 		const org1Name = page.getByText('Test Organization 1');
 		const org2Name = page.getByText('Test Organization 2');
-		
+
 		await expect.element(org1Name).toBeInTheDocument();
 		await expect.element(org2Name).toBeInTheDocument();
 	});
@@ -60,7 +60,7 @@ describe('/explore/orgs/+page.svelte', () => {
 
 		const description1 = page.getByText('Test organization description');
 		const description2 = page.getByText('Another test organization');
-		
+
 		await expect.element(description1).toBeInTheDocument();
 		await expect.element(description2).toBeInTheDocument();
 	});

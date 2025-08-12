@@ -37,11 +37,7 @@
 			{#each data.orgs as org (org.id)}
 				<Card variant="interactive" href="/org/{org.slug}" padding={false}>
 					{#snippet header()}
-						<img
-							src={org.avatar}
-							alt={org.description}
-							class="aspect-[21/9] w-full object-cover"
-						/>
+						<img src={org.avatar} alt={org.description} class="aspect-[21/9] w-full object-cover" />
 					{/snippet}
 
 					<div>

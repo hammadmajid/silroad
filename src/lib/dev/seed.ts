@@ -214,8 +214,8 @@ function createSlug(title: string): string {
 	return title
 		.toLowerCase()
 		.replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-		.replace(/\s+/g, '-')         // Replace spaces with hyphens
-		.replace(/-+/g, '-')          // Replace multiple hyphens with single
+		.replace(/\s+/g, '-') // Replace spaces with hyphens
+		.replace(/-+/g, '-') // Replace multiple hyphens with single
 		.trim();
 }
 
@@ -224,12 +224,12 @@ function createUniqueSlug(title: string, usedSlugs: Set<string>): string {
 	let baseSlug = createSlug(title);
 	let slug = baseSlug;
 	let counter = 1;
-	
+
 	while (usedSlugs.has(slug)) {
 		slug = `${baseSlug}-${counter}`;
 		counter++;
 	}
-	
+
 	usedSlugs.add(slug);
 	return slug;
 }

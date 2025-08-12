@@ -41,30 +41,36 @@
 			</div>
 		{:then events}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-			{#each events as event (event.id)}
-				<Card variant="interactive" href="/event/{event.slug}" padding={false} data-testid="event-card">
-					{#snippet header()}
-						<img
-							src={event.image}
-							alt={event.description}
-							class="aspect-[21/9] w-full object-cover"
-						/>
-					{/snippet}
+				{#each events as event (event.id)}
+					<Card
+						variant="interactive"
+						href="/event/{event.slug}"
+						padding={false}
+						data-testid="event-card"
+					>
+						{#snippet header()}
+							<img
+								src={event.image}
+								alt={event.description}
+								class="aspect-[21/9] w-full object-cover"
+							/>
+						{/snippet}
 
-					<div>
-						<h2 class="h6 text-primary-500">Event</h2>
-						<h3 class="h3">{event.title}</h3>
-					</div>
-					<p class="opacity-60">
-						{event.description}
-					</p>
+						<div>
+							<h2 class="h6 text-primary-500">Event</h2>
+							<h3 class="h3">{event.title}</h3>
+						</div>
+						<p class="opacity-60">
+							{event.description}
+						</p>
 
-					{#snippet footer()}
-						<small class="opacity-60">Learn more</small>
-						<small class="opacity-60">→</small>
-					{/snippet}
-				</Card>
-			{/each}			</div>
+						{#snippet footer()}
+							<small class="opacity-60">Learn more</small>
+							<small class="opacity-60">→</small>
+						{/snippet}
+					</Card>
+				{/each}
+			</div>
 		{:catch error}
 			<div class="alert preset-filled-error-500">
 				<p>Failed to load events: {error.message}</p>
@@ -98,30 +104,31 @@
 			</div>
 		{:then orgs}
 			<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-			{#each orgs as org (org.id)}
-				<Card variant="interactive" href="/org/{org.slug}" padding={false} data-testid="org-card">
-					{#snippet header()}
-						<img
-							src={org.avatar}
-							alt={org.description}
-							class="aspect-[21/9] w-full object-cover"
-						/>
-					{/snippet}
+				{#each orgs as org (org.id)}
+					<Card variant="interactive" href="/org/{org.slug}" padding={false} data-testid="org-card">
+						{#snippet header()}
+							<img
+								src={org.avatar}
+								alt={org.description}
+								class="aspect-[21/9] w-full object-cover"
+							/>
+						{/snippet}
 
-					<div>
-						<h2 class="h6 text-primary-500">Organization</h2>
-						<h3 class="h3">{org.name}</h3>
-					</div>
-					<p class="opacity-60">
-						{org.description}
-					</p>
+						<div>
+							<h2 class="h6 text-primary-500">Organization</h2>
+							<h3 class="h3">{org.name}</h3>
+						</div>
+						<p class="opacity-60">
+							{org.description}
+						</p>
 
-					{#snippet footer()}
-						<small class="opacity-60">Learn more</small>
-						<small class="opacity-60">→</small>
-					{/snippet}
-				</Card>
-			{/each}			</div>
+						{#snippet footer()}
+							<small class="opacity-60">Learn more</small>
+							<small class="opacity-60">→</small>
+						{/snippet}
+					</Card>
+				{/each}
+			</div>
 		{:catch error}
 			<div class="alert preset-filled-error-500">
 				<p>Failed to load organizations: {error.message}</p>
