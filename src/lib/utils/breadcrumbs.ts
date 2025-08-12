@@ -5,6 +5,7 @@ export interface BreadcrumbItem {
 	href?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function generateBreadcrumbs(page: Page, pageData?: Record<string, any>): BreadcrumbItem[] {
 	const { pathname } = page.url;
 	const segments = pathname.split('/').filter(Boolean);
