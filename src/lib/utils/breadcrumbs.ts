@@ -163,10 +163,10 @@ export function generateBreadcrumbs(page: Page, pageData?: Record<string, any>):
 							label: pageData.organization.name
 						});
 					}
-					// Generic fallback
+					// Generic fallback - let component handle formatting
 					else {
 						breadcrumbs.push({
-							label: segment.charAt(0).toUpperCase() + segment.slice(1)
+							label: segment
 						});
 					}
 				}
