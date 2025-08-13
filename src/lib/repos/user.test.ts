@@ -12,6 +12,12 @@ vi.mock('$lib/utils/crypto', () => ({
 	hashPassword: vi.fn()
 }));
 
+vi.mock('./session', () => ({
+	SessionRepo: vi.fn().mockImplementation(() => ({
+		deleteByUserId: vi.fn().mockResolvedValue(undefined)
+	}))
+}));
+
 describe('UserRepo', () => {
 	let userRepo: UserRepo;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

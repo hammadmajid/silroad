@@ -13,10 +13,12 @@ export type User = {
 export class UserRepo {
 	private db;
 	private logger;
+	private platform;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
 		this.logger = getLogger(platform);
+		this.platform = platform;
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
@@ -164,6 +166,11 @@ export class UserRepo {
 			const newHashedPassword = await hashPassword(newPass, salt);
 
 			await this.db.update(users).set({ password: newHashedPassword }).where(eq(users.id, userId));
+
+			// Invalidate all existing sessions for security
+			const { SessionRepo } = await import('./session');
+			const sessionRepo = new SessionRepo(this.platform);
+			await sessionRepo.deleteByUserId(userId);
 
 			return true;
 		} catch (error) {
