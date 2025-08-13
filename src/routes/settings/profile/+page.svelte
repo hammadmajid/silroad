@@ -6,10 +6,7 @@
 	import Edit from '@lucide/svelte/icons/edit';
 	import Save from '@lucide/svelte/icons/save';
 	import X from '@lucide/svelte/icons/x';
-	import Key from '@lucide/svelte/icons/key';
-	import Download from '@lucide/svelte/icons/download';
 	import LogOut from '@lucide/svelte/icons/log-out';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	let isEditing = $state(false);
 	let editedName = $state('');
@@ -173,43 +170,7 @@
 		</section>
 
 		<section class="space-y-6">
-			<header>
-				<h2 class="h3">Account Actions</h2>
-			</header>
-
-			<Card class="space-y-4 p-6">
-				<div class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4">
-					<div class="space-y-1">
-						<h3 class="font-medium">Change Password</h3>
-						<p class="text-surface-600-300 text-sm">
-							Update your password to keep your account secure
-						</p>
-					</div>
-					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
-						<Key size={16} />
-						Change
-					</button>
-				</div>
-
-				<div class="border-surface-300-600 flex items-center justify-between rounded-lg border p-4">
-					<div class="space-y-1">
-						<h3 class="font-medium">Download Data</h3>
-						<p class="text-surface-600-300 text-sm">Download a copy of all your data</p>
-					</div>
-					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
-						<Download size={16} />
-						Download
-					</button>
-				</div>
-			</Card>
-		</section>
-
-		<section class="space-y-6">
-			<header>
-				<h2 class="h3 text-error-500">Danger Zone</h2>
-			</header>
-
-			<Card variant="form" class="space-y-4 border-error-500 p-6">
+			<Card variant="form" class="space-y-4 p-6">
 				<div
 					class="flex items-center justify-between rounded-lg border border-error-300 bg-error-50 p-4 dark:border-error-600 dark:bg-error-900/20"
 				>
@@ -225,21 +186,6 @@
 					>
 						<LogOut size={16} />
 						Sign Out
-					</button>
-				</div>
-
-				<div
-					class="flex items-center justify-between rounded-lg border border-error-300 bg-error-50 p-4 dark:border-error-600 dark:bg-error-900/20"
-				>
-					<div class="space-y-1">
-						<h3 class="font-medium text-error-700 dark:text-error-300">Delete Account</h3>
-						<p class="text-sm text-error-600 dark:text-error-400">
-							Permanently delete your account and all data
-						</p>
-					</div>
-					<button class="btn flex items-center gap-2 preset-filled-error-500 btn-sm" disabled>
-						<Trash2 size={16} />
-						Delete Account
 					</button>
 				</div>
 			</Card>
