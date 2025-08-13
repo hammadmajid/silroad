@@ -1,8 +1,23 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import { themeMode, setThemeMode, type ThemeMode } from '$lib/stores/theme.js';
 
-	let theme = $state('system');
+	let currentTheme = $state<ThemeMode>('system');
 	let language = $state('en');
+
+	// Subscribe to theme changes
+	$effect(() => {
+		const unsubscribe = themeMode.subscribe((mode) => {
+			currentTheme = mode;
+		});
+		return unsubscribe;
+	});
+
+	// Handle theme change
+	function handleThemeChange(newTheme: ThemeMode) {
+		currentTheme = newTheme;
+		setThemeMode(newTheme);
+	}
 </script>
 
 <svelte:head>
@@ -21,9 +36,15 @@
 					<p class="text-surface-600-300-token">Choose how Silroad looks to you.</p>
 					<div class="grid max-w-md grid-cols-3 gap-4">
 						<label class="cursor-pointer">
-							<input type="radio" bind:group={theme} value="light" class="sr-only" />
+							<input
+								type="radio"
+								value="light"
+								checked={currentTheme === 'light'}
+								onchange={() => handleThemeChange('light')}
+								class="sr-only"
+							/>
 							<div
-								class="rounded-lg border-2 p-4 text-center {theme === 'light'
+								class="rounded-lg border-2 p-4 text-center {currentTheme === 'light'
 									? 'border-primary-500'
 									: 'border-surface-300-600-token'}"
 							>
@@ -33,9 +54,15 @@
 						</label>
 
 						<label class="cursor-pointer">
-							<input type="radio" bind:group={theme} value="dark" class="sr-only" />
+							<input
+								type="radio"
+								value="dark"
+								checked={currentTheme === 'dark'}
+								onchange={() => handleThemeChange('dark')}
+								class="sr-only"
+							/>
 							<div
-								class="rounded-lg border-2 p-4 text-center {theme === 'dark'
+								class="rounded-lg border-2 p-4 text-center {currentTheme === 'dark'
 									? 'border-primary-500'
 									: 'border-surface-300-600-token'}"
 							>
@@ -45,9 +72,15 @@
 						</label>
 
 						<label class="cursor-pointer">
-							<input type="radio" bind:group={theme} value="system" class="sr-only" />
+							<input
+								type="radio"
+								value="system"
+								checked={currentTheme === 'system'}
+								onchange={() => handleThemeChange('system')}
+								class="sr-only"
+							/>
 							<div
-								class="rounded-lg border-2 p-4 text-center {theme === 'system'
+								class="rounded-lg border-2 p-4 text-center {currentTheme === 'system'
 									? 'border-primary-500'
 									: 'border-surface-300-600-token'}"
 							>

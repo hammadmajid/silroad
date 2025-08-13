@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
+/* Configure dark mode using data attribute strategy */
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton/optional/presets';
 @import '@skeletonlabs/skeleton/themes/vintage';

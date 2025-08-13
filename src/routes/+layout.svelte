@@ -4,6 +4,7 @@
 	import '../app.css';
 	import { AppBar, Avatar } from '@skeletonlabs/skeleton-svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
+	import { initTheme } from '$lib/stores/theme.js';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { generateBreadcrumbs } from '$lib/utils/breadcrumbs.js';
 	import { page } from '$app/stores';
@@ -13,6 +14,11 @@
 	import LogIn from '@lucide/svelte/icons/log-in';
 
 	let { data, children }: LayoutProps = $props();
+
+	// Initialize theme management
+	$effect(() => {
+		initTheme();
+	});
 
 	// Update user store when server data changes
 	$effect(() => {
