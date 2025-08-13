@@ -33,16 +33,16 @@ export const actions = {
 
 		const { firstName, lastName, email, password } = form.data;
 
-		// hash password here to prevent timing attack
+		// Always hash password to prevent timing attack
 		const salt = generateSalt();
-		const hashedPaswword = await hashPassword(password, salt);
+		const hashedPassword = await hashPassword(password, salt);
 
 		const exists = await userRepo.getByEmail(email);
 		if (exists) {
 			return message(form, 'Failed to create user');
 		}
 
-		const user = await userRepo.create(email, `${firstName} ${lastName}`, hashedPaswword, salt);
+		const user = await userRepo.create(email, `${firstName} ${lastName}`, hashedPassword, salt);
 		if (!user) {
 			return message(form, 'Failed to create user');
 		}
