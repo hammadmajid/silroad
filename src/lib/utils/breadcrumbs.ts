@@ -5,7 +5,8 @@ export interface BreadcrumbItem {
 	href?: string;
 }
 
-export function generateBreadcrumbs(page: Page, pageData?: any): BreadcrumbItem[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function generateBreadcrumbs(page: Page, pageData?: Record<string, any>): BreadcrumbItem[] {
 	const { pathname } = page.url;
 	const segments = pathname.split('/').filter(Boolean);
 	const breadcrumbs: BreadcrumbItem[] = [];
@@ -151,13 +152,13 @@ export function generateBreadcrumbs(page: Page, pageData?: any): BreadcrumbItem[
 				// Handle dynamic segments like [slug]
 				if (isLast && pageData) {
 					// For event pages
-					if (segments[i - 1] === 'events' && pageData.event) {
+					if (segments[i - 1] === 'events' && pageData?.event) {
 						breadcrumbs.push({
 							label: pageData.event.title
 						});
 					}
 					// For organization pages
-					else if (segments[i - 1] === 'orgs' && pageData.organization) {
+					else if (segments[i - 1] === 'orgs' && pageData?.organization) {
 						breadcrumbs.push({
 							label: pageData.organization.name
 						});

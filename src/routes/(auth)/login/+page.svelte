@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { Field, Control, Label, Description, FieldErrors } from 'formsnap';
+	import { Field, Control, Description, FieldErrors } from 'formsnap';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import SuperDebug from 'sveltekit-superforms';
@@ -100,7 +100,7 @@
 				<Control>
 					{#snippet children({ props })}
 						<label class="label">
-							<div class="flex justify-between items-center">
+							<div class="flex items-center justify-between">
 								<span class="label-text">Password</span>
 								<a href="/password-reset" class="anchor text-sm">Forgot password?</a>
 							</div>

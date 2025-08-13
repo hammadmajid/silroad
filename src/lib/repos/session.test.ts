@@ -14,8 +14,11 @@ vi.mock('$lib/utils/crypto', () => ({
 
 describe('SessionRepo', () => {
 	let sessionRepo: SessionRepo;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockDb: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockKV: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockLogger: any;
 
 	beforeEach(async () => {
@@ -330,10 +333,7 @@ describe('SessionRepo', () => {
 
 	describe('deleteByUserId', () => {
 		it('should delete all user sessions from database and KV', async () => {
-			const userSessions = [
-				{ sessionToken: 'token1' },
-				{ sessionToken: 'token2' }
-			];
+			const userSessions = [{ sessionToken: 'token1' }, { sessionToken: 'token2' }];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
@@ -356,7 +356,12 @@ describe('SessionRepo', () => {
 
 			expect(result).toBe(0);
 			expect(mockLogger.writeDataPoint).toHaveBeenCalledWith({
-				blobs: ['error', 'SessionRepo', 'deleteByUserId', JSON.stringify(new Error('Database error'))],
+				blobs: [
+					'error',
+					'SessionRepo',
+					'deleteByUserId',
+					JSON.stringify(new Error('Database error'))
+				],
 				doubles: [1],
 				indexes: [expect.any(String)]
 			});
@@ -534,10 +539,7 @@ describe('SessionRepo', () => {
 
 	describe('deleteExpired', () => {
 		it('should delete expired sessions from database and KV', async () => {
-			const expiredSessions = [
-				{ sessionToken: 'token1' },
-				{ sessionToken: 'token2' }
-			];
+			const expiredSessions = [{ sessionToken: 'token1' }, { sessionToken: 'token2' }];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
@@ -563,7 +565,12 @@ describe('SessionRepo', () => {
 
 			expect(result).toBe(0);
 			expect(mockLogger.writeDataPoint).toHaveBeenCalledWith({
-				blobs: ['error', 'SessionRepo', 'deleteExpired', JSON.stringify(new Error('Database error'))],
+				blobs: [
+					'error',
+					'SessionRepo',
+					'deleteExpired',
+					JSON.stringify(new Error('Database error'))
+				],
 				doubles: [1],
 				indexes: [expect.any(String)]
 			});

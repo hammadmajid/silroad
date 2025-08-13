@@ -37,7 +37,7 @@
 	}: Props = $props();
 
 	// Variant-specific overrides
-	const variantOverrides = {
+	const variantOverrides: Record<string, Partial<Props>> = {
 		default: {},
 		interactive: {
 			border: 'border-[1px] border-surface-200-800',
@@ -47,7 +47,7 @@
 		form: {}
 	};
 
-	const overrides = variantOverrides[variant];
+	const overrides = variantOverrides[variant] || {};
 
 	const finalClasses = [
 		base,

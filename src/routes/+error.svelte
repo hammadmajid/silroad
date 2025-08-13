@@ -47,7 +47,7 @@
 </svelte:head>
 
 <div class="flex min-h-[60vh] items-center justify-center">
-	<div class="text-center space-y-6 max-w-md">
+	<div class="max-w-md space-y-6 text-center">
 		<div class="flex justify-center">
 			<div class="rounded-full bg-error-500/10 p-6">
 				<AlertTriangle size={48} class="text-error-500" />
@@ -59,20 +59,20 @@
 			<p class="text-surface-600-300">{getErrorDescription(status)}</p>
 			{#if error?.message && status >= 500}
 				<details class="mt-4 text-left">
-					<summary class="cursor-pointer text-sm text-surface-500-400 hover:text-surface-700-200">
+					<summary class="text-surface-500-400 hover:text-surface-700-200 cursor-pointer text-sm">
 						Technical details
 					</summary>
-					<pre class="mt-2 text-xs text-surface-600-300 whitespace-pre-wrap">{error.message}</pre>
+					<pre class="text-surface-600-300 mt-2 text-xs whitespace-pre-wrap">{error.message}</pre>
 				</details>
 			{/if}
 		</div>
 
-		<div class="flex flex-col sm:flex-row gap-3 justify-center">
-			<a href="/explore" class="btn preset-filled-primary flex items-center gap-2">
+		<div class="flex flex-col justify-center gap-3 sm:flex-row">
+			<a href="/explore" class="preset-filled-primary btn flex items-center gap-2">
 				<Home size={16} />
 				<span>Back to Home</span>
 			</a>
-			<button onclick={reload} class="btn preset-tonal flex items-center gap-2">
+			<button onclick={reload} class="btn flex items-center gap-2 preset-tonal">
 				<RefreshCcw size={16} />
 				<span>Try Again</span>
 			</button>
