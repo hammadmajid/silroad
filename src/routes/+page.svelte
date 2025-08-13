@@ -13,7 +13,7 @@
 <!-- Main container with proper spacing between sections -->
 <div class="space-y-16">
 	<!-- Hero Section -->
-	<section class="px-4 py-8">
+	<section class="px-2 py-8 sm:px-4">
 		<div class="grid items-center gap-12 md:grid-cols-2">
 			<div class="space-y-6 text-center md:text-left">
 				<header class="space-y-4">
@@ -51,7 +51,7 @@
 	</section>
 
 	<!-- Features Section -->
-	<section class="space-y-8 card rounded-container bg-surface-100-900 p-8">
+	<section class="space-y-8 card rounded-container bg-surface-100-900 p-4 sm:p-8">
 		<header class="space-y-4 text-center">
 			<h2 class="text-3xl font-bold">Why Choose Silroad?</h2>
 			<p class="text-surface-600-300 text-lg">
@@ -102,7 +102,7 @@
 	</section>
 
 	<!-- How It Works Section -->
-	<section class="space-y-8 px-4 py-8">
+	<section class="space-y-8 px-2 py-8 sm:px-4">
 		<header class="space-y-4 text-center">
 			<h2 class="text-3xl font-bold">How It Works</h2>
 			<p class="text-surface-600-300 text-lg">Get started in just a few simple steps</p>
@@ -162,7 +162,7 @@
 	</section>
 
 	<!-- CTA Section -->
-	<section class="space-y-6 card rounded-container bg-primary-500 p-8 text-black">
+	<section class="space-y-6 card rounded-container bg-primary-500 p-4 text-black sm:p-8">
 		<header class="space-y-4 text-center">
 			<h2 class="text-3xl font-bold">Ready to Start Connecting?</h2>
 			<p class="text-lg opacity-90">

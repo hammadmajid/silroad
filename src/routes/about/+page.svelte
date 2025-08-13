@@ -1,4 +1,4 @@
-<div class="container mx-auto max-w-4xl px-4 py-12">
+<div class="container mx-auto max-w-4xl px-2 py-12 sm:px-4">
 	<div class="space-y-8">
 		<header class="text-center">
 			<h1 class="mb-4 text-4xl font-bold">About Silroad</h1>
