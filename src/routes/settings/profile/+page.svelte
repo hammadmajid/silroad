@@ -68,6 +68,9 @@
 				type={$message === 'Profile updated successfully' ? 'success' : 'error'}
 				title={$message === 'Profile updated successfully' ? 'Success' : 'Error'}
 				dismissible={true}
+				data-testid={$message === 'Profile updated successfully'
+					? 'success-message'
+					: 'error-message'}
 			>
 				{#snippet icon()}
 					{#if $message === 'Profile updated successfully'}
@@ -130,6 +133,7 @@
 												type="text"
 												bind:value={$formData.name}
 												placeholder="Enter your full name"
+												data-testid="name-input"
 											/>
 										</label>
 									{/snippet}
@@ -139,7 +143,13 @@
 
 							<div class="space-y-2">
 								<label for="join-date" class="label-text">Member Since</label>
-								<input id="join-date" value={formatJoinDate()} class="input w-full" disabled />
+								<input
+									id="join-date"
+									value={formatJoinDate()}
+									class="input w-full"
+									disabled
+									data-testid="join-date-input"
+								/>
 							</div>
 
 							<!-- Action Buttons -->
@@ -148,6 +158,7 @@
 									type="submit"
 									class="btn flex items-center gap-2 preset-filled-primary-500"
 									disabled={$submitting}
+									data-testid="save-changes-btn"
 								>
 									{#if $submitting}
 										<LoaderCircle class="animate-spin" size={16} />
@@ -177,6 +188,7 @@
 					<button
 						onclick={handleLogout}
 						class="btn flex items-center gap-2 preset-filled-error-500 btn-sm"
+						data-testid="logout-btn"
 					>
 						<LogOut size={16} />
 						Sign Out
