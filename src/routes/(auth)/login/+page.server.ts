@@ -9,16 +9,16 @@ import { isProduction } from '$lib/utils/env';
 
 function isSafeRedirect(url: string): boolean {
 	if (!url) return false;
-	
+
 	// Only allow relative URLs that start with /
 	if (!url.startsWith('/')) return false;
-	
+
 	// Prevent protocol-relative URLs (//example.com)
 	if (url.startsWith('//')) return false;
-	
+
 	// Prevent data URLs and javascript URLs
 	if (url.includes(':')) return false;
-	
+
 	return true;
 }
 
@@ -71,7 +71,8 @@ export const actions = {
 		// Check for redirectTo parameter and redirect accordingly
 		const redirectTo = url.searchParams.get('redirectTo');
 		const decodedRedirect = redirectTo ? decodeURIComponent(redirectTo) : null;
-		const redirectUrl = decodedRedirect && isSafeRedirect(decodedRedirect) ? decodedRedirect : '/explore';
+		const redirectUrl =
+			decodedRedirect && isSafeRedirect(decodedRedirect) ? decodedRedirect : '/explore';
 
 		throw redirect(303, redirectUrl);
 	}
