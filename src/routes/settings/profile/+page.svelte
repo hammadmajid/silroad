@@ -1,21 +1,36 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
+	import { superForm } from 'sveltekit-superforms';
+	import { Field, Control, FieldErrors } from 'formsnap';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema.js';
 	import Camera from '@lucide/svelte/icons/camera';
-	import Edit from '@lucide/svelte/icons/edit';
 	import Save from '@lucide/svelte/icons/save';
-	import X from '@lucide/svelte/icons/x';
 	import LogOut from '@lucide/svelte/icons/log-out';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 
-	let isEditing = $state(false);
-	let editedName = $state('');
+	let { data } = $props();
 
-	$effect(() => {
-		if (userStore.current) {
-			editedName = userStore.current.name;
+	const form = superForm(data.form, {
+		validators: zod4Client(schema),
+		delayMs: 400,
+		onResult: async ({ result }) => {
+			if (result.type === 'success' && result.data) {
+				// Update user store with new data if update was successful
+				const updatedUser = {
+					...userStore.current!,
+					name: result.data.form.data.name
+				};
+				userStore.setUser(updatedUser);
+			}
 		}
 	});
+	const { form: formData, enhance, submitting, message } = form;
 
 	async function handleLogout() {
 		await fetch('/api/logout', {
@@ -25,22 +40,6 @@
 		goto('/login', {
 			invalidateAll: true
 		});
-	}
-
-	function startEditing() {
-		isEditing = true;
-		editedName = userStore.current?.name || '';
-	}
-
-	function cancelEditing() {
-		isEditing = false;
-		editedName = userStore.current?.name || '';
-	}
-
-	async function saveProfile() {
-		// TODO: Implement save functionality
-		console.log('Save profile:', { name: editedName });
-		isEditing = false;
 	}
 
 	function getInitials(name: string): string {
@@ -64,6 +63,23 @@
 
 {#if userStore.current}
 	<div class="space-y-8">
+		{#if $message}
+			<Alert
+				type={$message === 'Profile updated successfully' ? 'success' : 'error'}
+				title={$message === 'Profile updated successfully' ? 'Success' : 'Error'}
+				dismissible={true}
+			>
+				{#snippet icon()}
+					{#if $message === 'Profile updated successfully'}
+						<CheckCircle />
+					{:else}
+						<TriangleAlert />
+					{/if}
+				{/snippet}
+				{$message}
+			</Alert>
+		{/if}
+
 		<section class="space-y-6">
 			<header>
 				<h1 class="h2">Profile</h1>
@@ -100,70 +116,48 @@
 						</button>
 					</div>
 
-					<!-- Profile Info -->
+					<!-- Profile Info Form -->
 					<div class="flex-1 space-y-4">
-						<div class="grid gap-4 sm:grid-cols-2">
-							<div class="space-y-2">
-								<label for="name" class="label-text">Full Name</label>
-								{#if isEditing}
-									<input
-										id="name"
-										bind:value={editedName}
-										class="input w-full"
-										placeholder="Enter your full name"
-									/>
-								{:else}
-									<input id="name" value={userStore.current.name} class="input w-full" disabled />
-								{/if}
-							</div>
-
-							<div class="space-y-2">
-								<label for="email" class="label-text">Email</label>
-								<input id="email" value={userStore.current.email} class="input w-full" disabled />
-							</div>
-						</div>
-
-						<div class="grid gap-4 sm:grid-cols-2">
-							<div class="space-y-2">
-								<label for="user-id" class="label-text">User ID</label>
-								<input
-									id="user-id"
-									value={userStore.current.id}
-									class="input w-full font-mono text-sm"
-									disabled
-								/>
-							</div>
+						<form class="space-y-4" method="POST" use:enhance>
+							<Field {form} name="name">
+								<Control>
+									{#snippet children({ props })}
+										<label class="label">
+											<span class="label-text">Full Name</span>
+											<input
+												class="input w-full"
+												{...props}
+												type="text"
+												bind:value={$formData.name}
+												placeholder="Enter your full name"
+											/>
+										</label>
+									{/snippet}
+								</Control>
+								<FieldErrors class="text-error-700-300" />
+							</Field>
 
 							<div class="space-y-2">
 								<label for="join-date" class="label-text">Member Since</label>
 								<input id="join-date" value={formatJoinDate()} class="input w-full" disabled />
 							</div>
-						</div>
 
-						<!-- Action Buttons -->
-						<div class="flex gap-3 pt-4">
-							{#if isEditing}
+							<!-- Action Buttons -->
+							<div class="flex gap-3 pt-4">
 								<button
-									onclick={saveProfile}
+									type="submit"
 									class="btn flex items-center gap-2 preset-filled-primary-500"
+									disabled={$submitting}
 								>
-									<Save size={16} />
+									{#if $submitting}
+										<LoaderCircle class="animate-spin" size={16} />
+									{:else}
+										<Save size={16} />
+									{/if}
 									Save Changes
 								</button>
-								<button onclick={cancelEditing} class="btn flex items-center gap-2 preset-outlined">
-									<X size={16} />
-									Cancel
-								</button>
-							{:else}
-								<button
-									onclick={startEditing}
-									class="btn flex items-center gap-2 preset-filled-primary-500"
-								>
-									<Edit size={16} />
-									Edit Profile
-								</button>
-							{/if}
-						</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</Card>
