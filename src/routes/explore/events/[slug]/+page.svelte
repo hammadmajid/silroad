@@ -2,6 +2,9 @@
 	import Card from '$lib/components/Card.svelte';
 	import Badge from '$lib/components/Badge.svelte';
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import Calendar from '@lucide/svelte/icons/calendar';
+	import Users from '@lucide/svelte/icons/users';
+	import Clock from '@lucide/svelte/icons/clock';
 	let { data } = $props();
 
 	const { event, attendeeCount, organizers } = data;
@@ -50,23 +53,23 @@
 
 			<div class="text-surface-600-300 flex flex-wrap gap-4 text-sm">
 				<div class="flex items-center gap-2">
-					<span>📅</span>
+					<Calendar size={16} />
 					<span>{formatDate(new Date(event.dateOfEvent).getTime())}</span>
 				</div>
 				{#if event.maxAttendees}
 					<div class="flex items-center gap-2">
-						<span>👥</span>
+						<Users size={16} />
 						<span>{attendeeCount}/{event.maxAttendees} attendees</span>
 					</div>
 				{:else}
 					<div class="flex items-center gap-2">
-						<span>👥</span>
+						<Users size={16} />
 						<span>{attendeeCount} attendees</span>
 					</div>
 				{/if}
 				{#if event.closeRsvpAt}
 					<div class="flex items-center gap-2">
-						<span>🕒</span>
+						<Clock size={16} />
 						<span>RSVP closes {formatDate(new Date(event.closeRsvpAt).getTime())}</span>
 					</div>
 				{/if}

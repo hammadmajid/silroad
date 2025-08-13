@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
+	import Users from '@lucide/svelte/icons/users';
+	import Calendar from '@lucide/svelte/icons/calendar';
 	let { data } = $props();
 
 	const { organization, events, memberCount, members } = data;
@@ -51,11 +53,11 @@
 
 				<div class="text-surface-600-300 flex flex-wrap gap-4 text-sm">
 					<div class="flex items-center gap-2">
-						<span>👥</span>
+						<Users size={16} />
 						<span>{memberCount} members</span>
 					</div>
 					<div class="flex items-center gap-2">
-						<span>📅</span>
+						<Calendar size={16} />
 						<span>{events.length} events</span>
 					</div>
 				</div>
