@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { generateSalt, hashPassword, generateSessionToken } from '$lib/utils/crypto';
 import * as schema from '$lib/db/schema';
-import { getDb } from '$lib/db';
+import { getDb, getKV } from '$lib/db';
 
 // prevent worker from hitting the CPU time limit
 const password = 'Pass!234';
@@ -30,9 +30,13 @@ async function insertInBatches<T extends Record<string, unknown>>(
 
 export async function seedDatabase(platform: App.Platform | undefined, count: number) {
 	const db = getDb(platform);
+	const kv = getKV(platform);
 
 	try {
 		console.log('Starting database seeding...');
+
+		await clearKV(kv);
+		console.log('KV cleared');
 
 		await clearDatabase(db);
 		console.log('Database cleared');
@@ -63,6 +67,14 @@ export async function seedDatabase(platform: App.Platform | undefined, count: nu
 }
 
 // ----------------------------
+
+async function clearKV(kv: KVNamespace) {
+	const { keys } = await kv.list();
+	
+	for (const key of keys) {
+		await kv.delete(key.name);
+	}
+}
 
 async function clearDatabase(db: ReturnType<typeof getDb>) {
 	await db.delete(schema.attendees).run();
