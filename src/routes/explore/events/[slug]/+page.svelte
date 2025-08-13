@@ -5,6 +5,10 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Users from '@lucide/svelte/icons/users';
 	import Clock from '@lucide/svelte/icons/clock';
+	import { userStore } from '$lib/stores/user.svelte';
+	import { handleLoginRedirect } from '$lib/utils/redirect';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	let { data } = $props();
 
 	const { event, attendeeCount, organizers } = data;
@@ -26,6 +30,10 @@
 	const isEventFull = event.maxAttendees ? attendeeCount >= event.maxAttendees : false;
 
 	const handleRsvp = () => {
+		if (!userStore.isLoggedIn) {
+			goto(handleLoginRedirect({ url: $page.url }, 'You must be logged in to RSVP to events'));
+			return;
+		}
 		// TODO: Implement RSVP functionality
 		alert('RSVP functionality coming soon!');
 	};

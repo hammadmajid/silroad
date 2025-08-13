@@ -3,6 +3,10 @@
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 	import Users from '@lucide/svelte/icons/users';
 	import Calendar from '@lucide/svelte/icons/calendar';
+	import { userStore } from '$lib/stores/user.svelte';
+	import { handleLoginRedirect } from '$lib/utils/redirect';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	let { data } = $props();
 
 	const { organization, events, memberCount, members } = data;
@@ -20,6 +24,10 @@
 	};
 
 	const handleJoin = () => {
+		if (!userStore.isLoggedIn) {
+			goto(handleLoginRedirect({ url: $page.url }, 'You must be logged in to join organizations'));
+			return;
+		}
 		// TODO: Implement join functionality
 		alert('Join functionality coming soon!');
 	};
