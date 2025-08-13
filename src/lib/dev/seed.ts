@@ -70,7 +70,7 @@ export async function seedDatabase(platform: App.Platform | undefined, count: nu
 
 async function clearKV(kv: KVNamespace) {
 	const { keys } = await kv.list();
-	
+
 	for (const key of keys) {
 		await kv.delete(key.name);
 	}
