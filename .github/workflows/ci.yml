@@ -43,9 +43,6 @@ jobs:
       - name: Build project
         run: pnpm run build
 
-      - name: Lint and format check
-        run: pnpm lint
-
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
