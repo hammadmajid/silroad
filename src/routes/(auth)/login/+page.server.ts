@@ -7,6 +7,21 @@ import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
 import { UserRepo } from '$lib/repos/user';
 import { isProduction } from '$lib/utils/env';
 
+function isSafeRedirect(url: string): boolean {
+	if (!url) return false;
+	
+	// Only allow relative URLs that start with /
+	if (!url.startsWith('/')) return false;
+	
+	// Prevent protocol-relative URLs (//example.com)
+	if (url.startsWith('//')) return false;
+	
+	// Prevent data URLs and javascript URLs
+	if (url.includes(':')) return false;
+	
+	return true;
+}
+
 export const load: PageServerLoad = async ({ locals, platform }) => {
 	// Note: We still check locals.user for server-side redirect
 	// The client will handle the user store initialization
@@ -55,7 +70,8 @@ export const actions = {
 
 		// Check for redirectTo parameter and redirect accordingly
 		const redirectTo = url.searchParams.get('redirectTo');
-		const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+		const decodedRedirect = redirectTo ? decodeURIComponent(redirectTo) : null;
+		const redirectUrl = decodedRedirect && isSafeRedirect(decodedRedirect) ? decodedRedirect : '/explore';
 
 		throw redirect(303, redirectUrl);
 	}
