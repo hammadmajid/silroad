@@ -58,8 +58,6 @@ describe('SessionRepo', () => {
 		it('should return session from KV when found and not expired', async () => {
 			const mockSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60).toISOString()
 			};
@@ -74,8 +72,6 @@ describe('SessionRepo', () => {
 		it('should delete expired session from KV and return null', async () => {
 			const expiredSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() - 1000).toISOString()
 			};
@@ -91,8 +87,6 @@ describe('SessionRepo', () => {
 		it('should fallback to database when not in KV', async () => {
 			const dbSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60)
 			};
@@ -108,8 +102,6 @@ describe('SessionRepo', () => {
 
 			expect(result).toEqual({
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: dbSession.sessionExpiresAt.toISOString()
 			});
@@ -198,8 +190,6 @@ describe('SessionRepo', () => {
 				{
 					sessionToken: 'token1',
 					userId: 'user-1',
-					userEmail: 'test@example.com',
-					userName: 'Test User',
 					userImage: null,
 					sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60)
 				}
@@ -215,8 +205,6 @@ describe('SessionRepo', () => {
 			expect(result).toHaveLength(1);
 			expect(result[0]).toEqual({
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: mockSessions[0].sessionExpiresAt.toISOString()
 			});
@@ -243,8 +231,6 @@ describe('SessionRepo', () => {
 		it('should update session in KV', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date().toISOString()
 			};
@@ -264,8 +250,6 @@ describe('SessionRepo', () => {
 		it('should return null when session not found', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date().toISOString()
 			};
@@ -283,8 +267,6 @@ describe('SessionRepo', () => {
 		it('should return null and log error on database error', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date().toISOString()
 			};
@@ -400,8 +382,6 @@ describe('SessionRepo', () => {
 		it('should refresh session expiry and update KV when close to expiring', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
 			};
@@ -421,8 +401,6 @@ describe('SessionRepo', () => {
 
 			expect(result).toMatchObject({
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: expect.any(String)
 			});
@@ -432,8 +410,6 @@ describe('SessionRepo', () => {
 		it('should return session unchanged when not close to expiring', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString() // 7 days
 			};
@@ -448,8 +424,6 @@ describe('SessionRepo', () => {
 		it('should return null when session not found in database', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
 			};
@@ -467,8 +441,6 @@ describe('SessionRepo', () => {
 		it('should return null and log error on database error', async () => {
 			const session: SerializableSession = {
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString() // 24 hours
 			};
@@ -494,8 +466,6 @@ describe('SessionRepo', () => {
 			const expiredSessions = [
 				{
 					userId: 'user-1',
-					userEmail: 'test@example.com',
-					userName: 'Test User',
 					userImage: null,
 					sessionExpiresAt: new Date(Date.now() - 1000)
 				}
@@ -512,8 +482,6 @@ describe('SessionRepo', () => {
 			expect(result).toHaveLength(1);
 			expect(result[0]).toMatchObject({
 				userId: 'user-1',
-				userEmail: 'test@example.com',
-				userName: 'Test User',
 				userImage: null,
 				sessionExpiresAt: expect.any(String)
 			});
