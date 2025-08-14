@@ -5,6 +5,7 @@ import { schema } from './schema';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { UserRepo } from '$lib/repos/user';
+import { SESSION_COOKIE_NAME } from '$lib/repos/session';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals } = event;
@@ -29,7 +30,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, platform, locals }) => {
+	default: async ({ request, platform, locals, cookies }) => {
 		const form = await superValidate(request, zod4(schema));
 
 		if (!locals.user) {
@@ -43,13 +44,22 @@ export const actions: Actions = {
 		const userRepo = new UserRepo(platform);
 		const { name } = form.data;
 
+		// Get session token
+		const sessionToken = cookies.get(SESSION_COOKIE_NAME);
+		if (!sessionToken) {
+			return message(form, 'Failed to update profile');
+		}
+
 		// Update user
-		const updatedUser = await userRepo.update({
-			id: locals.user.id,
-			name,
-			email: locals.user.email,
-			image: locals.user.image
-		});
+		const updatedUser = await userRepo.update(
+			{
+				id: locals.user.id,
+				name,
+				email: locals.user.email,
+				image: locals.user.image
+			},
+			sessionToken
+		);
 
 		if (!updatedUser) {
 			return message(form, 'Failed to update profile');

@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 import { getDb, getLogger } from '$lib/db';
 import { users } from '$lib/db/schema';
 import { comparePassword, hashPassword } from '$lib/utils/crypto';
+import { SessionRepo } from './session';
 
 export type User = {
 	id: string;
@@ -13,12 +14,12 @@ export type User = {
 export class UserRepo {
 	private db;
 	private logger;
-	private platform;
+	private sessionRepo;
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
 		this.logger = getLogger(platform);
-		this.platform = platform;
+		this.sessionRepo = new SessionRepo(platform);
 	}
 
 	async getByEmail(email: string): Promise<User | null> {
@@ -111,7 +112,7 @@ export class UserRepo {
 		}
 	}
 
-	async update(user: User): Promise<User | null> {
+	async update(user: User, currentSessionToken: string): Promise<User | null> {
 		try {
 			const [updatedUser] = await this.db
 				.update(users)
@@ -126,6 +127,19 @@ export class UserRepo {
 					name: users.name,
 					image: users.image
 				});
+
+			if (updatedUser) {
+				const activeSession = await this.sessionRepo.getByToken(currentSessionToken);
+
+				if (!activeSession) {
+					throw 'Session not found';
+				}
+
+				await this.sessionRepo.update({
+					...activeSession,
+					userName: updatedUser.name
+				});
+			}
 
 			return updatedUser ?? null;
 		} catch (error) {
@@ -168,9 +182,7 @@ export class UserRepo {
 			await this.db.update(users).set({ password: newHashedPassword }).where(eq(users.id, userId));
 
 			// Invalidate all existing sessions for security
-			const { SessionRepo } = await import('./session');
-			const sessionRepo = new SessionRepo(this.platform);
-			await sessionRepo.deleteByUserId(userId);
+			await this.sessionRepo.deleteByUserId(userId);
 
 			return true;
 		} catch (error) {
