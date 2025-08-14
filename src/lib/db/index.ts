@@ -43,8 +43,24 @@ export function getLogger(platform: App.Platform | undefined) {
 	}
 
 	if (!platform.env.LOGGER) {
-		throw error(500, 'KV not available');
+		throw error(500, 'Logger not available');
 	}
 
 	return platform.env.LOGGER;
+}
+
+export function getBucket(platform: App.Platform | undefined) {
+	if (!platform) {
+		throw error(500, 'Platform not available');
+	}
+
+	if (!platform.env) {
+		throw error(500, 'Environment not available');
+	}
+
+	if (!platform.env.BUCKET) {
+		throw error(500, 'BUCKET not available');
+	}
+
+	return platform.env.BUCKET;
 }

@@ -55,5 +55,11 @@
 			"binding": "LOGGER",
 			"dataset": "silroad_logs"
 		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "silroad",
+			"binding": "BUCKET"
+		}
 	]
 }
