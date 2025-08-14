@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
-	import { userStore } from '$lib/stores/user.svelte.js';
+	// import { userStore } from '$lib/stores/user.svelte.js';
 	import Key from '@lucide/svelte/icons/key';
 	import Download from '@lucide/svelte/icons/download';
 	import Trash2 from '@lucide/svelte/icons/trash-2';

@@ -68,7 +68,7 @@ export class SessionRepo {
 		}
 	}
 
-	async create({ id: userId, email, name, image }: User): Promise<{
+	async create({ id: userId, image }: User): Promise<{
 		token: string;
 		expiresAt: Date;
 	} | null> {

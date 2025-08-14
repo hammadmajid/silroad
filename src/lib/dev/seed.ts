@@ -7,9 +7,13 @@ import { getDb, getKV } from '$lib/db';
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 interface Logger {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	error: (message: string, ...args: any[]) => void;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	warn: (message: string, ...args: any[]) => void;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	info: (message: string, ...args: any[]) => void;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	debug: (message: string, ...args: any[]) => void;
 }
 
@@ -24,15 +28,19 @@ function createLogger(level: LogLevel): Logger {
 	const currentLevel = levels[level];
 
 	return {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		error: (message: string, ...args: any[]) => {
 			if (currentLevel >= 0) console.error(message, ...args);
 		},
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		warn: (message: string, ...args: any[]) => {
 			if (currentLevel >= 1) console.warn(message, ...args);
 		},
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		info: (message: string, ...args: any[]) => {
 			if (currentLevel >= 2) console.log(message, ...args);
 		},
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		debug: (message: string, ...args: any[]) => {
 			if (currentLevel >= 3) console.log(message, ...args);
 		}
