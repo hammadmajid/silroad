@@ -2,6 +2,41 @@ import { error, json } from '@sveltejs/kit';
 import { getBucket } from '$lib/db/index.js';
 import type { RequestEvent } from '@sveltejs/kit';
 
+export async function GET({ platform }: RequestEvent) {
+	try {
+		const bucket = getBucket(platform);
+
+		// List all objects in the bucket
+		const listed = await bucket.list();
+
+		const objects = listed.objects.map(obj => ({
+			key: obj.key,
+			size: obj.size,
+			etag: obj.etag,
+			uploaded: obj.uploaded,
+			httpEtag: obj.httpEtag,
+			customMetadata: obj.customMetadata,
+			httpMetadata: obj.httpMetadata,
+			url: `https://static.silroad.space/${obj.key}`
+		}));
+
+		return json({
+			success: true,
+			totalObjects: objects.length,
+			truncated: listed.truncated,
+			objects
+		});
+
+	} catch (err) {
+		if (err instanceof Error && 'status' in err) {
+			throw err;
+		}
+
+		console.error('R2 list error:', err);
+		throw error(500, 'Failed to list bucket contents');
+	}
+}
+
 export async function POST({ platform }: RequestEvent) {
 	try {
 		const bucket = getBucket(platform);
