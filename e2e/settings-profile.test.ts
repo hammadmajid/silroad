@@ -109,7 +109,8 @@ test.describe('Profile Settings Page', () => {
 
 		// Verify avatar updates with new initials
 		const nameParts = newName.split(' ');
-		const expectedInitials = `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+		const expectedInitials =
+			`${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
 		const avatarElement = page.locator('.bg-primary-500').filter({ hasText: expectedInitials });
 		await expect(avatarElement).toBeVisible();
 	});

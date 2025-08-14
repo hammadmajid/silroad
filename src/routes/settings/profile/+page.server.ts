@@ -15,7 +15,7 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	// Initialize form with current user data
-	console.log("Load: ", locals.user.name)
+	console.log('Load: ', locals.user.name);
 	const form = await superValidate(
 		{
 			name: locals.user.name
@@ -57,7 +57,7 @@ export const actions: Actions = {
 
 		// Update locals.user with new data
 		locals.user.name = updatedUser.name;
-		console.log("Action: ", locals.user.name)
+		console.log('Action: ', locals.user.name);
 
 		return message(form, 'Profile updated successfully');
 	}

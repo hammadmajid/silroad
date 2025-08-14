@@ -207,11 +207,7 @@ async function clearDatabase(db: ReturnType<typeof getDb>, logger: Logger) {
 
 // ----------------------------
 
-async function createOrganizations(
-	db: ReturnType<typeof getDb>,
-	count: number,
-	logger: Logger
-) {
+async function createOrganizations(db: ReturnType<typeof getDb>, count: number, logger: Logger) {
 	const organizations: (typeof schema.organizations.$inferInsert)[] = [];
 	const usedSlugs = new Set<string>();
 

@@ -9,7 +9,7 @@ export async function GET({ platform }: RequestEvent) {
 		// List all objects in the bucket
 		const listed = await bucket.list();
 
-		const objects = listed.objects.map(obj => ({
+		const objects = listed.objects.map((obj) => ({
 			key: obj.key,
 			size: obj.size,
 			etag: obj.etag,
@@ -26,7 +26,6 @@ export async function GET({ platform }: RequestEvent) {
 			truncated: listed.truncated,
 			objects
 		});
-
 	} catch (err) {
 		if (err instanceof Error && 'status' in err) {
 			throw err;
@@ -58,7 +57,6 @@ export async function POST({ platform }: RequestEvent) {
 			}
 		});
 
-
 		const metadata = {
 			success: true,
 			r2ObjectKey: uniqueKey,
@@ -71,7 +69,6 @@ export async function POST({ platform }: RequestEvent) {
 		};
 
 		return json(metadata);
-
 	} catch (err) {
 		if (err instanceof Error && 'status' in err) {
 			throw err;
