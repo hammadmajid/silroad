@@ -58,10 +58,10 @@
 							<Avatar
 								src={userStore.current?.image || undefined}
 								name="User"
-								size="w-8"
+								size="w-8 h-8"
 								background="preset-filled-primary-500"
 							>
-								<User size={16} />
+								<User class="w-8 h-8" />
 							</Avatar>
 						</a>
 					</li>

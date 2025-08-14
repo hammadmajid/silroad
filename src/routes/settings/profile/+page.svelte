@@ -84,22 +84,14 @@
 				<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
 					<!-- Avatar Section -->
 					<div class="flex flex-col items-center gap-4">
-						<div class="relative">
 							<Avatar
 								src={userStore.current?.image || undefined}
 								name="User"
-								size="w-8"
+								size="w-24 h-24"
 								background="preset-filled-primary-500"
 							>
-								<User size={16} />
+								<User class="w-24 h-24" />
 							</Avatar>
-							<button
-								class="bg-surface-100-800 text-surface-600-300 hover:bg-surface-200-700 absolute -right-1 -bottom-1 rounded-full p-2"
-								aria-label="Edit profile photo"
-							>
-								<Camera class="h-4 w-4" />
-							</button>
-						</div>
 						<button class="btn flex items-center gap-2 preset-outlined btn-sm">
 							<Camera size={16} />
 							Change photo
