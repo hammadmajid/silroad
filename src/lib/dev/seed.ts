@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { generateSalt, hashPassword, generateSessionToken } from '$lib/utils/crypto';
 import * as schema from '$lib/db/schema';
-import { getDb, getKV, getBucket } from '$lib/db';
+import { getDb, getKV } from '$lib/db';
 
 // Logging utilities
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
@@ -45,90 +45,19 @@ const salt = generateSalt();
 const hashedPassword = await hashPassword(password, salt);
 
 // Image utilities
-async function listImagesFromPath(
-	platform: App.Platform | undefined,
-	path: string,
-	logger: Logger
-): Promise<string[]> {
-	try {
-		const bucket = getBucket(platform);
-		logger.debug(`📁 Listing images from path: ${path}`);
-
-		const { objects } = await bucket.list({ prefix: path });
-		const imageUrls = objects
-			.filter((obj) => obj.key.match(/\.(jpg|jpeg|png|gif|webp)$/i))
-			.map((obj) => `https://static.silroad.space/${obj.key}`);
-
-		logger.debug(`📸 Found ${imageUrls.length} images in ${path}:`, imageUrls);
-		return imageUrls;
-	} catch (error) {
-		logger.error(`❌ Error listing images from ${path}:`, error);
-		return [];
-	}
+function getRandomAvatar(): string {
+	const imageNumber = Math.floor(Math.random() * 40) + 1;
+	return `https://static.silroad.space/avatars/${imageNumber}.png`;
 }
 
-async function getRandomImageFromPath(
-	platform: App.Platform | undefined,
-	path: string,
-	logger: Logger,
-	fallbackUrl?: string
-): Promise<string> {
-	try {
-		logger.debug(`🎲 Getting random image from path: ${path}`);
-		const images = await listImagesFromPath(platform, path, logger);
-
-		if (images.length === 0) {
-			logger.warn(`⚠️ No images found in ${path}, using fallback`);
-			return fallbackUrl || `https://static.silroad.space/default.png`;
-		}
-
-		const selectedImage = faker.helpers.arrayElement(images);
-		logger.debug(`✅ Selected random image: ${selectedImage}`);
-		return selectedImage;
-	} catch (error) {
-		logger.error(`❌ Error getting random image from ${path}:`, error);
-		return fallbackUrl || `https://static.silroad.space/default.png`;
-	}
+function getRandomOrgBackground(): string {
+	const imageNumber = Math.floor(Math.random() * 40) + 1;
+	return `https://static.silroad.space/orgs/${imageNumber}.png`;
 }
 
-async function getRandomAvatar(
-	platform: App.Platform | undefined,
-	name: string,
-	logger: Logger
-): Promise<string> {
-	logger.debug(`👤 Getting random avatar for: ${name}`);
-	return await getRandomImageFromPath(
-		platform,
-		'avatar/',
-		logger,
-		`https://static.silroad.space/avatar/default.png`
-	);
-}
-
-async function getRandomOrgBackground(
-	platform: App.Platform | undefined,
-	logger: Logger
-): Promise<string> {
-	logger.debug(`🏢 Getting random organization background`);
-	return await getRandomImageFromPath(
-		platform,
-		'orgs/',
-		logger,
-		`https://static.silroad.space/orgs/default.png`
-	);
-}
-
-async function getRandomEventBackground(
-	platform: App.Platform | undefined,
-	logger: Logger
-): Promise<string> {
-	logger.debug(`🎉 Getting random event background`);
-	return await getRandomImageFromPath(
-		platform,
-		'events/',
-		logger,
-		`https://static.silroad.space/events/default.png`
-	);
+function getRandomEventBackground(): string {
+	const imageNumber = Math.floor(Math.random() * 40) + 1;
+	return `https://static.silroad.space/events/${imageNumber}.png`;
 }
 
 // Helper function to insert data in batches
@@ -184,11 +113,11 @@ export async function seedDatabase(
 		logger.info('✅ Database cleared');
 
 		logger.info('🏢 Creating organizations...');
-		const organizations = await createOrganizations(db, platform, count, logger);
+		const organizations = await createOrganizations(db, count, logger);
 		logger.info(`✅ Created ${organizations.length} organizations`);
 
 		logger.info('👥 Creating users...');
-		const users = await createUsers(db, platform, count, organizations, logger);
+		const users = await createUsers(db, count, organizations, logger);
 		logger.info(`✅ Created ${users.length} users`);
 
 		logger.info('🤝 Assigning organization members...');
@@ -196,7 +125,7 @@ export async function seedDatabase(
 		logger.info('✅ Assigned organization members');
 
 		logger.info('🎉 Creating events...');
-		const events = await createEvents(db, platform, organizations, logger);
+		const events = await createEvents(db, organizations, logger);
 		logger.info(`✅ Created ${events.length} events`);
 
 		logger.info('👤 Assigning event organizers and attendees...');
@@ -280,7 +209,6 @@ async function clearDatabase(db: ReturnType<typeof getDb>, logger: Logger) {
 
 async function createOrganizations(
 	db: ReturnType<typeof getDb>,
-	platform: App.Platform | undefined,
 	count: number,
 	logger: Logger
 ) {
@@ -300,8 +228,8 @@ async function createOrganizations(
 		usedSlugs.add(slug);
 
 		logger.debug(`🏢 Creating organization ${i + 1}/${count}: ${name}`);
-		const avatar = await getRandomAvatar(platform, name, logger);
-		const backgroundImage = await getRandomOrgBackground(platform, logger);
+		const avatar = getRandomAvatar();
+		const backgroundImage = getRandomOrgBackground();
 
 		organizations.push({
 			id: crypto.randomUUID(),
@@ -323,7 +251,6 @@ async function createOrganizations(
 
 async function createUsers(
 	db: ReturnType<typeof getDb>,
-	platform: App.Platform | undefined,
 	count: number,
 	organizations: (typeof schema.organizations.$inferInsert)[],
 	logger: Logger
@@ -334,7 +261,7 @@ async function createUsers(
 
 	// Always create the testing user with email u@test.it
 	logger.debug(`👤 Creating test user: Test User (u@test.it)`);
-	const testUserAvatar = await getRandomAvatar(platform, 'Test User', logger);
+	const testUserAvatar = getRandomAvatar();
 	users.push({
 		id: crypto.randomUUID(),
 		name: 'Test User',
@@ -372,7 +299,7 @@ async function createUsers(
 
 		const fullName = faker.person.fullName();
 		logger.debug(`👤 Creating user ${i + 1}/${count}: ${fullName} (${email})`);
-		const userAvatar = await getRandomAvatar(platform, fullName, logger);
+		const userAvatar = getRandomAvatar();
 
 		users.push({
 			id: crypto.randomUUID(),
@@ -464,7 +391,6 @@ function createUniqueSlug(title: string, usedSlugs: Set<string>): string {
 
 async function createEvents(
 	db: ReturnType<typeof getDb>,
-	platform: App.Platform | undefined,
 	organizations: (typeof schema.organizations.$inferInsert)[],
 	logger: Logger
 ) {
@@ -482,7 +408,7 @@ async function createEvents(
 			const title = faker.company.catchPhrase();
 
 			logger.debug(`🎉 Creating event ${i + 1}/${eventCount}: ${title}`);
-			const eventImage = await getRandomEventBackground(platform, logger);
+			const eventImage = getRandomEventBackground();
 
 			events.push({
 				id: crypto.randomUUID(),
