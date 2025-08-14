@@ -70,6 +70,7 @@
 		"@lucide/svelte": "^0.536.0",
 		"drizzle-orm": "^0.44.4",
 		"formsnap": "^2.0.1",
+		"sharp": "^0.34.3",
 		"sveltekit-superforms": "^2.27.1"
 	}
 }
