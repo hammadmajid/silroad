@@ -24,7 +24,7 @@
 						<input
 							id="primary-email"
 							class="input w-full max-w-md"
-							value={userStore.current?.email || ''}
+							value="TODO: FIXME"
 							disabled
 						/>
 					</div>
