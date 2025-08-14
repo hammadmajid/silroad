@@ -13,6 +13,8 @@
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import CheckCircle from '@lucide/svelte/icons/check-circle';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import User from '@lucide/svelte/icons/user';
+	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 
 	let { data } = $props();
 
@@ -30,7 +32,7 @@
 			}
 		}
 	});
-	const { form: formData, enhance, submitting, message } = form;
+	const { form: formData, submitting, message } = form;
 
 	async function handleLogout() {
 		await fetch('/api/logout', {
@@ -42,18 +44,8 @@
 		});
 	}
 
-	function getInitials(name: string): string {
-		return name
-			.split(' ')
-			.map((n) => n[0])
-			.join('')
-			.toUpperCase();
-	}
-
 	function formatJoinDate(): string {
-		// Extract timestamp from UUID v7 (first 48 bits are timestamp)
-		// This is a simplified version - in reality you'd want proper date tracking
-		return 'Member since 2024';
+		return 'TODO: FIXME';
 	}
 </script>
 
@@ -93,19 +85,14 @@
 					<!-- Avatar Section -->
 					<div class="flex flex-col items-center gap-4">
 						<div class="relative">
-							{#if userStore.current.image}
-								<img
-									src={userStore.current.image}
-									alt="Profile"
-									class="border-surface-300-600 h-24 w-24 rounded-full border-4 object-cover"
-								/>
-							{:else}
-								<div
-									class="border-surface-300-600 flex h-24 w-24 items-center justify-center rounded-full border-4 bg-primary-500 text-2xl font-bold text-white"
-								>
-									{getInitials(userStore.current.name)}
-								</div>
-							{/if}
+							<Avatar
+								src={userStore.current?.image || undefined}
+								name="User"
+								size="w-8"
+								background="preset-filled-primary-500"
+							>
+								<User size={16} />
+							</Avatar>
 							<button
 								class="bg-surface-100-800 text-surface-600-300 hover:bg-surface-200-700 absolute -right-1 -bottom-1 rounded-full p-2"
 								aria-label="Edit profile photo"
@@ -121,7 +108,7 @@
 
 					<!-- Profile Info Form -->
 					<div class="flex-1 space-y-4">
-						<form class="space-y-4" method="POST" use:enhance>
+						<form class="space-y-4" method="POST">
 							<Field {form} name="name">
 								<Control>
 									{#snippet children({ props })}
