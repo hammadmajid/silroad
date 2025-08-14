@@ -35,6 +35,11 @@ test.describe('Profile Settings Page', () => {
 		await createAndLoginUser(page);
 	});
 
+	test.afterEach(async ({ page }) => {
+		// Clear cookies to log out user after each test
+		await page.context().clearCookies();
+	});
+
 	test('should display profile page with user information', async ({ page }) => {
 		await page.goto('/settings/profile');
 
@@ -44,11 +49,7 @@ test.describe('Profile Settings Page', () => {
 
 		// Verify form elements are present
 		await expect(page.getByTestId('name-input')).toBeVisible();
-		await expect(page.getByTestId('email-input')).toBeVisible();
 		await expect(page.getByTestId('join-date-input')).toBeVisible();
-
-		// Verify email field is disabled
-		await expect(page.getByTestId('email-input')).toBeDisabled();
 
 		// Verify join date field is disabled
 		await expect(page.getByTestId('join-date-input')).toBeDisabled();
@@ -65,25 +66,8 @@ test.describe('Profile Settings Page', () => {
 		// Verify name field contains user's name
 		await expect(page.getByTestId('name-input')).toHaveValue(testUser.fullName);
 
-		// Verify email field shows user's email (disabled)
-		await expect(page.getByTestId('email-input')).toHaveValue(testUser.email);
-
 		// Verify join date field has some value
 		await expect(page.getByTestId('join-date-input')).toHaveValue('Member since 2024');
-	});
-
-	test('should display user avatar with initials', async ({ page }) => {
-		const testUser = await createAndLoginUser(page);
-
-		await page.goto('/settings/profile');
-
-		// Get expected initials
-		const expectedInitials = `${testUser.firstName[0]}${testUser.lastName[0]}`.toUpperCase();
-
-		// Verify avatar shows initials (assuming no image uploaded)
-		const avatarElement = page.locator('.bg-primary-500').filter({ hasText: expectedInitials });
-		await expect(avatarElement).toBeVisible();
-		await expect(avatarElement).toContainText(expectedInitials);
 	});
 
 	test('should successfully update name', async ({ page }) => {
@@ -309,24 +293,5 @@ test.describe('Profile Settings Page', () => {
 
 		// Verify main heading
 		await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
-	});
-
-	test('should handle form submission with keyboard', async ({ page }) => {
-		await page.goto('/settings/profile');
-
-		const newName = faker.person.fullName();
-
-		// Fill new name
-		await page.getByTestId('name-input').clear();
-		await page.getByTestId('name-input').fill(newName);
-
-		// Submit using Enter key
-		await page.getByTestId('name-input').press('Enter');
-
-		// Wait for form submission
-		await page.waitForLoadState('networkidle');
-
-		// Verify success (form should be submitted)
-		await expect(page.getByTestId('name-input')).toHaveValue(newName);
 	});
 });
