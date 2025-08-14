@@ -2,143 +2,82 @@ import { faker } from '@faker-js/faker';
 import { generateSalt, hashPassword, generateSessionToken } from '$lib/utils/crypto';
 import * as schema from '$lib/db/schema';
 import { getDb, getKV, getBucket } from '$lib/db';
-import sharp from 'sharp';
 
 // prevent worker from hitting the CPU time limit
 const password = 'Pass!234';
 const salt = generateSalt();
 const hashedPassword = await hashPassword(password, salt);
 
-// Image generation utilities
-function generateRandomColor(): string {
-	return `hsl(${faker.number.int({ min: 0, max: 360 })}, ${faker.number.int({ min: 50, max: 90 })}%, ${faker.number.int({ min: 40, max: 70 })}%)`;
-}
-
-function generateAvatarSVG(initials: string): string {
-	const bgColor = generateRandomColor();
-	const textColor = '#ffffff';
-
-	return `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-		<rect width="200" height="200" fill="${bgColor}"/>
-		<text x="50%" y="50%" font-family="Arial, sans-serif" font-size="60" font-weight="bold" 
-			  fill="${textColor}" text-anchor="middle" dominant-baseline="central">${initials}</text>
-	</svg>`;
-}
-
-function generateBackgroundSVG(): string {
-	const color1 = generateRandomColor();
-	const color2 = generateRandomColor();
-	const pattern = faker.helpers.arrayElement(['gradient', 'circles', 'waves']);
-
-	if (pattern === 'gradient') {
-		return `<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-			<defs>
-				<linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-					<stop offset="0%" style="stop-color:${color1}"/>
-					<stop offset="100%" style="stop-color:${color2}"/>
-				</linearGradient>
-			</defs>
-			<rect width="800" height="400" fill="url(#grad)"/>
-		</svg>`;
-	} else if (pattern === 'circles') {
-		const circles = Array.from({ length: 8 }, (_, i) => {
-			const cx = faker.number.int({ min: 0, max: 800 });
-			const cy = faker.number.int({ min: 0, max: 400 });
-			const r = faker.number.int({ min: 20, max: 80 });
-			const opacity = faker.number.float({ min: 0.3, max: 0.7 });
-			return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${color1}" opacity="${opacity}"/>`;
-		}).join('');
-
-		return `<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-			<rect width="800" height="400" fill="${color2}"/>
-			${circles}
-		</svg>`;
-	} else {
-		return `<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-			<defs>
-				<pattern id="wave" x="0" y="0" width="100" height="50" patternUnits="userSpaceOnUse">
-					<path d="M0,25 Q25,0 50,25 T100,25" stroke="${color1}" stroke-width="3" fill="none"/>
-				</pattern>
-			</defs>
-			<rect width="800" height="400" fill="${color2}"/>
-			<rect width="800" height="400" fill="url(#wave)" opacity="0.5"/>
-		</svg>`;
-	}
-}
-
-async function uploadImageToR2(
+// Image utilities
+async function listImagesFromPath(
 	platform: App.Platform | undefined,
-	svgContent: string,
-	filename: string
-): Promise<string> {
+	path: string
+): Promise<string[]> {
 	try {
 		const bucket = getBucket(platform);
+		console.log(`📁 Listing images from path: ${path}`);
 
-		console.log(`Generating image for ${filename}...`);
+		const { objects } = await bucket.list({ prefix: path });
+		const imageUrls = objects
+			.filter((obj) => obj.key.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+			.map((obj) => `https://static.silroad.space/${obj.key}`);
 
-		// Try Sharp first
-		let imageData: Uint8Array;
-		try {
-			const pngBuffer = await sharp(Buffer.from(svgContent)).png().toBuffer();
+		console.log(`📸 Found ${imageUrls.length} images in ${path}:`, imageUrls);
+		return imageUrls;
+	} catch (error) {
+		console.error(`❌ Error listing images from ${path}:`, error);
+		return [];
+	}
+}
 
-			// Convert Buffer to Uint8Array for Cloudflare Workers compatibility
-			imageData = new Uint8Array(pngBuffer);
-		} catch (sharpError) {
-			console.warn(`Sharp failed for ${filename}, using fallback:`, sharpError);
-			// Fallback: create a simple solid color image
-			const fallbackSvg = `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-				<rect width="200" height="200" fill="${generateRandomColor()}"/>
-				<text x="50%" y="50%" font-family="Arial" font-size="24" fill="white" text-anchor="middle" dominant-baseline="central">IMG</text>
-			</svg>`;
-			const fallbackBuffer = await sharp(Buffer.from(fallbackSvg)).png().toBuffer();
-			imageData = new Uint8Array(fallbackBuffer);
+async function getRandomImageFromPath(
+	platform: App.Platform | undefined,
+	path: string,
+	fallbackUrl?: string
+): Promise<string> {
+	try {
+		console.log(`🎲 Getting random image from path: ${path}`);
+		const images = await listImagesFromPath(platform, path);
+
+		if (images.length === 0) {
+			console.warn(`⚠️ No images found in ${path}, using fallback`);
+			return fallbackUrl || `https://static.silroad.space/default.png`;
 		}
 
-		const uniqueKey = `seed/${filename}-${Date.now()}-${Math.random().toString(36).substring(2)}.png`;
-
-		console.log(`Uploading ${uniqueKey} (${imageData.length} bytes)...`);
-
-		await bucket.put(uniqueKey, imageData, {
-			httpMetadata: {
-				contentType: 'image/png'
-			}
-		});
-
-		console.log(`Successfully uploaded ${uniqueKey}`);
-		return `https://static.silroad.space/${uniqueKey}`;
+		const selectedImage = faker.helpers.arrayElement(images);
+		console.log(`✅ Selected random image: ${selectedImage}`);
+		return selectedImage;
 	} catch (error) {
-		console.error(`Error uploading image for ${filename}:`, error);
-		console.error('SVG content:', svgContent);
-		// Ultimate fallback: return a data URL
-		return `data:image/svg+xml;base64,${Buffer.from(svgContent).toString('base64')}`;
+		console.error(`❌ Error getting random image from ${path}:`, error);
+		return fallbackUrl || `https://static.silroad.space/default.png`;
 	}
 }
 
-async function generateAvatar(platform: App.Platform | undefined, name: string): Promise<string> {
-	try {
-		const initials = name
-			.split(' ')
-			.map((word) => word.charAt(0).toUpperCase())
-			.slice(0, 2)
-			.join('');
-		console.log(`Generating avatar for "${name}" with initials "${initials}"`);
-		const svg = generateAvatarSVG(initials);
-		return await uploadImageToR2(platform, svg, 'avatar');
-	} catch (error) {
-		console.error(`Error generating avatar for ${name}:`, error);
-		throw error;
-	}
+async function getRandomAvatar(platform: App.Platform | undefined, name: string): Promise<string> {
+	console.log(`👤 Getting random avatar for: ${name}`);
+	return await getRandomImageFromPath(
+		platform,
+		'avatar/',
+		`https://static.silroad.space/avatar/default.png`
+	);
 }
 
-async function generateBackground(platform: App.Platform | undefined): Promise<string> {
-	try {
-		console.log('Generating background image...');
-		const svg = generateBackgroundSVG();
-		return await uploadImageToR2(platform, svg, 'background');
-	} catch (error) {
-		console.error('Error generating background:', error);
-		throw error;
-	}
+async function getRandomOrgBackground(platform: App.Platform | undefined): Promise<string> {
+	console.log(`🏢 Getting random organization background`);
+	return await getRandomImageFromPath(
+		platform,
+		'orgs/',
+		`https://static.silroad.space/orgs/default.png`
+	);
+}
+
+async function getRandomEventBackground(platform: App.Platform | undefined): Promise<string> {
+	console.log(`🎉 Getting random event background`);
+	return await getRandomImageFromPath(
+		platform,
+		'events/',
+		`https://static.silroad.space/events/default.png`
+	);
 }
 
 // Helper function to insert data in batches
@@ -148,17 +87,27 @@ async function insertInBatches<T extends Record<string, unknown>>(
 	data: T[],
 	batchSize: number = 10
 ) {
-	if (data.length === 0) return;
+	if (data.length === 0) {
+		console.log('📝 No data to insert, skipping batch insertion');
+		return;
+	}
 
+	console.log(`📦 Inserting ${data.length} records in batches of ${batchSize}`);
 	for (let i = 0; i < data.length; i += batchSize) {
 		const batch = data.slice(i, i + batchSize);
+		const batchNumber = Math.floor(i / batchSize) + 1;
+		const totalBatches = Math.ceil(data.length / batchSize);
+
 		try {
+			console.log(`📝 Inserting batch ${batchNumber}/${totalBatches} (${batch.length} records)`);
 			await db.insert(table).values(batch).run();
+			console.log(`✅ Batch ${batchNumber}/${totalBatches} inserted successfully`);
 		} catch (error) {
-			console.error(`Failed to insert batch ${Math.floor(i / batchSize) + 1}:`, error);
+			console.error(`❌ Failed to insert batch ${batchNumber}/${totalBatches}:`, error);
 			throw error;
 		}
 	}
+	console.log(`🎯 All ${data.length} records inserted successfully`);
 }
 
 export async function seedDatabase(platform: App.Platform | undefined, count: number) {
@@ -166,35 +115,47 @@ export async function seedDatabase(platform: App.Platform | undefined, count: nu
 	const kv = getKV(platform);
 
 	try {
-		console.log('Starting database seeding...');
+		console.log('🚀 Starting database seeding...');
+		console.log(`📊 Configuration: ${count} items requested`);
 
+		console.log('🧹 Clearing KV store...');
 		await clearKV(kv);
-		console.log('KV cleared');
+		console.log('✅ KV cleared');
 
+		console.log('🧹 Clearing database...');
 		await clearDatabase(db);
-		console.log('Database cleared');
+		console.log('✅ Database cleared');
 
+		console.log('🏢 Creating organizations...');
 		const organizations = await createOrganizations(db, platform, count);
-		console.log(`Created ${organizations.length} organizations`);
+		console.log(`✅ Created ${organizations.length} organizations`);
 
+		console.log('👥 Creating users...');
 		const users = await createUsers(db, platform, count, organizations);
-		console.log(`Created ${users.length} users`);
+		console.log(`✅ Created ${users.length} users`);
 
+		console.log('🤝 Assigning organization members...');
 		await assignOrganizationMembers(db, users, organizations);
-		console.log('Assigned organization members');
+		console.log('✅ Assigned organization members');
 
+		console.log('🎉 Creating events...');
 		const events = await createEvents(db, platform, organizations);
-		console.log(`Created ${events.length} events`);
+		console.log(`✅ Created ${events.length} events`);
 
+		console.log('👤 Assigning event organizers and attendees...');
 		await assignEventOrganizersAndAttendees(db, events, users);
-		console.log('Assigned event organizers and attendees');
+		console.log('✅ Assigned event organizers and attendees');
 
+		console.log('🔐 Creating sessions...');
 		await createSessions(db, count, users);
-		console.log(`Created ${count} sessions`);
+		console.log(`✅ Created ${count} sessions`);
 
-		console.log('Database seeding completed successfully');
+		console.log('🎊 Database seeding completed successfully!');
+		console.log(
+			`📈 Final stats: ${organizations.length} orgs, ${users.length} users, ${events.length} events`
+		);
 	} catch (error) {
-		console.error('Error during database seeding:', error);
+		console.error('💥 Error during database seeding:', error);
 		throw error;
 	}
 }
@@ -202,22 +163,60 @@ export async function seedDatabase(platform: App.Platform | undefined, count: nu
 // ----------------------------
 
 async function clearKV(kv: KVNamespace) {
+	console.log('🗑️ Listing KV keys for deletion...');
 	const { keys } = await kv.list();
+	console.log(`🔑 Found ${keys.length} keys to delete`);
 
 	for (const key of keys) {
+		console.log(`🗑️ Deleting KV key: ${key.name}`);
 		await kv.delete(key.name);
 	}
+	console.log(`✅ Deleted ${keys.length} KV keys`);
 }
 
 async function clearDatabase(db: ReturnType<typeof getDb>) {
-	await db.delete(schema.attendees).run();
-	await db.delete(schema.eventOrganizers).run();
-	await db.delete(schema.events).run();
-	await db.delete(schema.organizationMembers).run();
-	await db.delete(schema.sessions).run();
-	await db.delete(schema.verificationTokens).run();
-	await db.delete(schema.users).run();
-	await db.delete(schema.organizations).run();
+	console.log('🗑️ Clearing all database tables...');
+	const tables = [
+		'attendees',
+		'eventOrganizers',
+		'events',
+		'organizationMembers',
+		'sessions',
+		'verificationTokens',
+		'users',
+		'organizations'
+	];
+
+	for (const tableName of tables) {
+		console.log(`🗑️ Clearing table: ${tableName}`);
+		switch (tableName) {
+			case 'attendees':
+				await db.delete(schema.attendees).run();
+				break;
+			case 'eventOrganizers':
+				await db.delete(schema.eventOrganizers).run();
+				break;
+			case 'events':
+				await db.delete(schema.events).run();
+				break;
+			case 'organizationMembers':
+				await db.delete(schema.organizationMembers).run();
+				break;
+			case 'sessions':
+				await db.delete(schema.sessions).run();
+				break;
+			case 'verificationTokens':
+				await db.delete(schema.verificationTokens).run();
+				break;
+			case 'users':
+				await db.delete(schema.users).run();
+				break;
+			case 'organizations':
+				await db.delete(schema.organizations).run();
+				break;
+		}
+		console.log(`✅ Cleared table: ${tableName}`);
+	}
 }
 
 // ----------------------------
@@ -242,8 +241,9 @@ async function createOrganizations(
 		}
 		usedSlugs.add(slug);
 
-		const avatar = await generateAvatar(platform, name);
-		const backgroundImage = await generateBackground(platform);
+		console.log(`🏢 Creating organization ${i + 1}/${count}: ${name}`);
+		const avatar = await getRandomAvatar(platform, name);
+		const backgroundImage = await getRandomOrgBackground(platform);
 
 		organizations.push({
 			id: crypto.randomUUID(),
@@ -253,6 +253,7 @@ async function createOrganizations(
 			avatar,
 			backgroundImage
 		});
+		console.log(`✅ Organization created: ${name} (${slug})`);
 	}
 
 	// Insert in batches to avoid SQL limits
@@ -273,7 +274,8 @@ async function createUsers(
 	const usedOrganizationIds = new Set<string>();
 
 	// Always create the testing user with email u@test.it
-	const testUserAvatar = await generateAvatar(platform, 'Test User');
+	console.log(`👤 Creating test user: Test User (u@test.it)`);
+	const testUserAvatar = await getRandomAvatar(platform, 'Test User');
 	users.push({
 		id: crypto.randomUUID(),
 		name: 'Test User',
@@ -284,6 +286,7 @@ async function createUsers(
 		organizationId: null
 	});
 	usedEmails.add('u@test.it');
+	console.log(`✅ Test user created with avatar: ${testUserAvatar}`);
 
 	for (let i = 0; i < count; i++) {
 		// Only assign organization if it hasn't been used (due to unique constraint)
@@ -309,7 +312,8 @@ async function createUsers(
 		usedEmails.add(email);
 
 		const fullName = faker.person.fullName();
-		const userAvatar = await generateAvatar(platform, fullName);
+		console.log(`👤 Creating user ${i + 1}/${count}: ${fullName} (${email})`);
+		const userAvatar = await getRandomAvatar(platform, fullName);
 
 		users.push({
 			id: crypto.randomUUID(),
@@ -321,6 +325,7 @@ async function createUsers(
 			salt,
 			organizationId: organization?.id || null
 		});
+		console.log(`✅ User created: ${fullName} with avatar: ${userAvatar}`);
 	}
 
 	// Insert in batches to avoid SQL limits
@@ -335,10 +340,12 @@ async function assignOrganizationMembers(
 	users: (typeof schema.users.$inferInsert)[],
 	organizations: (typeof schema.organizations.$inferInsert)[]
 ) {
+	console.log('🤝 Starting organization member assignment...');
 	const members: (typeof schema.organizationMembers.$inferInsert)[] = [];
 	const memberPairs = new Set<string>();
 
 	for (const org of organizations) {
+		console.log(`🤝 Processing members for organization: ${org.name}`);
 		const orgUsers = users.filter((u) => u.organizationId === org.id);
 		const additionalUsers = faker.helpers.arrayElements(
 			users.filter((u) => u.organizationId !== org.id),
@@ -346,6 +353,8 @@ async function assignOrganizationMembers(
 		);
 
 		const allMembers = [...orgUsers, ...additionalUsers];
+		console.log(`👥 Assigning ${allMembers.length} members to ${org.name}`);
+
 		for (const user of allMembers) {
 			if (!user) continue;
 
@@ -356,10 +365,12 @@ async function assignOrganizationMembers(
 					userId: user.id!,
 					organizationId: org.id!
 				});
+				console.log(`✅ Added ${user.name} to ${org.name}`);
 			}
 		}
 	}
 
+	console.log(`📊 Total organization memberships to create: ${members.length}`);
 	// Insert in batches to avoid SQL limits
 	await insertInBatches(db, schema.organizationMembers, members, 10);
 }
@@ -401,12 +412,16 @@ async function createEvents(
 
 	for (const org of organizations) {
 		const eventCount = faker.number.int({ min: 0, max: 3 });
+		console.log(`🎉 Creating ${eventCount} events for organization: ${org.name}`);
+
 		for (let i = 0; i < eventCount; i++) {
 			const now = Date.now();
 			const daysUntilEvent = faker.number.int({ min: 2, max: 14 }); // Start from 2 days
 			const daysUntilRsvpClose = faker.number.int({ min: 1, max: daysUntilEvent - 1 });
 			const title = faker.company.catchPhrase();
-			const eventImage = await generateBackground(platform);
+
+			console.log(`🎉 Creating event ${i + 1}/${eventCount}: ${title}`);
+			const eventImage = await getRandomEventBackground(platform);
 
 			events.push({
 				id: crypto.randomUUID(),
@@ -419,6 +434,7 @@ async function createEvents(
 				image: eventImage,
 				organizationId: org.id!
 			});
+			console.log(`✅ Event created: ${title} with image: ${eventImage}`);
 		}
 	}
 
@@ -434,20 +450,29 @@ async function assignEventOrganizersAndAttendees(
 	events: (typeof schema.events.$inferInsert)[],
 	users: (typeof schema.users.$inferInsert)[]
 ) {
+	console.log('👤 Starting event organizer and attendee assignment...');
 	const organizers: (typeof schema.eventOrganizers.$inferInsert)[] = [];
 	const attendees: (typeof schema.attendees.$inferInsert)[] = [];
 	const organizerPairs = new Set<string>();
 	const attendeePairs = new Set<string>();
 
 	for (const event of events) {
+		console.log(`🎯 Processing assignments for event: ${event.title}`);
 		const eligibleUsers = users.filter(
 			(u) => u.organizationId === event.organizationId || faker.datatype.boolean()
 		);
 
-		if (eligibleUsers.length === 0) continue;
+		if (eligibleUsers.length === 0) {
+			console.warn(`⚠️ No eligible users found for event: ${event.title}`);
+			continue;
+		}
 
 		const organizerCount = Math.min(faker.number.int({ min: 1, max: 2 }), eligibleUsers.length);
 		const attendeeCount = Math.min(faker.number.int({ min: 1, max: 10 }), eligibleUsers.length);
+
+		console.log(
+			`👥 Assigning ${organizerCount} organizers and ${attendeeCount} attendees to ${event.title}`
+		);
 
 		const selectedOrganizers = faker.helpers.arrayElements(eligibleUsers, organizerCount);
 		const selectedAttendees = faker.helpers.arrayElements(eligibleUsers, attendeeCount);
@@ -457,6 +482,7 @@ async function assignEventOrganizersAndAttendees(
 			if (!organizerPairs.has(pairKey)) {
 				organizerPairs.add(pairKey);
 				organizers.push({ eventId: event.id!, userId: user.id! });
+				console.log(`👨‍💼 Added organizer: ${user.name} for ${event.title}`);
 			}
 		}
 
@@ -465,9 +491,13 @@ async function assignEventOrganizersAndAttendees(
 			if (!attendeePairs.has(pairKey)) {
 				attendeePairs.add(pairKey);
 				attendees.push({ eventId: event.id!, userId: user.id! });
+				console.log(`🎫 Added attendee: ${user.name} for ${event.title}`);
 			}
 		}
 	}
+
+	console.log(`📊 Total organizers to create: ${organizers.length}`);
+	console.log(`📊 Total attendees to create: ${attendees.length}`);
 
 	// Insert in batches to avoid SQL limits
 	await insertInBatches(db, schema.eventOrganizers, organizers, 10);
@@ -481,17 +511,25 @@ async function createSessions(
 	count: number,
 	users: (typeof schema.users.$inferInsert)[]
 ) {
+	console.log(`🔐 Creating ${count} user sessions...`);
 	const sessions: (typeof schema.sessions.$inferInsert)[] = [];
 
 	for (let i = 0; i < count; i++) {
 		const user = users[i % users.length];
+		const sessionToken = generateSessionToken();
+		const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
+
 		sessions.push({
 			userId: user.id!,
-			sessionToken: generateSessionToken(),
-			expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
+			sessionToken,
+			expires
 		});
+		console.log(
+			`🔑 Created session ${i + 1}/${count} for user: ${user.name} (expires: ${expires.toISOString()})`
+		);
 	}
 
+	console.log(`📊 Total sessions to create: ${sessions.length}`);
 	// Insert in batches to avoid SQL limits
 	await insertInBatches(db, schema.sessions, sessions, 10);
 }
