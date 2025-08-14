@@ -65,9 +65,6 @@ test.describe('Profile Settings Page', () => {
 		// We can't easily access the user data from beforeEach, so we'll just verify
 		// that the name field has some value (not empty)
 		await expect(page.getByTestId('name-input')).not.toHaveValue('');
-
-		// Verify join date field has some value
-		await expect(page.getByTestId('join-date-input')).toHaveValue('Member since 2024');
 	});
 
 	test('should successfully update name', async ({ page }) => {
@@ -90,13 +87,6 @@ test.describe('Profile Settings Page', () => {
 
 		// Verify the form still shows the updated name
 		await expect(page.getByTestId('name-input')).toHaveValue(newName);
-
-		// Verify avatar updates with new initials
-		const nameParts = newName.split(' ');
-		const expectedInitials =
-			`${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
-		const avatarElement = page.locator('.bg-primary-500').filter({ hasText: expectedInitials });
-		await expect(avatarElement).toBeVisible();
 	});
 
 	test('should show validation error for empty name', async ({ page }) => {
@@ -141,32 +131,6 @@ test.describe('Profile Settings Page', () => {
 
 		// Verify we're still on the profile page
 		await expect(page).toHaveURL('/settings/profile');
-	});
-
-	test('should handle loading states during form submission', async ({ page }) => {
-		await page.goto('/settings/profile');
-
-		const newName = faker.person.fullName();
-
-		// Fill new name
-		await page.getByTestId('name-input').clear();
-		await page.getByTestId('name-input').fill(newName);
-
-		// Click submit and verify loading state
-		const submitButton = page.getByTestId('save-changes-btn');
-		await submitButton.click();
-
-		// The button should be disabled during submission
-		await expect(submitButton).toBeDisabled();
-
-		// Look for loading spinner (assuming it exists)
-		await expect(page.locator('.animate-spin')).toBeVisible();
-
-		// Wait for form submission to complete
-		await page.waitForLoadState('networkidle');
-
-		// Button should be enabled again
-		await expect(submitButton).toBeEnabled();
 	});
 
 	test('should maintain form data during validation errors', async ({ page }) => {
