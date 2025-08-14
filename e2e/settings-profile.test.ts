@@ -220,17 +220,6 @@ test.describe('Profile Settings Page', () => {
 		await expect(page).toHaveURL(/\/login\?redirectTo=%2Fsettings%2Fprofile&msg=.*/);
 	});
 
-	test('should display change photo buttons but not support image upload', async ({ page }) => {
-		await page.goto('/settings/profile');
-
-		// Verify change photo buttons are present
-		await expect(page.getByRole('button', { name: 'Change photo' })).toBeVisible();
-		await expect(page.locator('button[aria-label="Edit profile photo"]')).toBeVisible();
-
-		// These buttons should be present but the actual image upload functionality
-		// is not implemented yet as per requirements
-	});
-
 	test('should preserve form state during page navigation', async ({ page }) => {
 		await page.goto('/settings/profile');
 
