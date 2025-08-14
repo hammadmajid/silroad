@@ -84,14 +84,14 @@
 				<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
 					<!-- Avatar Section -->
 					<div class="flex flex-col items-center gap-4">
-							<Avatar
-								src={userStore.current?.image || undefined}
-								name="User"
-								size="w-24 h-24"
-								background="preset-filled-primary-500"
-							>
-								<User class="w-24 h-24" />
-							</Avatar>
+						<Avatar
+							src={userStore.current?.image || undefined}
+							name="User"
+							size="w-24 h-24"
+							background="preset-filled-primary-500"
+						>
+							<User class="h-24 w-24" />
+						</Avatar>
 						<button class="btn flex items-center gap-2 preset-outlined btn-sm">
 							<Camera size={16} />
 							Change photo

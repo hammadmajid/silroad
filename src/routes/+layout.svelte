@@ -61,7 +61,7 @@
 								size="w-8 h-8"
 								background="preset-filled-primary-500"
 							>
-								<User class="w-8 h-8" />
+								<User class="h-8 w-8" />
 							</Avatar>
 						</a>
 					</li>

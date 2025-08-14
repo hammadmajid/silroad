@@ -21,12 +21,7 @@
 				<div class="space-y-4">
 					<div>
 						<label for="primary-email" class="mb-2 label-text block">Primary Email</label>
-						<input
-							id="primary-email"
-							class="input w-full max-w-md"
-							value="TODO: FIXME"
-							disabled
-						/>
+						<input id="primary-email" class="input w-full max-w-md" value="TODO: FIXME" disabled />
 					</div>
 					<button class="btn preset-outlined btn-sm"> Change Email </button>
 				</div>
