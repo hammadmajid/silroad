@@ -6,7 +6,7 @@ export const load = async ({ platform, url }) => {
 	const db = getDb(platform);
 
 	const page = parseInt(url.searchParams.get('page') || '1');
-	const pageSize = 10;
+	const pageSize = 6;
 	const offset = (page - 1) * pageSize;
 
 	// Get total count and paginated events
