@@ -22,6 +22,30 @@ export class UserRepo {
 		this.sessionRepo = new SessionRepo(platform);
 	}
 
+	async getById(id: string): Promise<User | null> {
+		try {
+			const result = await this.db
+				.select({
+					id: users.id,
+					email: users.email,
+					name: users.name,
+					image: users.image
+				})
+				.from(users)
+				.where(eq(users.id, id))
+				.limit(1);
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'UserRepo', 'getById', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
+	}
+
 	async getByEmail(email: string): Promise<User | null> {
 		try {
 			const result = await this.db
@@ -112,7 +136,7 @@ export class UserRepo {
 		}
 	}
 
-	async update(user: User, currentSessionToken: string): Promise<User | null> {
+	async update(user: User): Promise<User | null> {
 		try {
 			const [updatedUser] = await this.db
 				.update(users)
@@ -129,18 +153,8 @@ export class UserRepo {
 				});
 
 			if (updatedUser) {
-				const activeSession = await this.sessionRepo.getByToken(currentSessionToken);
-
-				if (!activeSession) {
-					throw 'Session not found';
-				}
-
-				await this.sessionRepo.update({
-					...activeSession,
-					userName: updatedUser.name
-				});
+				// No need to update session since we no longer cache user data there
 			}
-
 			return updatedUser ?? null;
 		} catch (error) {
 			this.logger.writeDataPoint({

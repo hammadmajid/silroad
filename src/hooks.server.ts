@@ -10,8 +10,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (session) {
 		event.locals.user = {
 			id: session.userId,
-			name: session.userName,
-			email: session.userEmail,
 			image: session.userImage
 		};
 

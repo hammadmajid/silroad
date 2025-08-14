@@ -8,8 +8,6 @@ export const SESSION_COOKIE_NAME = 'session';
 
 export type SerializableSession = {
 	userId: string;
-	userEmail: string;
-	userName: string;
 	userImage: string | null;
 	sessionExpiresAt: string;
 };
@@ -43,8 +41,6 @@ export class SessionRepo {
 				const result = await this.db
 					.select({
 						userId: users.id,
-						userEmail: users.email,
-						userName: users.name,
 						userImage: users.image,
 						sessionExpiresAt: sessions.expires
 					})
@@ -58,8 +54,6 @@ export class SessionRepo {
 
 				return {
 					userId: session.userId,
-					userEmail: session.userEmail,
-					userName: session.userName,
 					userImage: session.userImage,
 					sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 				};
@@ -90,8 +84,6 @@ export class SessionRepo {
 
 			const session: SerializableSession = {
 				userId,
-				userEmail: email,
-				userName: name,
 				userImage: image,
 				sessionExpiresAt: new Date(expires).toISOString()
 			};
@@ -120,8 +112,6 @@ export class SessionRepo {
 				.select({
 					sessionToken: sessions.sessionToken,
 					userId: sessions.userId,
-					userEmail: users.email,
-					userName: users.name,
 					userImage: users.image,
 					sessionExpiresAt: sessions.expires
 				})
@@ -131,8 +121,6 @@ export class SessionRepo {
 
 			return userSessions.map((session) => ({
 				userId: session.userId,
-				userEmail: session.userEmail,
-				userName: session.userName,
 				userImage: session.userImage,
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
@@ -247,8 +235,6 @@ export class SessionRepo {
 
 			const refreshedSession: SerializableSession = {
 				userId: session.userId,
-				userEmail: session.userEmail,
-				userName: session.userName,
 				userImage: session.userImage,
 				sessionExpiresAt: newExpiry.toISOString()
 			};
@@ -270,8 +256,6 @@ export class SessionRepo {
 			const expiredSessions = await this.db
 				.select({
 					userId: users.id,
-					userEmail: users.email,
-					userName: users.name,
 					userImage: users.image,
 					sessionExpiresAt: sessions.expires
 				})
@@ -281,8 +265,6 @@ export class SessionRepo {
 
 			return expiredSessions.map((session) => ({
 				userId: session.userId,
-				userEmail: session.userEmail,
-				userName: session.userName,
 				userImage: session.userImage,
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
