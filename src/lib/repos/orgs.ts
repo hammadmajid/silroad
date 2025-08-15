@@ -1,6 +1,9 @@
 // Dependencies will be used when implementing methods
 // import { getDb, getLogger } from '$lib/db';
 
+/**
+ * Represents an organization entity.
+ */
 export type Organization = {
 	id: string;
 	name: string;
@@ -10,6 +13,14 @@ export type Organization = {
 	backgroundImage: string | null;
 };
 
+/**
+ * Data required to create a new organization.
+ * @property name - Organization name (required)
+ * @property slug - Unique slug identifier (required)
+ * @property description - Optional description
+ * @property avatar - Optional avatar image URL
+ * @property backgroundImage - Optional background image URL
+ */
 export type OrganizationCreateData = {
 	name: string;
 	slug: string;
@@ -18,6 +29,9 @@ export type OrganizationCreateData = {
 	backgroundImage?: string;
 };
 
+/**
+ * Data for updating an organization. All fields optional.
+ */
 export type OrganizationUpdateData = Partial<OrganizationCreateData>;
 
 export type OrganizationMember = {
@@ -30,11 +44,21 @@ export type OrganizationWithStats = Organization & {
 	eventCount: number;
 };
 
+/**
+ * Pagination options for listing organizations.
+ * @property page - Page number (1-based)
+ * @property pageSize - Number of items per page
+ */
 export type PaginationOptions = {
 	page: number;
 	pageSize: number;
 };
 
+/**
+ * Result of a paginated query.
+ * @property data - Array of results
+ * @property pagination - Pagination metadata
+ */
 export type PaginationResult<T> = {
 	data: T[];
 	pagination: {
@@ -45,32 +69,65 @@ export type PaginationResult<T> = {
 	};
 };
 
+/**
+ * Repository for organization CRUD and queries.
+ */
 export class OrganizationRepo {
 	constructor(_platform: App.Platform | undefined) {
 		// Dependencies will be injected when implementing methods
 	}
 
-	// Core CRUD Operations
+	/**
+	 * Creates a new organization.
+	 * @param orgData - Organization creation data
+	 * @returns The created organization, or null on error
+	 */
 	async create(_orgData: OrganizationCreateData): Promise<Organization | null> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets an organization by its UUID.
+	 * @param id - Organization UUID
+	 * @returns The organization, or null if not found or error
+	 */
 	async getById(_id: string): Promise<Organization | null> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets an organization by its slug.
+	 * @param slug - Organization slug
+	 * @returns The organization, or null if not found or error
+	 */
 	async getBySlug(_slug: string): Promise<Organization | null> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Updates an organization.
+	 * @param id - Organization UUID
+	 * @param orgData - Partial update data
+	 * @returns The updated organization, or null if not found or error
+	 */
 	async update(_id: string, _orgData: OrganizationUpdateData): Promise<Organization | null> {
 		throw new Error('Not implemented');
 	}
 
-	async delete(_id: string): Promise<void> {
+	/**
+	 * Deletes an organization by its UUID. Does not throw on error.
+	 * @param id - Organization UUID
+	 * @returns void in case of success or Error in case of error
+	 */
+	async delete(_id: string): Promise<Error | void> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets a paginated list of organizations.
+	 * @param pagination - Optional pagination options
+	 * @returns Paginated result of organizations
+	 */
 	async getAll(_pagination?: PaginationOptions): Promise<PaginationResult<Organization>> {
 		throw new Error('Not implemented');
 	}
