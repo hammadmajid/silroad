@@ -1,5 +1,6 @@
-// Dependencies will be used when implementing methods
-// import { getDb, getLogger } from '$lib/db';
+import { getDb, getLogger } from "$lib/db";
+import { eq } from 'drizzle-orm';
+import { organizations } from "$lib/db/schema";
 
 /**
  * Represents an organization entity.
@@ -73,8 +74,12 @@ export type PaginationResult<T> = {
  * Repository for organization CRUD and queries.
  */
 export class OrganizationRepo {
-	constructor(_platform: App.Platform | undefined) {
-		// Dependencies will be injected when implementing methods
+	private db;
+	private logger;
+
+	constructor(platform: App.Platform | undefined) {
+		this.db = getDb(platform);
+		this.logger = getLogger(platform);
 	}
 
 	/**
@@ -91,8 +96,18 @@ export class OrganizationRepo {
 	 * @param id - Organization UUID
 	 * @returns The organization, or null if not found or error
 	 */
-	async getById(_id: string): Promise<Organization | null> {
-		throw new Error('Not implemented');
+	async getById(id: string): Promise<Organization | null> {
+		try {
+			const org = await this.db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
+			return org.length === 0 ? null : org[0];
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getById', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
@@ -100,8 +115,19 @@ export class OrganizationRepo {
 	 * @param slug - Organization slug
 	 * @returns The organization, or null if not found or error
 	 */
-	async getBySlug(_slug: string): Promise<Organization | null> {
-		throw new Error('Not implemented');
+	async getBySlug(slug: string): Promise<Organization | null> {
+		try {
+			const org = await this.db.select().from(organizations).where(eq(organizations.slug, slug)).limit(1);
+
+			return org.length === 0 ? null : org[0];
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getBySlug', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
