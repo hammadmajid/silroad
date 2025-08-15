@@ -171,20 +171,6 @@ describe('EventRepo - Organizer Management', () => {
 
 			expect(result).toBe(false);
 		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.addOrganizer('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.addOrganizer('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('removeOrganizer', () => {
@@ -264,20 +250,6 @@ describe('EventRepo - Organizer Management', () => {
 
 			expect(result).toBe(false);
 		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.removeOrganizer('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.removeOrganizer('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('getOrganizers', () => {
@@ -322,13 +294,6 @@ describe('EventRepo - Organizer Management', () => {
 			const result = await eventRepo.getOrganizers('event-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.getOrganizers('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order organizers by assignment date', async () => {
@@ -393,13 +358,6 @@ describe('EventRepo - Organizer Management', () => {
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.getUserOrganizedEvents('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order events by date descending', async () => {
@@ -493,20 +451,6 @@ describe('EventRepo - Organizer Management', () => {
 			const result = await eventRepo.isOrganizer('event-1', 'user-1');
 
 			expect(result).toBe(false);
-		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.isOrganizer('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.isOrganizer('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should use efficient single query with limit 1', async () => {

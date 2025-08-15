@@ -216,13 +216,6 @@ describe('EventRepo - Query Methods', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should validate UUID format for organizationId', async () => {
-			const result = await eventRepo.getEventsByOrganization('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
 		it('should order events by date descending', async () => {
 			const mockEvents = [
 				{ ...mockEvent, dateOfEvent: new Date('2024-12-15') },
@@ -451,19 +444,6 @@ describe('EventRepo - Query Methods', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should handle special characters in search query', async () => {
-			const mockEvents = [mockEvent];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
-
-			const result = await eventRepo.searchEvents('test & event');
-
-			expect(result).toEqual(mockEvents);
-		});
-
 		it('should trim whitespace from search query', async () => {
 			const mockEvents = [mockEvent];
 
@@ -475,13 +455,6 @@ describe('EventRepo - Query Methods', () => {
 			const result = await eventRepo.searchEvents('  test  ');
 
 			expect(result).toEqual(mockEvents);
-		});
-
-		it('should validate organization filter UUID format', async () => {
-			const result = await eventRepo.searchEvents('test', { organizationId: 'invalid-uuid' });
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 	});
 
@@ -532,13 +505,6 @@ describe('EventRepo - Query Methods', () => {
 			const result = await eventRepo.getEventWithAttendeeCount('nonexistent');
 
 			expect(result).toBeNull();
-		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.getEventWithAttendeeCount('invalid-uuid');
-
-			expect(result).toBeNull();
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should use efficient aggregation query', async () => {

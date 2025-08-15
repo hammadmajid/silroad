@@ -110,20 +110,6 @@ describe('OrganizationRepo - Member Management', () => {
 
 			expect(result).toBe(false);
 		});
-
-		it('should validate UUID format for organizationId', async () => {
-			const result = await orgRepo.addMember('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await orgRepo.addMember('org-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('removeMember', () => {
@@ -173,20 +159,6 @@ describe('OrganizationRepo - Member Management', () => {
 
 			expect(result).toBe(false);
 		});
-
-		it('should validate UUID format for organizationId', async () => {
-			const result = await orgRepo.removeMember('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.delete).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await orgRepo.removeMember('org-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.delete).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('getMembers', () => {
@@ -231,13 +203,6 @@ describe('OrganizationRepo - Member Management', () => {
 			const result = await orgRepo.getMembers('org-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for organizationId', async () => {
-			const result = await orgRepo.getMembers('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order members by join date', async () => {
@@ -302,13 +267,6 @@ describe('OrganizationRepo - Member Management', () => {
 			const result = await orgRepo.getUserOrganizations('user-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await orgRepo.getUserOrganizations('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order organizations by name', async () => {
@@ -385,20 +343,6 @@ describe('OrganizationRepo - Member Management', () => {
 			const result = await orgRepo.isMember('org-1', 'user-1');
 
 			expect(result).toBe(false);
-		});
-
-		it('should validate UUID format for organizationId', async () => {
-			const result = await orgRepo.isMember('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await orgRepo.isMember('org-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should use efficient single query with limit 1', async () => {

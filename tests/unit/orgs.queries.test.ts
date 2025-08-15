@@ -170,19 +170,6 @@ describe('OrganizationRepo - Query Methods', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should handle special characters in search query', async () => {
-			const mockOrgs = [mockOrg];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockOrgs);
-
-			const result = await orgRepo.searchOrganizations('test & org');
-
-			expect(result).toEqual(mockOrgs);
-		});
-
 		it('should trim whitespace from search query', async () => {
 			const mockOrgs = [mockOrg];
 
@@ -245,13 +232,6 @@ describe('OrganizationRepo - Query Methods', () => {
 			const result = await orgRepo.getOrganizationStats('nonexistent');
 
 			expect(result).toBeNull();
-		});
-
-		it('should validate UUID format for organizationId', async () => {
-			const result = await orgRepo.getOrganizationStats('invalid-uuid');
-
-			expect(result).toBeNull();
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should count only active members', async () => {

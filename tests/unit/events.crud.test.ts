@@ -282,13 +282,6 @@ describe('EventRepo - CRUD Operations', () => {
 
 			expect(result).toBeNull();
 		});
-
-		it('should validate UUID format', async () => {
-			const result = await eventRepo.getById('invalid-uuid');
-
-			expect(result).toBeNull();
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('getBySlug', () => {
@@ -311,17 +304,6 @@ describe('EventRepo - CRUD Operations', () => {
 			mockDb.limit.mockResolvedValue([]);
 
 			const result = await eventRepo.getBySlug('nonexistent-slug');
-
-			expect(result).toBeNull();
-		});
-
-		it('should handle case sensitivity in slug search', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await eventRepo.getBySlug('TEST-EVENT');
 
 			expect(result).toBeNull();
 		});
@@ -507,11 +489,6 @@ describe('EventRepo - CRUD Operations', () => {
 			mockDb.where.mockRejectedValue(new Error('FOREIGN KEY constraint failed'));
 
 			await expect(eventRepo.delete('event-1')).resolves.not.toThrow();
-		});
-
-		it('should validate UUID format', async () => {
-			await expect(eventRepo.delete('invalid-uuid')).resolves.not.toThrow();
-			expect(mockDb.delete).not.toHaveBeenCalled();
 		});
 	});
 

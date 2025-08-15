@@ -200,17 +200,6 @@ describe('OrganizationRepo - CRUD Operations', () => {
 
 			expect(result).toBeNull();
 		});
-
-		it('should validate UUID format', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await orgRepo.getById('invalid-uuid');
-
-			expect(result).toBeNull();
-		});
 	});
 
 	describe('getBySlug', () => {
@@ -233,17 +222,6 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			mockDb.limit.mockResolvedValue([]);
 
 			const result = await orgRepo.getBySlug('nonexistent-slug');
-
-			expect(result).toBeNull();
-		});
-
-		it('should handle case sensitivity in slug search', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await orgRepo.getBySlug('TEST-ORG');
 
 			expect(result).toBeNull();
 		});

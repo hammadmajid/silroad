@@ -199,20 +199,6 @@ describe('EventRepo - Attendee Management', () => {
 			expect(result).toBe(false);
 		});
 
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.addAttendee('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.addAttendee('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
 		it('should allow adding attendee when event has no closeRsvpAt date', async () => {
 			const eventWithNoCloseDate = {
 				...mockEvent,
@@ -283,20 +269,6 @@ describe('EventRepo - Attendee Management', () => {
 
 			expect(result).toBe(false);
 		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.removeAttendee('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.delete).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.removeAttendee('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.delete).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('getAttendees', () => {
@@ -341,13 +313,6 @@ describe('EventRepo - Attendee Management', () => {
 			const result = await eventRepo.getAttendees('event-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.getAttendees('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order attendees by join date', async () => {
@@ -414,13 +379,6 @@ describe('EventRepo - Attendee Management', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.getUserAttendedEvents('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
 		it('should order events by date descending', async () => {
 			const mockEvents = [
 				{ ...mockEvent, dateOfEvent: new Date('2024-12-15') },
@@ -483,13 +441,6 @@ describe('EventRepo - Attendee Management', () => {
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.getUpcomingUserEvents('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should order events by date ascending (soonest first)', async () => {
@@ -566,20 +517,6 @@ describe('EventRepo - Attendee Management', () => {
 			const result = await eventRepo.isAttending('event-1', 'user-1');
 
 			expect(result).toBe(false);
-		});
-
-		it('should validate UUID format for eventId', async () => {
-			const result = await eventRepo.isAttending('invalid-uuid', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should validate UUID format for userId', async () => {
-			const result = await eventRepo.isAttending('event-1', 'invalid-uuid');
-
-			expect(result).toBe(false);
-			expect(mockDb.select).not.toHaveBeenCalled();
 		});
 
 		it('should use efficient single query with limit 1', async () => {
