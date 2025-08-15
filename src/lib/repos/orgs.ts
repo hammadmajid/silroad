@@ -133,32 +133,89 @@ export class OrganizationRepo {
 	}
 
 	// Member Management
+	/**
+	 * Adds a user as a member to an organization.
+	 * @param organizationId - Organization UUID
+	 * @param userId - User UUID to add as member
+	 * @returns true if member was added successfully, false if already exists or on error
+	 */
 	async addMember(_organizationId: string, _userId: string): Promise<boolean> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Removes a user from an organization's membership.
+	 * @param organizationId - Organization UUID
+	 * @param userId - User UUID to remove from membership
+	 * @returns true if member was removed successfully, false if not found or on error
+	 */
 	async removeMember(_organizationId: string, _userId: string): Promise<boolean> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets all member user IDs for an organization.
+	 * @param organizationId - Organization UUID
+	 * @returns Array of user IDs who are members, ordered by join date. Empty array if none or on error.
+	 */
 	async getMembers(_organizationId: string): Promise<string[]> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets all organizations that a user is a member of.
+	 * @param userId - User UUID
+	 * @returns Array of organizations the user belongs to, ordered by name. Empty array if none or on error.
+	 */
 	async getUserOrganizations(_userId: string): Promise<Organization[]> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Checks if a user is a member of an organization.
+	 * @param organizationId - Organization UUID
+	 * @param userId - User UUID to check membership for
+	 * @returns true if user is a member, false otherwise or on error
+	 */
 	async isMember(_organizationId: string, _userId: string): Promise<boolean> {
 		throw new Error('Not implemented');
 	}
 
 	// Query Methods
+
+	/**
+	 * Searches organizations by name and description using case-insensitive matching.
+	 * Trims whitespace and handles empty queries by returning all organizations.
+	 * Orders results by relevance (name matches first) and limits to 20 results.
+	 * @param query - Search query string
+	 * @returns Array of matching organizations, empty array if none found or error
+	 */
 	async searchOrganizations(_query: string): Promise<Organization[]> {
 		throw new Error('Not implemented');
 	}
 
+	/**
+	 * Gets an organization with aggregated statistics (member count and event count).
+	 * Uses efficient aggregation query with left joins.
+	 * Counts all events (past and future) and active members.
+	 * Validates UUID format for organizationId.
+	 * @param organizationId - Organization UUID
+	 * @returns Organization with stats, or null if not found or error
+	 */
 	async getOrganizationStats(_organizationId: string): Promise<OrganizationWithStats | null> {
+		throw new Error('Not implemented');
+	}
+
+	/**
+	 * Gets an organization with its associated events, ordered by event date.
+	 * Uses left join to include organization even if it has no events.
+	 * Validates UUID format for organizationId.
+	 * @param organizationId - Organization UUID
+	 * @returns Organization with events array, or null if not found or error
+	 */
+	async getOrganizationWithEvents(
+		_organizationId: string
+	): Promise<(Organization & { events: any[] }) | null> {
 		throw new Error('Not implemented');
 	}
 }
