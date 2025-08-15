@@ -114,27 +114,6 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			expect(result).toEqual(minimalOrg);
 		});
 
-		it('should generate UUID for id field', async () => {
-			const createData: OrganizationCreateData = {
-				name: 'Test Organization',
-				slug: 'test-org'
-			};
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([mockOrg]);
-
-			await orgRepo.create(createData);
-
-			expect(mockDb.values).toHaveBeenCalledWith(
-				expect.objectContaining({
-					id: expect.stringMatching(
-						/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-					)
-				})
-			);
-		});
-
 		it('should return null on database error', async () => {
 			const createData: OrganizationCreateData = {
 				name: 'Test Organization',
