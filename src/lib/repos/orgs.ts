@@ -1,6 +1,6 @@
-import { getDb, getLogger } from "$lib/db";
-import { eq } from 'drizzle-orm';
-import { organizations } from "$lib/db/schema";
+import { getDb, getLogger } from '$lib/db';
+import { eq, like, or, and, count, asc } from 'drizzle-orm';
+import { organizations, organizationMembers, events } from '$lib/db/schema';
 
 /**
  * Represents an organization entity.
@@ -87,8 +87,26 @@ export class OrganizationRepo {
 	 * @param orgData - Organization creation data
 	 * @returns The created organization, or null on error
 	 */
-	async create(_orgData: OrganizationCreateData): Promise<Organization | null> {
-		throw new Error('Not implemented');
+	async create(orgData: OrganizationCreateData): Promise<Organization | null> {
+		try {
+			const createData = {
+				name: orgData.name,
+				slug: orgData.slug,
+				description: orgData.description || null,
+				avatar: orgData.avatar || null,
+				backgroundImage: orgData.backgroundImage || null
+			};
+
+			const result = await this.db.insert(organizations).values(createData).returning();
+			return result.length > 0 ? result[0] : null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'create', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
@@ -98,7 +116,11 @@ export class OrganizationRepo {
 	 */
 	async getById(id: string): Promise<Organization | null> {
 		try {
-			const org = await this.db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
+			const org = await this.db
+				.select()
+				.from(organizations)
+				.where(eq(organizations.id, id))
+				.limit(1);
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
 			this.logger.writeDataPoint({
@@ -117,7 +139,11 @@ export class OrganizationRepo {
 	 */
 	async getBySlug(slug: string): Promise<Organization | null> {
 		try {
-			const org = await this.db.select().from(organizations).where(eq(organizations.slug, slug)).limit(1);
+			const org = await this.db
+				.select()
+				.from(organizations)
+				.where(eq(organizations.slug, slug))
+				.limit(1);
 
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
@@ -136,8 +162,23 @@ export class OrganizationRepo {
 	 * @param orgData - Partial update data
 	 * @returns The updated organization, or null if not found or error
 	 */
-	async update(_id: string, _orgData: OrganizationUpdateData): Promise<Organization | null> {
-		throw new Error('Not implemented');
+	async update(id: string, orgData: OrganizationUpdateData): Promise<Organization | null> {
+		try {
+			const result = await this.db
+				.update(organizations)
+				.set(orgData)
+				.where(eq(organizations.id, id))
+				.returning();
+
+			return result.length > 0 ? result[0] : null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'update', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
@@ -145,8 +186,17 @@ export class OrganizationRepo {
 	 * @param id - Organization UUID
 	 * @returns void in case of success or Error in case of error
 	 */
-	async delete(_id: string): Promise<Error | void> {
-		throw new Error('Not implemented');
+	async delete(id: string): Promise<Error | void> {
+		try {
+			await this.db.delete(organizations).where(eq(organizations.id, id));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'delete', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return error instanceof Error ? error : new Error(String(error));
+		}
 	}
 
 	/**
@@ -154,8 +204,50 @@ export class OrganizationRepo {
 	 * @param pagination - Optional pagination options
 	 * @returns Paginated result of organizations
 	 */
-	async getAll(_pagination?: PaginationOptions): Promise<PaginationResult<Organization>> {
-		throw new Error('Not implemented');
+	async getAll(pagination?: PaginationOptions): Promise<PaginationResult<Organization>> {
+		try {
+			const page = pagination?.page || 1;
+			const pageSize = pagination?.pageSize || 10;
+			const offset = (page - 1) * pageSize;
+
+			// Get total count
+			const countResult = await this.db.select({ count: count() }).from(organizations);
+			const totalCount = countResult[0]?.count || 0;
+			const totalPages = Math.ceil(totalCount / pageSize);
+
+			// Get paginated data
+			const data = await this.db
+				.select()
+				.from(organizations)
+				.orderBy(asc(organizations.name))
+				.limit(pageSize)
+				.offset(offset);
+
+			return {
+				data,
+				pagination: {
+					page,
+					pageSize,
+					totalCount,
+					totalPages: totalPages === 0 ? 0 : totalPages
+				}
+			};
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getAll', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return {
+				data: [],
+				pagination: {
+					page: pagination?.page || 1,
+					pageSize: pagination?.pageSize || 10,
+					totalCount: 0,
+					totalPages: 0
+				}
+			};
+		}
 	}
 
 	// Member Management
@@ -165,8 +257,24 @@ export class OrganizationRepo {
 	 * @param userId - User UUID to add as member
 	 * @returns true if member was added successfully, false if already exists or on error
 	 */
-	async addMember(_organizationId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async addMember(organizationId: string, userId: string): Promise<boolean> {
+		try {
+			await this.db
+				.insert(organizationMembers)
+				.values({
+					organizationId,
+					userId
+				})
+				.returning();
+			return true;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'addMember', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	/**
@@ -175,8 +283,26 @@ export class OrganizationRepo {
 	 * @param userId - User UUID to remove from membership
 	 * @returns true if member was removed successfully, false if not found or on error
 	 */
-	async removeMember(_organizationId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async removeMember(organizationId: string, userId: string): Promise<boolean> {
+		try {
+			const result = await this.db
+				.delete(organizationMembers)
+				.where(
+					and(
+						eq(organizationMembers.organizationId, organizationId),
+						eq(organizationMembers.userId, userId)
+					)
+				);
+
+			return result.success;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'removeMember', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	/**
@@ -184,8 +310,25 @@ export class OrganizationRepo {
 	 * @param organizationId - Organization UUID
 	 * @returns Array of user IDs who are members, ordered by join date. Empty array if none or on error.
 	 */
-	async getMembers(_organizationId: string): Promise<string[]> {
-		throw new Error('Not implemented');
+	async getMembers(organizationId: string): Promise<string[]> {
+		try {
+			const members = await this.db
+				.select({ userId: organizationMembers.userId })
+				.from(organizationMembers)
+				.where(eq(organizationMembers.organizationId, organizationId))
+				.orderBy(asc(organizationMembers.userId));
+
+			// TODO: return full user data instead of just their Id's
+
+			return members.map((member) => member.userId);
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getMembers', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
@@ -193,8 +336,31 @@ export class OrganizationRepo {
 	 * @param userId - User UUID
 	 * @returns Array of organizations the user belongs to, ordered by name. Empty array if none or on error.
 	 */
-	async getUserOrganizations(_userId: string): Promise<Organization[]> {
-		throw new Error('Not implemented');
+	async getUserOrganizations(userId: string): Promise<Organization[]> {
+		try {
+			const orgs = await this.db
+				.select({
+					id: organizations.id,
+					name: organizations.name,
+					slug: organizations.slug,
+					description: organizations.description,
+					avatar: organizations.avatar,
+					backgroundImage: organizations.backgroundImage
+				})
+				.from(organizations)
+				.innerJoin(organizationMembers, eq(organizations.id, organizationMembers.organizationId))
+				.where(eq(organizationMembers.userId, userId))
+				.orderBy(asc(organizations.name));
+
+			return orgs;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getUserOrganizations', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
@@ -203,8 +369,28 @@ export class OrganizationRepo {
 	 * @param userId - User UUID to check membership for
 	 * @returns true if user is a member, false otherwise or on error
 	 */
-	async isMember(_organizationId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async isMember(organizationId: string, userId: string): Promise<boolean> {
+		try {
+			const result = await this.db
+				.select()
+				.from(organizationMembers)
+				.where(
+					and(
+						eq(organizationMembers.organizationId, organizationId),
+						eq(organizationMembers.userId, userId)
+					)
+				)
+				.limit(1);
+
+			return result.length > 0;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'isMember', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	// Query Methods
@@ -216,8 +402,37 @@ export class OrganizationRepo {
 	 * @param query - Search query string
 	 * @returns Array of matching organizations, empty array if none found or error
 	 */
-	async searchOrganizations(_query: string): Promise<Organization[]> {
-		throw new Error('Not implemented');
+	async searchOrganizations(query: string): Promise<Organization[]> {
+		try {
+			const trimmedQuery = query.trim();
+
+			if (trimmedQuery === '') {
+				// Return all organizations if query is empty
+				return await this.db
+					.select()
+					.from(organizations)
+					.orderBy(asc(organizations.name));
+			}
+
+			const searchPattern = `%${trimmedQuery}%`;
+
+			return await this.db
+				.select()
+				.from(organizations)
+				.where(or(
+					like(organizations.name, searchPattern),
+					like(organizations.description, searchPattern)
+				))
+				.limit(20)
+				.orderBy(asc(organizations.name));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'searchOrganizations', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
@@ -228,20 +443,33 @@ export class OrganizationRepo {
 	 * @param organizationId - Organization UUID
 	 * @returns Organization with stats, or null if not found or error
 	 */
-	async getOrganizationStats(_organizationId: string): Promise<OrganizationWithStats | null> {
-		throw new Error('Not implemented');
-	}
+	async getOrganizationStats(organizationId: string): Promise<OrganizationWithStats | null> {
+		try {
+			const result = await this.db
+				.select({
+					id: organizations.id,
+					name: organizations.name,
+					slug: organizations.slug,
+					description: organizations.description,
+					avatar: organizations.avatar,
+					backgroundImage: organizations.backgroundImage,
+					memberCount: count(organizationMembers.userId),
+					eventCount: count(events.id)
+				})
+				.from(organizations)
+				.leftJoin(organizationMembers, eq(organizations.id, organizationMembers.organizationId))
+				.leftJoin(events, eq(organizations.id, events.organizationId))
+				.where(eq(organizations.id, organizationId))
+				.groupBy(organizations.id);
 
-	/**
-	 * Gets an organization with its associated events, ordered by event date.
-	 * Uses left join to include organization even if it has no events.
-	 * Validates UUID format for organizationId.
-	 * @param organizationId - Organization UUID
-	 * @returns Organization with events array, or null if not found or error
-	 */
-	async getOrganizationWithEvents(
-		_organizationId: string
-	): Promise<(Organization & { events: any[] }) | null> {
-		throw new Error('Not implemented');
+			return result.length > 0 ? result[0] : null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'OrganizationRepo', 'getOrganizationStats', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 }
