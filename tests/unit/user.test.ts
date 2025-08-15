@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UserRepo } from './user';
+import { UserRepo } from '$lib/repos/user';
 import { hashPassword } from '$lib/utils/crypto';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
+	getKV: vi.fn(),
 	getLogger: vi.fn()
 }));
 
@@ -23,6 +24,8 @@ describe('UserRepo', () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockDb: any;
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let mockKV: any;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockLogger: any;
 
 	beforeEach(async () => {
@@ -39,12 +42,19 @@ describe('UserRepo', () => {
 			delete: vi.fn().mockReturnThis()
 		};
 
+		mockKV = {
+			get: vi.fn(),
+			put: vi.fn(),
+			delete: vi.fn()
+		};
+
 		mockLogger = {
 			writeDataPoint: vi.fn()
 		};
 
-		const { getDb, getLogger } = await import('$lib/db');
+		const { getDb, getKV, getLogger } = await import('$lib/db');
 		vi.mocked(getDb).mockReturnValue(mockDb);
+		vi.mocked(getKV).mockReturnValue(mockKV);
 		vi.mocked(getLogger).mockReturnValue(mockLogger);
 
 		userRepo = new UserRepo(undefined);

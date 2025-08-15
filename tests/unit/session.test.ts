@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SessionRepo, type SerializableSession } from './session';
-import type { User } from './user';
+import { SessionRepo, type SerializableSession } from '$lib/repos/session';
+import type { User } from '$lib/repos/user';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
