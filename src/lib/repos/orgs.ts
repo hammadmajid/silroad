@@ -158,20 +158,7 @@ export class OrganizationRepo {
 		throw new Error('Not implemented');
 	}
 
-	async getOrganizationWithEvents(_organizationId: string): Promise<any> {
-		throw new Error('Not implemented');
-	}
-
 	async getOrganizationStats(_organizationId: string): Promise<OrganizationWithStats | null> {
-		throw new Error('Not implemented');
-	}
-
-	// Integration Methods
-	async getEventsFromUserOrganizations(_userId: string): Promise<any[]> {
-		throw new Error('Not implemented');
-	}
-
-	async getUpcomingEventsFromUserOrganizations(_userId: string): Promise<any[]> {
 		throw new Error('Not implemented');
 	}
 }
