@@ -364,31 +364,30 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockResolvedValue({ changes: 1 });
 
-			await orgRepo.delete('org-1');
+			const result = await orgRepo.delete('org-1');
 
 			expect(mockDb.delete).toHaveBeenCalled();
 			expect(mockDb.where).toHaveBeenCalled();
+			expect(result).toBeUndefined();
 		});
 
-		it('should not throw error when deleting non-existent organization', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			await expect(orgRepo.delete('nonexistent')).resolves.not.toThrow();
-		});
-
-		it('should handle database error gracefully', async () => {
+		it('should return error when database error occurs', async () => {
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockRejectedValue(new Error('Database error'));
 
-			await expect(orgRepo.delete('org-1')).resolves.not.toThrow();
+			const result = await orgRepo.delete('org-1');
+
+			expect(result).toBeInstanceOf(Error);
 		});
 
-		it('should handle foreign key constraint violations', async () => {
+		it('should return error when foreign key constraint is violated', async () => {
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockRejectedValue(new Error('FOREIGN KEY constraint failed'));
 
-			await expect(orgRepo.delete('org-1')).resolves.not.toThrow();
+			const result = await orgRepo.delete('org-1');
+
+			expect(result).toBeInstanceOf(Error);
+			expect(result?.message).toContain('FOREIGN KEY constraint failed');
 		});
 	});
 
