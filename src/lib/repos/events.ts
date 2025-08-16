@@ -1,6 +1,6 @@
 import { getDb, getLogger } from '$lib/db';
-import { desc, eq, count } from 'drizzle-orm';
-import { events } from '$lib/db/schema';
+import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
+import { events, attendees } from '$lib/db/schema';
 
 /**
  * Represents an event entity.
@@ -380,47 +380,152 @@ export class EventRepo {
 	// Query Methods
 	/**
 	 * Gets upcoming events ordered by date.
-	 * @param _limit - Optional limit on number of events to return
+	 * @param limit - Optional limit on number of events to return
 	 * @returns Array of upcoming events, empty array if none or on error
 	 */
-	async getUpcomingEvents(_limit?: number): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingEvents(limit?: number): Promise<Event[]> {
+		try {
+			const now = new Date();
+			const queryLimit = limit ?? 10;
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(gt(events.dateOfEvent, now))
+				.orderBy(asc(events.dateOfEvent))
+				.limit(queryLimit);
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getUpcomingEvents', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events for a specific organization.
-	 * @param _organizationId - Organization UUID
+	 * @param organizationId - Organization UUID
 	 * @returns Array of events for the organization, empty array if none or on error
 	 */
-	async getEventsByOrganization(_organizationId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getEventsByOrganization(organizationId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(eq(events.organizationId, organizationId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getEventsByOrganization', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Gets upcoming events for a specific organization.
-	 * @param _organizationId - Organization UUID
+	 * @param organizationId - Organization UUID
 	 * @returns Array of upcoming events for the organization, empty array if none or on error
 	 */
-	async getUpcomingEventsByOrganization(_organizationId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingEventsByOrganization(organizationId: string): Promise<Event[]> {
+		try {
+			const now = new Date();
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(and(eq(events.organizationId, organizationId), gt(events.dateOfEvent, now)))
+				.orderBy(asc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getUpcomingEventsByOrganization', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Searches events by title and description using case-insensitive matching.
-	 * @param _query - Search query string
-	 * @param _filters - Optional filters for the search
+	 * @param query - Search query string
+	 * @param filters - Optional filters for the search
 	 * @returns Array of matching events, empty array if none found or error
 	 */
-	async searchEvents(_query: string, _filters?: { organizationId?: string }): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async searchEvents(query: string, filters?: { organizationId?: string }): Promise<Event[]> {
+		try {
+			const searchPattern = `%${query}%`;
+
+			let whereCondition = or(
+				like(events.title, searchPattern),
+				like(events.description, searchPattern)
+			);
+
+			if (filters?.organizationId) {
+				whereCondition = and(whereCondition, eq(events.organizationId, filters.organizationId));
+			}
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(whereCondition)
+				.orderBy(desc(events.dateOfEvent))
+				.limit(20);
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'searchEvents', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Gets an event with aggregated attendee count.
-	 * @param _eventId - Event UUID
+	 * @param eventId - Event UUID
 	 * @returns Event with attendee count, or null if not found or error
 	 */
-	async getEventWithAttendeeCount(_eventId: string): Promise<EventWithAttendeeCount | null> {
-		throw new Error('Not implemented');
+	async getEventWithAttendeeCount(eventId: string): Promise<EventWithAttendeeCount | null> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId,
+					attendeeCount: count(attendees.userId)
+				})
+				.from(events)
+				.leftJoin(attendees, eq(events.id, attendees.eventId))
+				.where(eq(events.id, eventId))
+				.groupBy(events.id);
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getEventWithAttendeeCount', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 }
