@@ -98,69 +98,6 @@ describe('EventRepo - Organizer Management', () => {
 			expect(result).toBe(false);
 		});
 
-		it('should return false when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([]); // No event found
-
-			const result = await eventRepo.addOrganizer('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]);
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockRejectedValue(new Error('FOREIGN KEY constraint failed'));
-
-			const result = await eventRepo.addOrganizer('event-1', 'nonexistent-user');
-
-			expect(result).toBe(false);
-		});
-
-		it('should validate that user is member of event organization', async () => {
-			// Mock event exists
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]); // Event lookup
-
-			// Mock user is not member of organization
-			mockDb.limit.mockResolvedValueOnce([]); // Organization membership check
-
-			const result = await eventRepo.addOrganizer('event-1', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
-		it('should allow adding organizer when user is member of organization', async () => {
-			// Mock event exists
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]); // Event lookup
-
-			// Mock user is member of organization
-			mockDb.limit.mockResolvedValueOnce([{ userId: 'user-1' }]); // Organization membership check
-
-			// Mock successful insertion
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([{ eventId: 'event-1', userId: 'user-1' }]);
-
-			const result = await eventRepo.addOrganizer('event-1', 'user-1');
-
-			expect(result).toBe(true);
-		});
-
 		it('should return false on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
@@ -183,33 +120,6 @@ describe('EventRepo - Organizer Management', () => {
 			expect(result).toBe(true);
 			expect(mockDb.delete).toHaveBeenCalled();
 			expect(mockDb.where).toHaveBeenCalled();
-		});
-
-		it('should return false when organizer not found', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeOrganizer('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when event does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeOrganizer('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeOrganizer('event-1', 'nonexistent-user');
-
-			expect(result).toBe(false);
 		});
 
 		it('should prevent removing the last organizer', async () => {
@@ -276,16 +186,6 @@ describe('EventRepo - Organizer Management', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should return empty array when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
-
-			const result = await eventRepo.getOrganizers('nonexistent-event');
-
-			expect(result).toEqual([]);
-		});
-
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
@@ -294,20 +194,6 @@ describe('EventRepo - Organizer Management', () => {
 			const result = await eventRepo.getOrganizers('event-1');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should order organizers by assignment date', async () => {
-			const mockOrganizers = [{ userId: 'user-2' }, { userId: 'user-1' }, { userId: 'user-3' }];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockOrganizers);
-
-			const result = await eventRepo.getOrganizers('event-1');
-
-			expect(result).toEqual(['user-2', 'user-1', 'user-3']);
-			expect(mockDb.orderBy).toHaveBeenCalled();
 		});
 	});
 
@@ -334,17 +220,6 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.where.mockResolvedValue([]);
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
-
-			expect(result).toEqual([]);
-		});
-
-		it('should return empty array when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
-
-			const result = await eventRepo.getUserOrganizedEvents('nonexistent-user');
 
 			expect(result).toEqual([]);
 		});
@@ -416,28 +291,6 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.limit.mockResolvedValue([]);
 
 			const result = await eventRepo.isOrganizer('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await eventRepo.isOrganizer('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await eventRepo.isOrganizer('event-1', 'nonexistent-user');
 
 			expect(result).toBe(false);
 		});

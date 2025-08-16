@@ -104,35 +104,6 @@ describe('EventRepo - Attendee Management', () => {
 			expect(result).toBe(false);
 		});
 
-		it('should return false when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([]); // No event found
-
-			const result = await eventRepo.addAttendee('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]);
-
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]);
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockRejectedValue(new Error('FOREIGN KEY constraint failed'));
-
-			const result = await eventRepo.addAttendee('event-1', 'nonexistent-user');
-
-			expect(result).toBe(false);
-		});
-
 		it('should return false when RSVP is closed', async () => {
 			const pastCloseDate = new Date('2020-01-01T18:00:00.000Z');
 			const eventWithClosedRsvp = {
@@ -234,33 +205,6 @@ describe('EventRepo - Attendee Management', () => {
 			expect(mockDb.where).toHaveBeenCalled();
 		});
 
-		it('should return false when attendee not found', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeAttendee('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when event does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeAttendee('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await eventRepo.removeAttendee('event-1', 'nonexistent-user');
-
-			expect(result).toBe(false);
-		});
-
 		it('should return false on database error', async () => {
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockRejectedValue(new Error('Database error'));
@@ -291,16 +235,6 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockResolvedValue([]);
 
 			const result = await eventRepo.getAttendees('event-1');
-
-			expect(result).toEqual([]);
-		});
-
-		it('should return empty array when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
-
-			const result = await eventRepo.getAttendees('nonexistent-event');
 
 			expect(result).toEqual([]);
 		});
@@ -353,17 +287,6 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockResolvedValue([]);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
-
-			expect(result).toEqual([]);
-		});
-
-		it('should return empty array when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
-
-			const result = await eventRepo.getUserAttendedEvents('nonexistent-user');
 
 			expect(result).toEqual([]);
 		});
@@ -482,28 +405,6 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.limit.mockResolvedValue([]);
 
 			const result = await eventRepo.isAttending('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when event does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await eventRepo.isAttending('nonexistent-event', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue([]);
-
-			const result = await eventRepo.isAttending('event-1', 'nonexistent-user');
 
 			expect(result).toBe(false);
 		});

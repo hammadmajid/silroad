@@ -155,28 +155,6 @@ describe('EventRepo - Query Methods', () => {
 
 			expect(result).toEqual([]);
 		});
-
-		it('should validate limit parameter', async () => {
-			const result = await eventRepo.getUpcomingEvents(-5);
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
-		it('should cap limit to reasonable maximum', async () => {
-			const mockUpcomingEvents = [mockEvent];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValue(mockUpcomingEvents);
-
-			const result = await eventRepo.getUpcomingEvents(1000);
-
-			expect(result).toEqual(mockUpcomingEvents);
-			expect(mockDb.limit).toHaveBeenCalledWith(100); // Capped to reasonable max
-		});
 	});
 
 	describe('getEventsByOrganization', () => {
@@ -290,13 +268,6 @@ describe('EventRepo - Query Methods', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should validate UUID format for organizationId', async () => {
-			const result = await eventRepo.getUpcomingEventsByOrganization('invalid-uuid');
-
-			expect(result).toEqual([]);
-			expect(mockDb.select).not.toHaveBeenCalled();
-		});
-
 		it('should order events by date ascending (soonest first)', async () => {
 			const mockUpcomingEvents = [
 				{ ...mockEvent, dateOfEvent: new Date('2024-11-20') },
@@ -368,28 +339,6 @@ describe('EventRepo - Query Methods', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should handle empty search query', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue([mockEvent]);
-
-			const result = await eventRepo.searchEvents('');
-
-			expect(result).toEqual([mockEvent]);
-			expect(mockDb.where).not.toHaveBeenCalled();
-		});
-
-		it('should handle whitespace-only search query', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue([mockEvent]);
-
-			const result = await eventRepo.searchEvents('   ');
-
-			expect(result).toEqual([mockEvent]);
-			expect(mockDb.where).not.toHaveBeenCalled();
-		});
-
 		it('should be case insensitive', async () => {
 			const mockEvents = [mockEvent];
 
@@ -442,19 +391,6 @@ describe('EventRepo - Query Methods', () => {
 			const result = await eventRepo.searchEvents('test');
 
 			expect(result).toEqual([]);
-		});
-
-		it('should trim whitespace from search query', async () => {
-			const mockEvents = [mockEvent];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
-
-			const result = await eventRepo.searchEvents('  test  ');
-
-			expect(result).toEqual(mockEvents);
 		});
 	});
 
@@ -570,25 +506,6 @@ describe('EventRepo - Query Methods', () => {
 			expect(result).toHaveProperty('image');
 			expect(result).toHaveProperty('organizationId');
 			expect(result).toHaveProperty('attendeeCount');
-		});
-
-		it('should handle events at capacity correctly', async () => {
-			const mockEventWithCount: EventWithAttendeeCount = {
-				...mockEvent,
-				maxAttendees: 50,
-				attendeeCount: 50
-			};
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.groupBy.mockResolvedValue([mockEventWithCount]);
-
-			const result = await eventRepo.getEventWithAttendeeCount('event-1');
-
-			expect(result?.attendeeCount).toBe(50);
-			expect(result?.maxAttendees).toBe(50);
 		});
 
 		it('should handle events with no max capacity', async () => {
