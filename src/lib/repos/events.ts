@@ -1,5 +1,6 @@
-// Dependencies will be used when implementing methods
-// import { getDb, getLogger } from '$lib/db';
+import { getDb, getLogger } from '$lib/db';
+import { eq } from 'drizzle-orm';
+import { events } from '$lib/db/schema';
 
 export type Event = {
 	id: string;
@@ -56,8 +57,12 @@ export type PaginationResult<T> = {
 };
 
 export class EventRepo {
-	constructor(_platform: App.Platform | undefined) {
-		// Dependencies will be injected when implementing methods
+	private db;
+	private logger;
+
+	constructor(platform: App.Platform | undefined) {
+		this.db = getDb(platform);
+		this.logger = getLogger(platform);
 	}
 
 	// Core CRUD Operations
@@ -65,12 +70,42 @@ export class EventRepo {
 		throw new Error('Not implemented');
 	}
 
-	async getById(_id: string): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async getById(id: string): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(eq(events.id, id))
+				.limit(1);
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getById', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
-	async getBySlug(_slug: string): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async getBySlug(slug: string): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(eq(events.slug, slug))
+				.limit(1);
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getBySlug', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	async update(_id: string, _eventData: EventUpdateData): Promise<Event | null> {
