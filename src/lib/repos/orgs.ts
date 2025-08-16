@@ -408,10 +408,7 @@ export class OrganizationRepo {
 
 			if (trimmedQuery === '') {
 				// Return all organizations if query is empty
-				return await this.db
-					.select()
-					.from(organizations)
-					.orderBy(asc(organizations.name));
+				return await this.db.select().from(organizations).orderBy(asc(organizations.name));
 			}
 
 			const searchPattern = `%${trimmedQuery}%`;
@@ -419,10 +416,12 @@ export class OrganizationRepo {
 			return await this.db
 				.select()
 				.from(organizations)
-				.where(or(
-					like(organizations.name, searchPattern),
-					like(organizations.description, searchPattern)
-				))
+				.where(
+					or(
+						like(organizations.name, searchPattern),
+						like(organizations.description, searchPattern)
+					)
+				)
 				.limit(20)
 				.orderBy(asc(organizations.name));
 		} catch (error) {
