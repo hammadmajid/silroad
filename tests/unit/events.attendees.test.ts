@@ -69,9 +69,9 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.limit.mockResolvedValueOnce([mockEvent]); // Event lookup
 
 			// Mock current attendee count is below max
-			mockDb.select.mockReturnValueOnce({
-				from: vi.fn().mockResolvedValue([{ count: 50 }])
-			});
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce(mockDb);
+			mockDb.where.mockResolvedValueOnce([{ count: 50 }]);
 
 			// Mock successful insertion
 			mockDb.insert.mockReturnValue(mockDb);
