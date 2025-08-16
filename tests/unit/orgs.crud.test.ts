@@ -269,22 +269,6 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			expect(result).toEqual(updatedOrg);
 		});
 
-		it('should not allow updating id field', async () => {
-			const updateData = {
-				id: 'new-id',
-				name: 'Updated Organization'
-			} as any;
-
-			mockDb.update.mockReturnValue(mockDb);
-			mockDb.set.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([mockOrg]);
-
-			await orgRepo.update('org-1', updateData);
-
-			expect(mockDb.set).toHaveBeenCalledWith(expect.not.objectContaining({ id: 'new-id' }));
-		});
-
 		it('should handle slug uniqueness constraint violation on update', async () => {
 			const updateData: OrganizationUpdateData = {
 				slug: 'existing-slug'

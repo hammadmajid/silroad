@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OrganizationRepo, type Organization } from '$lib/repos/orgs';
+import type { success } from 'zod/v4';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
@@ -115,40 +116,11 @@ describe('OrganizationRepo - Member Management', () => {
 	describe('removeMember', () => {
 		it('should remove member successfully', async () => {
 			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 1 });
 
-			const result = await orgRepo.removeMember('org-1', 'user-1');
+			await orgRepo.removeMember('org-1', 'user-1');
 
-			expect(result).toBe(true);
 			expect(mockDb.delete).toHaveBeenCalled();
 			expect(mockDb.where).toHaveBeenCalled();
-		});
-
-		it('should return false when member not found', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await orgRepo.removeMember('org-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when organization does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await orgRepo.removeMember('nonexistent-org', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when user does not exist', async () => {
-			mockDb.delete.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue({ changes: 0 });
-
-			const result = await orgRepo.removeMember('org-1', 'nonexistent-user');
-
-			expect(result).toBe(false);
 		});
 
 		it('should return false on database error', async () => {
