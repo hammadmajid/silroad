@@ -1,9 +1,0 @@
-{
-    "servers": {
-        "svelte-docs": {
-            "command": "npx",
-            "args": ["-y", "mcp-svelte-docs"],
-            "type": "stdio"
-        }
-    }
-}
