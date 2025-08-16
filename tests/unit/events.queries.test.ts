@@ -39,7 +39,6 @@ describe('EventRepo - Query Methods', () => {
 			and: vi.fn(),
 			gt: vi.fn(),
 			eq: vi.fn(),
-			count: vi.fn(),
 			as: vi.fn()
 		};
 
@@ -458,7 +457,6 @@ describe('EventRepo - Query Methods', () => {
 			await eventRepo.getEventWithAttendeeCount('event-1');
 
 			expect(mockDb.groupBy).toHaveBeenCalled();
-			expect(mockDb.count).toHaveBeenCalled();
 		});
 
 		it('should return null on database error', async () => {

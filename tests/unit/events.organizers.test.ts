@@ -124,10 +124,9 @@ describe('EventRepo - Organizer Management', () => {
 
 		it('should prevent removing the last organizer', async () => {
 			// Mock that user is the only organizer
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.count = vi.fn().mockResolvedValue([{ count: 1 }]); // Only 1 organizer
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 1 }])
+			});
 
 			const result = await eventRepo.removeOrganizer('event-1', 'user-1');
 
@@ -137,10 +136,9 @@ describe('EventRepo - Organizer Management', () => {
 
 		it('should allow removing organizer when multiple organizers exist', async () => {
 			// Mock that there are multiple organizers
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.count = vi.fn().mockResolvedValue([{ count: 3 }]); // Multiple organizers
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 3 }])
+			});
 
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockResolvedValue({ changes: 1 });
@@ -151,10 +149,9 @@ describe('EventRepo - Organizer Management', () => {
 		});
 
 		it('should return false on database error', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.count = vi.fn().mockRejectedValue(new Error('Database error'));
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockRejectedValue(new Error('Database error'))
+			});
 
 			const result = await eventRepo.removeOrganizer('event-1', 'user-1');
 

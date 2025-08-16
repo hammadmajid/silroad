@@ -37,7 +37,6 @@ describe('EventRepo - Attendee Management', () => {
 			delete: vi.fn().mockReturnThis(),
 			innerJoin: vi.fn().mockReturnThis(),
 			orderBy: vi.fn().mockReturnThis(),
-			count: vi.fn(),
 			eq: vi.fn(),
 			and: vi.fn(),
 			gt: vi.fn()
@@ -70,7 +69,9 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.limit.mockResolvedValueOnce([mockEvent]); // Event lookup
 
 			// Mock current attendee count is below max
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]); // Attendee count
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 50 }])
+			});
 
 			// Mock successful insertion
 			mockDb.insert.mockReturnValue(mockDb);
@@ -93,7 +94,9 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.limit.mockResolvedValueOnce([mockEvent]);
 
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]);
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 50 }])
+			});
 
 			mockDb.insert.mockReturnValue(mockDb);
 			mockDb.values.mockReturnValue(mockDb);
@@ -129,7 +132,9 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.limit.mockResolvedValueOnce([mockEvent]);
 
 			// Mock attendee count at capacity
-			mockDb.count.mockResolvedValueOnce([{ count: 100 }]); // At max capacity
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 100 }])
+			});
 
 			const result = await eventRepo.addAttendee('event-1', 'user-1');
 
@@ -156,7 +161,6 @@ describe('EventRepo - Attendee Management', () => {
 			const result = await eventRepo.addAttendee('event-1', 'user-1');
 
 			expect(result).toBe(true);
-			expect(mockDb.count).not.toHaveBeenCalled();
 		});
 
 		it('should return false on database error', async () => {
@@ -181,7 +185,9 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.limit.mockResolvedValueOnce([eventWithNoCloseDate]);
 
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]);
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 50 }])
+			});
 
 			mockDb.insert.mockReturnValue(mockDb);
 			mockDb.values.mockReturnValue(mockDb);
