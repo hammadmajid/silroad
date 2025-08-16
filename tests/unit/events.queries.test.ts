@@ -292,7 +292,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.searchEvents('test');
 
@@ -306,7 +307,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.searchEvents('testing');
 
@@ -319,7 +321,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.searchEvents('test', { organizationId: 'org-1' });
 
@@ -331,7 +334,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue([]);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue([]);
 
 			const result = await eventRepo.searchEvents('nonexistent');
 
@@ -344,7 +348,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.searchEvents('TEST');
 
@@ -374,7 +379,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockResolvedValue([mockEvent]);
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockResolvedValue([mockEvent]);
 
 			await eventRepo.searchEvents('test');
 
@@ -385,7 +391,8 @@ describe('EventRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
+			mockDb.orderBy.mockReturnValue(mockDb);
+			mockDb.limit.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.searchEvents('test');
 

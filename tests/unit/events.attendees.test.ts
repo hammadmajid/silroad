@@ -227,7 +227,8 @@ describe('EventRepo - Attendee Management', () => {
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockAttendees);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -238,7 +239,8 @@ describe('EventRepo - Attendee Management', () => {
 		it('should return empty array when no attendees', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -248,7 +250,8 @@ describe('EventRepo - Attendee Management', () => {
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -261,7 +264,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockAttendees);
+			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -277,7 +280,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -290,7 +294,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -301,7 +306,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -318,7 +324,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -339,7 +345,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockUpcomingEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -354,7 +361,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockUpcomingEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -365,7 +373,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -382,7 +391,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockUpcomingEvents);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 

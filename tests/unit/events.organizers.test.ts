@@ -165,7 +165,8 @@ describe('EventRepo - Organizer Management', () => {
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockOrganizers);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockOrganizers);
 
 			const result = await eventRepo.getOrganizers('event-1');
 
@@ -176,7 +177,8 @@ describe('EventRepo - Organizer Management', () => {
 		it('should return empty array when no organizers', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getOrganizers('event-1');
 
@@ -186,7 +188,8 @@ describe('EventRepo - Organizer Management', () => {
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.getOrganizers('event-1');
 
@@ -201,7 +204,8 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
@@ -214,7 +218,8 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
@@ -225,7 +230,8 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
@@ -242,7 +248,7 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
@@ -260,7 +266,7 @@ describe('EventRepo - Organizer Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserOrganizedEvents('user-1');
 
