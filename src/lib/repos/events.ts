@@ -273,59 +273,191 @@ export class EventRepo {
 	// Attendee Management
 	/**
 	 * Adds a user as an attendee to an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to add as attendee
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to add as attendee
 	 * @returns true if attendee was added successfully, false otherwise
 	 */
-	async addAttendee(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async addAttendee(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if event exists and get event details
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			// 2. Check if RSVP is still open
+			if (event.closeRsvpAt && new Date() > event.closeRsvpAt) {
+				return false;
+			}
+
+			// 3. Check capacity if maxAttendees is set
+			if (event.maxAttendees !== null) {
+				const attendeeCountResult = await this.db
+					.select({ count: count() })
+					.from(attendees)
+					.where(eq(attendees.eventId, eventId));
+
+				const currentCount = attendeeCountResult[0]?.count ?? 0;
+				if (currentCount >= event.maxAttendees) {
+					return false;
+				}
+			}
+
+			// 4. Try to insert attendee
+			await this.db.insert(attendees).values({ eventId, userId }).returning();
+
+			return true;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'addAttendee', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	/**
 	 * Removes a user from event attendance.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to remove from attendance
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to remove from attendance
 	 * @returns true if attendee was removed successfully, false otherwise
 	 */
-	async removeAttendee(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async removeAttendee(eventId: string, userId: string): Promise<boolean> {
+		try {
+			await this.db
+				.delete(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, userId)));
+
+			return true;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'removeAttendee', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	/**
 	 * Gets all attendee user IDs for an event.
-	 * @param _eventId - Event UUID
+	 * @param eventId - Event UUID
 	 * @returns Array of user IDs who are attending, empty array if none or on error
 	 */
-	async getAttendees(_eventId: string): Promise<string[]> {
-		throw new Error('Not implemented');
+	async getAttendees(eventId: string): Promise<string[]> {
+		try {
+			const result = await this.db
+				.select({ userId: attendees.userId })
+				.from(attendees)
+				.where(eq(attendees.eventId, eventId))
+				.orderBy(attendees.userId);
+
+			return result.map((row) => row.userId);
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getAttendees', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events that a user has attended (past events).
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of events the user attended, empty array if none or on error
 	 */
-	async getUserAttendedEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUserAttendedEvents(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(attendees, eq(events.id, attendees.eventId))
+				.where(eq(attendees.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getUserAttendedEvents', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all upcoming events that a user is attending.
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of upcoming events the user is attending, empty array if none or on error
 	 */
-	async getUpcomingUserEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingUserEvents(userId: string): Promise<Event[]> {
+		try {
+			const now = new Date();
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(attendees, eq(events.id, attendees.eventId))
+				.where(and(eq(attendees.userId, userId), gt(events.dateOfEvent, now)))
+				.orderBy(asc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getUpcomingUserEvents', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return [];
+		}
 	}
 
 	/**
 	 * Checks if a user is attending an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to check attendance for
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to check attendance for
 	 * @returns true if user is attending, false otherwise or on error
 	 */
-	async isAttending(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async isAttending(eventId: string, userId: string): Promise<boolean> {
+		try {
+			const result = await this.db
+				.select({ userId: attendees.userId })
+				.from(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, userId)))
+				.limit(1);
+
+			return result.length > 0;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'isAttending', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return false;
+		}
 	}
 
 	// Organizer Management
