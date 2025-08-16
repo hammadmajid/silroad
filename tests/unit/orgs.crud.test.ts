@@ -337,13 +337,16 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			const mockOrgs = [mockOrg, { ...mockOrg, id: 'org-2', name: 'Second Org' }];
 			const totalCount = 2;
 
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.orderBy.mockReturnValue(mockDb);
-			mockDb.limit.mockReturnValue(mockDb);
-			mockDb.offset.mockResolvedValue(mockOrgs);
+			// Mock the count query chain: this.db.select({ count: count() }).from(organizations)
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce([{ count: totalCount }]);
 
-			mockDb.count.mockResolvedValue([{ count: totalCount }]);
+			// Mock the data query chain: this.db.select().from(organizations).orderBy(...).limit(...).offset(...)
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce(mockDb);
+			mockDb.orderBy.mockReturnValueOnce(mockDb);
+			mockDb.limit.mockReturnValueOnce(mockDb);
+			mockDb.offset.mockResolvedValueOnce(mockOrgs);
 
 			const result = await orgRepo.getAll();
 
@@ -363,13 +366,16 @@ describe('OrganizationRepo - CRUD Operations', () => {
 			const totalCount = 15;
 			const pagination: PaginationOptions = { page: 2, pageSize: 5 };
 
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.orderBy.mockReturnValue(mockDb);
-			mockDb.limit.mockReturnValue(mockDb);
-			mockDb.offset.mockResolvedValue(mockOrgs);
+			// Mock the count query chain: this.db.select({ count: count() }).from(organizations)
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce([{ count: totalCount }]);
 
-			mockDb.count.mockResolvedValue([{ count: totalCount }]);
+			// Mock the data query chain: this.db.select().from(organizations).orderBy(...).limit(...).offset(...)
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce(mockDb);
+			mockDb.orderBy.mockReturnValueOnce(mockDb);
+			mockDb.limit.mockReturnValueOnce(mockDb);
+			mockDb.offset.mockResolvedValueOnce(mockOrgs);
 
 			const result = await orgRepo.getAll(pagination);
 
@@ -411,13 +417,16 @@ describe('OrganizationRepo - CRUD Operations', () => {
 		it('should handle page out of bounds gracefully', async () => {
 			const pagination: PaginationOptions = { page: 100, pageSize: 10 };
 
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.orderBy.mockReturnValue(mockDb);
-			mockDb.limit.mockReturnValue(mockDb);
-			mockDb.offset.mockResolvedValue([]);
+			// Mock the count query chain
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce([{ count: 5 }]);
 
-			mockDb.count.mockResolvedValue([{ count: 5 }]);
+			// Mock the data query chain
+			mockDb.select.mockReturnValueOnce(mockDb);
+			mockDb.from.mockReturnValueOnce(mockDb);
+			mockDb.orderBy.mockReturnValueOnce(mockDb);
+			mockDb.limit.mockReturnValueOnce(mockDb);
+			mockDb.offset.mockResolvedValueOnce([]);
 
 			const result = await orgRepo.getAll(pagination);
 

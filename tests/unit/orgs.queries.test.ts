@@ -139,8 +139,8 @@ describe('OrganizationRepo - Query Methods', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy.mockReturnValue(mockDb);
-			mockDb.limit = vi.fn().mockResolvedValue(mockOrgs.slice(0, 20));
+			mockDb.limit.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockOrgs.slice(0, 20));
 
 			const result = await orgRepo.searchOrganizations('test');
 
@@ -298,7 +298,7 @@ describe('OrganizationRepo - Query Methods', () => {
 			await orgRepo.getOrganizationStats('org-1');
 
 			expect(mockDb.groupBy).toHaveBeenCalled();
-			expect(mockDb.count).toHaveBeenCalled();
+			expect(mockDb.leftJoin).toHaveBeenCalledTimes(2); // Should join both organizationMembers and events
 		});
 
 		it('should include all organization fields in result', async () => {

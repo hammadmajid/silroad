@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { OrganizationRepo, type Organization } from '$lib/repos/orgs';
-import type { success } from 'zod/v4';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
@@ -34,6 +33,7 @@ describe('OrganizationRepo - Member Management', () => {
 			returning: vi.fn().mockReturnThis(),
 			delete: vi.fn().mockReturnThis(),
 			innerJoin: vi.fn().mockReturnThis(),
+			orderBy: vi.fn().mockReturnThis(),
 			eq: vi.fn(),
 			and: vi.fn()
 		};
@@ -139,7 +139,8 @@ describe('OrganizationRepo - Member Management', () => {
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockMembers);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockMembers);
 
 			const result = await orgRepo.getMembers('org-1');
 
@@ -199,7 +200,8 @@ describe('OrganizationRepo - Member Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockOrgs);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockOrgs);
 
 			const result = await orgRepo.getUserOrganizations('user-1');
 
