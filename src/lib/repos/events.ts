@@ -1,5 +1,5 @@
 import { getDb, getLogger } from '$lib/db';
-import { eq } from 'drizzle-orm';
+import { desc, eq, count } from 'drizzle-orm';
 import { events } from '$lib/db/schema';
 
 /**
@@ -107,11 +107,34 @@ export class EventRepo {
 	// Core CRUD Operations
 	/**
 	 * Creates a new event.
-	 * @param _eventData - Event creation data
+	 * @param eventData - Event creation data
 	 * @returns The created event, or null on error
 	 */
-	async create(_eventData: EventCreateData): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async create(eventData: EventCreateData): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.insert(events)
+				.values({
+					title: eventData.title,
+					slug: eventData.slug,
+					description: eventData.description ?? null,
+					dateOfEvent: eventData.dateOfEvent,
+					closeRsvpAt: eventData.closeRsvpAt ?? null,
+					maxAttendees: eventData.maxAttendees ?? null,
+					image: eventData.image ?? null,
+					organizationId: eventData.organizationId
+				})
+				.returning();
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'create', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
@@ -156,29 +179,95 @@ export class EventRepo {
 
 	/**
 	 * Updates an event.
-	 * @param _id - Event UUID
-	 * @param _eventData - Partial update data
+	 * @param id - Event UUID
+	 * @param eventData - Partial update data
 	 * @returns The updated event, or null if not found or error
 	 */
-	async update(_id: string, _eventData: EventUpdateData): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async update(id: string, eventData: EventUpdateData): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.update(events)
+				.set(eventData)
+				.where(eq(events.id, id))
+				.returning();
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'update', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return null;
+		}
 	}
 
 	/**
 	 * Deletes an event by its UUID.
-	 * @param _id - Event UUID
+	 * @param id - Event UUID
 	 */
-	async delete(_id: string): Promise<void> {
-		throw new Error('Not implemented');
+	async delete(id: string): Promise<void | Error> {
+		try {
+			await this.db.delete(events).where(eq(events.id, id));
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'delete', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return error as Error;
+		}
 	}
 
 	/**
 	 * Gets a paginated list of events.
-	 * @param _pagination - Optional pagination options
+	 * @param pagination - Optional pagination options
 	 * @returns Paginated result of events
 	 */
-	async getAll(_pagination?: PaginationOptions): Promise<PaginationResult<Event>> {
-		throw new Error('Not implemented');
+	async getAll(pagination?: PaginationOptions): Promise<PaginationResult<Event>> {
+		try {
+			const page = pagination?.page ?? 1;
+			const pageSize = pagination?.pageSize ?? 10;
+			const offset = (page - 1) * pageSize;
+
+			// Get total count
+			const totalCountResult = await this.db.select({ count: count() }).from(events);
+			const totalCount = totalCountResult[0]?.count ?? 0;
+			const totalPages = Math.ceil(totalCount / pageSize);
+
+			// Get paginated events
+			const eventsData = await this.db
+				.select()
+				.from(events)
+				.orderBy(desc(events.dateOfEvent))
+				.limit(pageSize)
+				.offset(offset);
+
+			return {
+				data: eventsData,
+				pagination: {
+					page,
+					pageSize,
+					totalCount,
+					totalPages
+				}
+			};
+		} catch (error) {
+			this.logger.writeDataPoint({
+				blobs: ['error', 'EventRepo', 'getAll', JSON.stringify(error)],
+				doubles: [1],
+				indexes: [crypto.randomUUID()]
+			});
+			return {
+				data: [],
+				pagination: {
+					page: 1,
+					pageSize: 10,
+					totalCount: 0,
+					totalPages: 0
+				}
+			};
+		}
 	}
 
 	// Attendee Management
