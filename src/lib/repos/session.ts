@@ -6,12 +6,19 @@ import type { User } from './user';
 
 export const SESSION_COOKIE_NAME = 'session';
 
+/**
+ * Session data that can be serialized and stored in KV.
+ */
 export type SerializableSession = {
 	userId: string;
 	userImage: string | null;
 	sessionExpiresAt: string;
 };
 
+/**
+ * Repository for session management with D1 database and KV cache.
+ * Uses KV for fast session lookups and D1 for persistence.
+ */
 export class SessionRepo {
 	private db;
 	private kv;
@@ -23,6 +30,12 @@ export class SessionRepo {
 		this.logger = getLogger(platform);
 	}
 
+	/**
+	 * Gets session data by token from KV cache first, then database.
+	 * Automatically cleans up expired sessions.
+	 * @param token - Session token
+	 * @returns Session data or null if not found/expired
+	 */
 	async getByToken(token: string): Promise<SerializableSession | null> {
 		try {
 			const now = new Date(Date.now());
@@ -68,6 +81,12 @@ export class SessionRepo {
 		}
 	}
 
+	/**
+	 * Creates a new session for a user with 30-day expiration.
+	 * Stores in both database and KV cache.
+	 * @param user - User to create session for
+	 * @returns Session token and expiration date, or null on error
+	 */
 	async create({ id: userId, image }: User): Promise<{
 		token: string;
 		expiresAt: Date;
@@ -104,6 +123,11 @@ export class SessionRepo {
 		}
 	}
 
+	/**
+	 * Gets all active sessions for a user.
+	 * @param userId - User UUID
+	 * @returns Array of active sessions for the user
+	 */
 	async getByUserId(userId: string): Promise<SerializableSession[]> {
 		try {
 			const now = new Date(Date.now());
@@ -133,6 +157,11 @@ export class SessionRepo {
 			return [];
 		}
 	}
+	/**
+	 * Updates session data in KV cache.
+	 * @param session - Updated session data
+	 * @returns Updated session data or null if not found
+	 */
 	async update(session: SerializableSession): Promise<SerializableSession | null> {
 		try {
 			const sessionToken = await this.db
@@ -156,6 +185,10 @@ export class SessionRepo {
 			return null;
 		}
 	}
+	/**
+	 * Deletes a session by token from both database and KV cache.
+	 * @param sessionToken - Session token to delete
+	 */
 	async delete(sessionToken: string): Promise<void> {
 		try {
 			await this.db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
@@ -168,6 +201,11 @@ export class SessionRepo {
 			});
 		}
 	}
+	/**
+	 * Deletes all sessions for a user from both database and KV cache.
+	 * @param userId - User UUID
+	 * @returns Number of sessions deleted
+	 */
 	async deleteByUserId(userId: string): Promise<number> {
 		try {
 			const userSessions = await this.db
@@ -191,6 +229,11 @@ export class SessionRepo {
 			return 0;
 		}
 	}
+	/**
+	 * Invalidates a session by setting expiration to past date.
+	 * Removes from KV cache immediately.
+	 * @param sessionToken - Session token to invalidate
+	 */
 	async invalidate(sessionToken: string): Promise<void> {
 		try {
 			await this.db
@@ -206,6 +249,13 @@ export class SessionRepo {
 			});
 		}
 	}
+	/**
+	 * Refreshes session expiration if it expires within 48 hours.
+	 * Extends expiration by 30 days and updates both database and KV cache.
+	 * @param sessionToken - Session token to refresh
+	 * @param session - Current session data
+	 * @returns Refreshed session data or null if not found
+	 */
 	async refresh(
 		sessionToken: string,
 		session: SerializableSession
@@ -251,6 +301,11 @@ export class SessionRepo {
 			return null;
 		}
 	}
+	/**
+	 * Gets all sessions that expired before a specific date.
+	 * @param before - Date to check expiration against
+	 * @returns Array of expired sessions
+	 */
 	async getExpired(before: Date): Promise<SerializableSession[]> {
 		try {
 			const expiredSessions = await this.db
@@ -277,6 +332,10 @@ export class SessionRepo {
 			return [];
 		}
 	}
+	/**
+	 * Deletes all expired sessions from both database and KV cache.
+	 * @returns Number of expired sessions deleted
+	 */
 	async deleteExpired(): Promise<number> {
 		try {
 			const now = new Date(Date.now());
