@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-	type Organization,
-	type OrganizationWithStats,
-} from '$lib/types';
+import { type Organization, type OrganizationWithStats } from '$lib/types';
 import { OrganizationRepo } from '$lib/repos/orgs';
 
 vi.mock('$lib/db', () => ({

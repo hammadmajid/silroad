@@ -2,7 +2,15 @@ import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
 import { events, attendees } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
-import type { Event, EventCreateData, EventOrganizer, EventUpdateData, EventWithAttendeeCount, PaginationOptions, PaginationResult } from "$lib/types"
+import type {
+	Event,
+	EventCreateData,
+	EventOrganizer,
+	EventUpdateData,
+	EventWithAttendeeCount,
+	PaginationOptions,
+	PaginationResult
+} from '$lib/types';
 
 /**
  * Repository for event CRUD operations and queries.

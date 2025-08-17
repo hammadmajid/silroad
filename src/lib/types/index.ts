@@ -7,19 +7,19 @@
  * @property image - URL to the user's profile image, or null if not set.
  */
 export type User = {
-    id: string;
-    email: string;
-    name: string;
-    image: string | null;
+	id: string;
+	email: string;
+	name: string;
+	image: string | null;
 };
 
 /**
  * Session data that can be serialized and stored in KV.
  */
 export type SerializableSession = {
-    userId: string;
-    userImage: string | null;
-    sessionExpiresAt: string;
+	userId: string;
+	userImage: string | null;
+	sessionExpiresAt: string;
 };
 
 //-------------------------------------------------------------------//
@@ -35,12 +35,12 @@ export type SerializableSession = {
  * @property backgroundImage - Optional URL to the organization's background image.
  */
 export type Organization = {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    avatar: string | null;
-    backgroundImage: string | null;
+	id: string;
+	name: string;
+	slug: string;
+	description: string | null;
+	avatar: string | null;
+	backgroundImage: string | null;
 };
 
 /**
@@ -52,11 +52,11 @@ export type Organization = {
  * @property backgroundImage - Optional background image URL
  */
 export type OrganizationCreateData = {
-    name: string;
-    slug: string;
-    description?: string;
-    avatar?: string;
-    backgroundImage?: string;
+	name: string;
+	slug: string;
+	description?: string;
+	avatar?: string;
+	backgroundImage?: string;
 };
 
 /**
@@ -71,8 +71,8 @@ export type OrganizationUpdateData = Partial<OrganizationCreateData>;
  * @property organizationId - The unique identifier of the organization.
  */
 export type OrganizationMember = {
-    userId: string;
-    organizationId: string;
+	userId: string;
+	organizationId: string;
 };
 
 /**
@@ -85,8 +85,8 @@ export type OrganizationMember = {
  * @property eventCount - The total number of events associated with the organization.
  */
 export type OrganizationWithStats = Organization & {
-    memberCount: number;
-    eventCount: number;
+	memberCount: number;
+	eventCount: number;
 };
 
 /**
@@ -95,8 +95,8 @@ export type OrganizationWithStats = Organization & {
  * @property pageSize - Number of items per page
  */
 export type PaginationOptions = {
-    page: number;
-    pageSize: number;
+	page: number;
+	pageSize: number;
 };
 
 /**
@@ -105,13 +105,13 @@ export type PaginationOptions = {
  * @property pagination - Pagination metadata
  */
 export type PaginationResult<T> = {
-    data: T[];
-    pagination: {
-        page: number;
-        pageSize: number;
-        totalCount: number;
-        totalPages: number;
-    };
+	data: T[];
+	pagination: {
+		page: number;
+		pageSize: number;
+		totalCount: number;
+		totalPages: number;
+	};
 };
 
 //---------------------------------------------------------------//
@@ -120,15 +120,15 @@ export type PaginationResult<T> = {
  * Represents an event entity.
  */
 export type Event = {
-    id: string;
-    title: string;
-    slug: string;
-    description: string | null;
-    dateOfEvent: Date;
-    closeRsvpAt: Date | null;
-    maxAttendees: number | null;
-    image: string | null;
-    organizationId: string;
+	id: string;
+	title: string;
+	slug: string;
+	description: string | null;
+	dateOfEvent: Date;
+	closeRsvpAt: Date | null;
+	maxAttendees: number | null;
+	image: string | null;
+	organizationId: string;
 };
 
 /**
@@ -143,14 +143,14 @@ export type Event = {
  * @property organizationId - Organization hosting the event (required)
  */
 export type EventCreateData = {
-    title: string;
-    slug: string;
-    description?: string;
-    dateOfEvent: Date;
-    closeRsvpAt?: Date;
-    maxAttendees?: number;
-    image?: string;
-    organizationId: string;
+	title: string;
+	slug: string;
+	description?: string;
+	dateOfEvent: Date;
+	closeRsvpAt?: Date;
+	maxAttendees?: number;
+	image?: string;
+	organizationId: string;
 };
 
 /**
@@ -162,21 +162,21 @@ export type EventUpdateData = Partial<Omit<EventCreateData, 'organizationId'>>;
  * Represents an event attendee relationship.
  */
 export type Attendee = {
-    eventId: string;
-    userId: string;
+	eventId: string;
+	userId: string;
 };
 
 /**
  * Represents an event organizer relationship.
  */
 export type EventOrganizer = {
-    eventId: string;
-    userId: string;
+	eventId: string;
+	userId: string;
 };
 
 /**
  * Event with aggregated attendee count.
  */
 export type EventWithAttendeeCount = Event & {
-    attendeeCount: number;
+	attendeeCount: number;
 };

@@ -3,7 +3,7 @@ import {
 	type Organization,
 	type OrganizationCreateData,
 	type OrganizationUpdateData,
-	type PaginationOptions,
+	type PaginationOptions
 } from '$lib/types';
 import { OrganizationRepo } from '$lib/repos/orgs';
 

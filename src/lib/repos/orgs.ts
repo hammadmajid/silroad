@@ -2,7 +2,15 @@ import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
 import { organizations, organizationMembers, events } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
-import type { Organization, OrganizationCreateData, OrganizationMember, OrganizationUpdateData, OrganizationWithStats, PaginationOptions, PaginationResult } from "$lib/types"
+import type {
+	Organization,
+	OrganizationCreateData,
+	OrganizationMember,
+	OrganizationUpdateData,
+	OrganizationWithStats,
+	PaginationOptions,
+	PaginationResult
+} from '$lib/types';
 
 /**
  * Repository for organization CRUD and queries.

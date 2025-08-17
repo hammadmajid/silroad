@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-	type Event,
-	type EventWithAttendeeCount,
-} from '$lib/types';
+import { type Event, type EventWithAttendeeCount } from '$lib/types';
 import { EventRepo } from '$lib/repos/events';
 
 vi.mock('$lib/db', () => ({
