@@ -6,7 +6,7 @@ export function getPublicTurnstileKey(platform: App.Platform | undefined) {
 	const key = platform?.env.PUBLIC_TURNSTILE_KEY;
 
 	if (!key) {
-		throw 'Turnstile public key not found';
+		throw new Error('Turnstile public key not found');
 	}
 
 	return key;
@@ -16,7 +16,7 @@ export function getSecretTurnstileKey(platform: App.Platform | undefined) {
 	const key = platform?.env.SECRET_TURNSTILE_KEY;
 
 	if (!key) {
-		throw 'Turnstile secret key not found';
+		throw new Error('Turnstile secret key not found');
 	}
 
 	return key;
