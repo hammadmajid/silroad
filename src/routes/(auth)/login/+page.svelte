@@ -47,10 +47,6 @@
 				goto(redirectUrl);
 			}
 		},
-		onUpdated() {
-			// When the form is updated, we reset the turnstile
-			reset?.();
-		}
 	});
 	const { form: formData, enhance, submitting, message } = form;
 </script>
@@ -128,9 +124,7 @@
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
-			{#if data.isProd}
-				<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
-			{/if}
+			<Turnstile siteKey={data.publicTurnstileKey} responseFieldName="cf-turnstile-response" size="flexible"/>
 
 			<button
 				type="submit"

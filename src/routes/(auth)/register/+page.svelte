@@ -193,9 +193,7 @@
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
-			{#if data.isProd}
-				<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
-			{/if}
+			<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
 
 			<button
 				type="submit"
