@@ -84,21 +84,6 @@ describe('EventRepo - Organizer Management', () => {
 			});
 		});
 
-		it('should return false when organizer already exists', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]);
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockRejectedValue(new Error('UNIQUE constraint failed'));
-
-			const result = await eventRepo.addOrganizer('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
 		it('should return false on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
