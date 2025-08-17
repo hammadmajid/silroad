@@ -46,7 +46,7 @@
 				const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
 				goto(redirectUrl);
 			}
-		},
+		}
 	});
 	const { form: formData, enhance, submitting, message } = form;
 </script>
@@ -124,7 +124,11 @@
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
-			<Turnstile siteKey={data.publicTurnstileKey} responseFieldName="cf-turnstile-response" size="flexible"/>
+			<Turnstile
+				siteKey={data.publicTurnstileKey}
+				responseFieldName="cf-turnstile-response"
+				size="flexible"
+			/>
 
 			<button
 				type="submit"

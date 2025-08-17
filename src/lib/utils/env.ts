@@ -6,7 +6,7 @@ export function getPublicTurnstileKey(platform: App.Platform | undefined) {
 	if (!isProduction(platform)) {
 		// Turnstile dummy test key, always passes
 		// See: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
-		return "1x00000000000000000000AA";
+		return '1x00000000000000000000AA';
 	}
 
 	const key = platform?.env.PUBLIC_TURNSTILE_KEY;
@@ -22,7 +22,7 @@ export function getSecretTurnstileKey(platform: App.Platform | undefined) {
 	if (!isProduction(platform)) {
 		// Turnstile dummy test key, always passes
 		// See: https://developers.cloudflare.com/turnstile/troubleshooting/testing/
-		return "1x0000000000000000000000000000000AA";
+		return '1x0000000000000000000000000000000AA';
 	}
 
 	const key = platform?.env.SECRET_TURNSTILE_KEY;
