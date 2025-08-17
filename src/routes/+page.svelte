@@ -35,7 +35,7 @@
 					</a>
 					<a href="/explore" class="btn flex items-center gap-2 preset-outlined-primary-500">
 						<Search size={20} />
-						Explore Events
+						Explore
 					</a>
 				</div>
 			</div>
@@ -178,7 +178,7 @@
 			</a>
 			<a href="/explore" class="btn flex items-center gap-2 preset-outlined">
 				<Search size={20} />
-				Browse Events
+				Browse
 			</a>
 		</div>
 	</section>

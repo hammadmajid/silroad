@@ -92,7 +92,7 @@
 				<div class="space-y-4">
 					<h4 class="font-semibold">Platform</h4>
 					<ul class="space-y-2">
-						<li><a href="/explore" class="anchor text-sm">Explore Events</a></li>
+						<li><a href="/explore/events" class="anchor text-sm">Explore Events</a></li>
 						<li>
 							<a href="/explore/orgs" class="anchor text-sm">Find Organizations</a>
 						</li>
