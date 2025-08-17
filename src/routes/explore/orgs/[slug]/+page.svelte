@@ -23,13 +23,15 @@
 		});
 	};
 
-	const handleJoin = () => {
+	const handleFollow = () => {
 		if (!userStore.isLoggedIn) {
-			goto(handleLoginRedirect({ url: $page.url }, 'You must be logged in to join organizations'));
+			goto(
+				handleLoginRedirect({ url: $page.url }, 'You must be logged in to follow organizations')
+			);
 			return;
 		}
-		// TODO: Implement join functionality
-		alert('Join functionality coming soon!');
+		// TODO: Implement follow functionality
+		alert('Follow functionality coming soon!');
 	};
 
 	// Separate upcoming and past events
@@ -85,7 +87,7 @@
 			<p class="text-surface-600-300 text-lg">{organization.description}</p>
 		{/if}
 
-		<button class="btn preset-filled-primary-500" onclick={handleJoin}> Join Organization </button>
+		<button class="btn preset-filled-primary-500" onclick={handleFollow}> Follow </button>
 	</section>
 
 	<div class="grid gap-8 px-4 lg:grid-cols-3">
