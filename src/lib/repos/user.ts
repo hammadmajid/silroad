@@ -1,7 +1,8 @@
 import { eq } from 'drizzle-orm';
-import { getDb, getLogger } from '$lib/db';
+import { getDb } from '$lib/db';
 import { users } from '$lib/db/schema';
 import { comparePassword, hashPassword } from '$lib/utils/crypto';
+import { Logger } from '$lib/utils/logger';
 import { SessionRepo } from './session';
 
 /**
@@ -24,7 +25,7 @@ export class UserRepo {
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
-		this.logger = getLogger(platform);
+		this.logger = new Logger(platform);
 		this.sessionRepo = new SessionRepo(platform);
 	}
 
@@ -48,11 +49,7 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'getById', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'getById', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -77,11 +74,7 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'getByEmail', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'getByEmail', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -119,11 +112,7 @@ export class UserRepo {
 				image: null
 			};
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'create', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'create', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -157,11 +146,7 @@ export class UserRepo {
 				image
 			};
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'verify', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'verify', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -192,11 +177,7 @@ export class UserRepo {
 			}
 			return updatedUser ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'update', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'update', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -208,11 +189,7 @@ export class UserRepo {
 		try {
 			await this.db.delete(users).where(eq(users.id, userId));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'delete', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'delete', JSON.stringify(error));
 		}
 	}
 	/**
@@ -247,11 +224,7 @@ export class UserRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'UserRepo', 'updatePassword', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('UserRepo', 'updatePassword', JSON.stringify(error));
 			return false;
 		}
 	}

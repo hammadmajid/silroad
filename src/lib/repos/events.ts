@@ -1,6 +1,7 @@
-import { getDb, getLogger } from '$lib/db';
+import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
 import { events, attendees } from '$lib/db/schema';
+import { Logger } from '$lib/utils/logger';
 
 /**
  * Represents an event entity.
@@ -101,7 +102,7 @@ export class EventRepo {
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
-		this.logger = getLogger(platform);
+		this.logger = new Logger(platform);
 	}
 
 	// Core CRUD Operations
@@ -128,11 +129,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'create', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'create', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -148,11 +145,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getById', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getById', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -168,11 +161,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getBySlug', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getBySlug', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -193,11 +182,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'update', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'update', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -210,11 +195,7 @@ export class EventRepo {
 		try {
 			await this.db.delete(events).where(eq(events.id, id));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'delete', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'delete', JSON.stringify(error));
 			return error as Error;
 		}
 	}
@@ -253,11 +234,7 @@ export class EventRepo {
 				}
 			};
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getAll', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getAll', JSON.stringify(error));
 			return {
 				data: [],
 				pagination: {
@@ -308,11 +285,7 @@ export class EventRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'addAttendee', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'addAttendee', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -331,11 +304,7 @@ export class EventRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'removeAttendee', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'removeAttendee', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -355,11 +324,7 @@ export class EventRepo {
 
 			return result.map((row) => row.userId);
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getAttendees', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getAttendees', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -390,11 +355,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getUserAttendedEvents', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getUserAttendedEvents', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -426,11 +387,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getUpcomingUserEvents', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getUpcomingUserEvents', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -451,11 +408,7 @@ export class EventRepo {
 
 			return result.length > 0;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'isAttending', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'isAttending', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -529,11 +482,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getUpcomingEvents', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getUpcomingEvents', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -553,11 +502,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getEventsByOrganization', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getEventsByOrganization', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -579,11 +524,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getUpcomingEventsByOrganization', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -616,11 +557,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'searchEvents', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'searchEvents', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -652,11 +589,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getEventWithAttendeeCount', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getEventWithAttendeeCount', JSON.stringify(error));
 			return null;
 		}
 	}

@@ -1,6 +1,7 @@
-import { getDb, getLogger } from '$lib/db';
+import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
 import { organizations, organizationMembers, events } from '$lib/db/schema';
+import { Logger } from '$lib/utils/logger';
 
 /**
  * Represents an organization entity.
@@ -79,7 +80,7 @@ export class OrganizationRepo {
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
-		this.logger = getLogger(platform);
+		this.logger = new Logger(platform);
 	}
 
 	/**
@@ -100,11 +101,7 @@ export class OrganizationRepo {
 			const result = await this.db.insert(organizations).values(createData).returning();
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'create', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'create', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -123,11 +120,7 @@ export class OrganizationRepo {
 				.limit(1);
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getById', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getById', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -147,11 +140,7 @@ export class OrganizationRepo {
 
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getBySlug', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getBySlug', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -172,11 +161,7 @@ export class OrganizationRepo {
 
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'update', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'update', JSON.stringify(error));
 			return null;
 		}
 	}
@@ -190,11 +175,7 @@ export class OrganizationRepo {
 		try {
 			await this.db.delete(organizations).where(eq(organizations.id, id));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'delete', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'delete', JSON.stringify(error));
 			return error instanceof Error ? error : new Error(String(error));
 		}
 	}
@@ -233,11 +214,7 @@ export class OrganizationRepo {
 				}
 			};
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getAll', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getAll', JSON.stringify(error));
 			return {
 				data: [],
 				pagination: {
@@ -268,11 +245,7 @@ export class OrganizationRepo {
 				.returning();
 			return true;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'addMember', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'addMember', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -296,11 +269,7 @@ export class OrganizationRepo {
 
 			return result.success;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'removeMember', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'removeMember', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -322,11 +291,7 @@ export class OrganizationRepo {
 
 			return members.map((member) => member.userId);
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getMembers', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getMembers', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -354,11 +319,7 @@ export class OrganizationRepo {
 
 			return orgs;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getUserOrganizations', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getUserOrganizations', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -384,11 +345,7 @@ export class OrganizationRepo {
 
 			return result.length > 0;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'isMember', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'isMember', JSON.stringify(error));
 			return false;
 		}
 	}
@@ -425,11 +382,7 @@ export class OrganizationRepo {
 				.limit(20)
 				.orderBy(asc(organizations.name));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'searchOrganizations', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'searchOrganizations', JSON.stringify(error));
 			return [];
 		}
 	}
@@ -463,11 +416,7 @@ export class OrganizationRepo {
 
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'OrganizationRepo', 'getOrganizationStats', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('OrganizationRepo', 'getOrganizationStats', JSON.stringify(error));
 			return null;
 		}
 	}
