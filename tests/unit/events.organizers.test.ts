@@ -152,23 +152,29 @@ describe('EventRepo - Organizer Management', () => {
 	});
 
 	describe('getOrganizers', () => {
-		it('should return list of organizer user IDs', async () => {
-			const mockOrganizers = [{ userId: 'user-1' }, { userId: 'user-2' }, { userId: 'user-3' }];
+		it('should return list of organizer user objects', async () => {
+			const mockOrganizers = [
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue(mockOrganizers);
 
 			const result = await eventRepo.getOrganizers('event-1');
 
-			expect(result).toEqual(['user-1', 'user-2', 'user-3']);
+			expect(result).toEqual(mockOrganizers);
 			expect(mockDb.where).toHaveBeenCalledWith(expect.anything()); // eq(eventOrganizers.eventId, 'event-1')
 		});
 
 		it('should return empty array when no organizers', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue([]);
 
@@ -180,6 +186,7 @@ describe('EventRepo - Organizer Management', () => {
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 

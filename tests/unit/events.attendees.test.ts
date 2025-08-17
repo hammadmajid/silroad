@@ -114,23 +114,29 @@ describe('EventRepo - Attendee Management', () => {
 	});
 
 	describe('getAttendees', () => {
-		it('should return list of attendee user IDs', async () => {
-			const mockAttendees = [{ userId: 'user-1' }, { userId: 'user-2' }, { userId: 'user-3' }];
+		it('should return list of attendee user objects', async () => {
+			const mockAttendees = [
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
-			expect(result).toEqual(['user-1', 'user-2', 'user-3']);
+			expect(result).toEqual(mockAttendees);
 			expect(mockDb.where).toHaveBeenCalledWith(expect.anything()); // eq(attendees.eventId, 'event-1')
 		});
 
 		it('should return empty array when no attendees', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue([]);
 
@@ -151,16 +157,21 @@ describe('EventRepo - Attendee Management', () => {
 		});
 
 		it('should order attendees by join date', async () => {
-			const mockAttendees = [{ userId: 'user-2' }, { userId: 'user-1' }, { userId: 'user-3' }];
+			const mockAttendees = [
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
-			expect(result).toEqual(['user-2', 'user-1', 'user-3']);
+			expect(result).toEqual(mockAttendees);
 			expect(mockDb.orderBy).toHaveBeenCalled();
 		});
 	});
@@ -201,7 +212,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
-			const result = await eventRepo.getUserAttendedEvents('user-1');
+			const result = await eventRepo.getAttendees('event-1');
 
 			expect(result).toEqual([]);
 		});

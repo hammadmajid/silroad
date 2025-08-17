@@ -135,24 +135,31 @@ describe('OrganizationRepo - Member Management', () => {
 	});
 
 	describe('getMembers', () => {
-		it('should return list of member user IDs', async () => {
-			const mockMembers = [{ userId: 'user-1' }, { userId: 'user-2' }, { userId: 'user-3' }];
+		it('should return list of member user objects', async () => {
+			const mockMembers = [
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockResolvedValue(mockMembers);
 
 			const result = await orgRepo.getMembers('org-1');
 
-			expect(result).toEqual(['user-1', 'user-2', 'user-3']);
+			expect(result).toEqual(mockMembers);
 			expect(mockDb.where).toHaveBeenCalledWith(expect.anything()); // eq(organizationMembers.organizationId, 'org-1')
 		});
 
 		it('should return empty array when no members', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await orgRepo.getMembers('org-1');
 
@@ -162,9 +169,11 @@ describe('OrganizationRepo - Member Management', () => {
 		it('should return empty array when organization does not exist', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
-			const result = await orgRepo.getMembers('nonexistent-org');
+			const result = await orgRepo.getMembers('non-existent-org');
 
 			expect(result).toEqual([]);
 		});
@@ -172,7 +181,9 @@ describe('OrganizationRepo - Member Management', () => {
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await orgRepo.getMembers('org-1');
 
@@ -180,16 +191,21 @@ describe('OrganizationRepo - Member Management', () => {
 		});
 
 		it('should order members by join date', async () => {
-			const mockMembers = [{ userId: 'user-2' }, { userId: 'user-1' }, { userId: 'user-3' }];
+			const mockMembers = [
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy = vi.fn().mockResolvedValue(mockMembers);
 
 			const result = await orgRepo.getMembers('org-1');
 
-			expect(result).toEqual(['user-2', 'user-1', 'user-3']);
+			expect(result).toEqual(mockMembers);
 			expect(mockDb.orderBy).toHaveBeenCalled();
 		});
 	});
