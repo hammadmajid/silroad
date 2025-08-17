@@ -49,7 +49,7 @@
 			<img
 				src={event.image}
 				alt={event.title}
-				class="aspect-[21/9] w-full rounded-lg object-cover"
+				class="aspect-[40/9] w-full rounded-lg object-cover"
 			/>
 		{/if}
 
