@@ -1,19 +1,11 @@
-import { getDb, getKV, getLogger } from '$lib/db';
+import { getDb, getKV } from '$lib/db';
 import { generateSessionToken } from '$lib/utils/crypto';
 import { and, eq, gt, lt } from 'drizzle-orm';
 import { sessions, users } from '$lib/db/schema';
-import type { User } from './user';
+import { Logger } from '$lib/utils/logger';
+import type { User, SerializableSession } from '$lib/types';
 
 export const SESSION_COOKIE_NAME = 'session';
-
-/**
- * Session data that can be serialized and stored in KV.
- */
-export type SerializableSession = {
-	userId: string;
-	userImage: string | null;
-	sessionExpiresAt: string;
-};
 
 /**
  * Repository for session management with D1 database and KV cache.
@@ -27,7 +19,7 @@ export class SessionRepo {
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
 		this.kv = getKV(platform);
-		this.logger = getLogger(platform);
+		this.logger = new Logger(platform);
 	}
 
 	/**
@@ -72,11 +64,7 @@ export class SessionRepo {
 				};
 			}
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'getByToken', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'getByToken', error);
 			return null;
 		}
 	}
@@ -114,11 +102,7 @@ export class SessionRepo {
 				expiresAt: new Date(expires)
 			};
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'create', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'create', error);
 			return null;
 		}
 	}
@@ -149,11 +133,7 @@ export class SessionRepo {
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'getByUserId', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'getByUserId', error);
 			return [];
 		}
 	}
@@ -177,11 +157,7 @@ export class SessionRepo {
 			await this.kv.put(sessionToken[0].sessionToken, JSON.stringify(session));
 			return session;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'update', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'update', error);
 			return null;
 		}
 	}
@@ -194,11 +170,7 @@ export class SessionRepo {
 			await this.db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 			await this.kv.delete(sessionToken);
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'delete', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'delete', error);
 		}
 	}
 	/**
@@ -221,11 +193,7 @@ export class SessionRepo {
 
 			return userSessions.length;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'deleteByUserId', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'deleteByUserId', error);
 			return 0;
 		}
 	}
@@ -242,11 +210,7 @@ export class SessionRepo {
 				.where(eq(sessions.sessionToken, sessionToken));
 			await this.kv.delete(sessionToken);
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'invalidate', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'invalidate', error);
 		}
 	}
 	/**
@@ -293,11 +257,7 @@ export class SessionRepo {
 
 			return refreshedSession;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'refresh', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'refresh', error);
 			return null;
 		}
 	}
@@ -324,11 +284,7 @@ export class SessionRepo {
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'getExpired', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'getExpired', error);
 			return [];
 		}
 	}
@@ -353,11 +309,7 @@ export class SessionRepo {
 
 			return expiredSessions.length;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'SessionRepo', 'deleteExpired', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('SessionRepo', 'deleteExpired', error);
 			return 0;
 		}
 	}

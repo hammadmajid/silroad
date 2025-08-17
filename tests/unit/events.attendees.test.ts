@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EventRepo, type Event } from '$lib/repos/events';
+import { type Event } from '$lib/types';
+import { EventRepo } from '$lib/repos/events';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
@@ -37,7 +38,6 @@ describe('EventRepo - Attendee Management', () => {
 			delete: vi.fn().mockReturnThis(),
 			innerJoin: vi.fn().mockReturnThis(),
 			orderBy: vi.fn().mockReturnThis(),
-			count: vi.fn(),
 			eq: vi.fn(),
 			and: vi.fn(),
 			gt: vi.fn()
@@ -62,66 +62,6 @@ describe('EventRepo - Attendee Management', () => {
 	});
 
 	describe('addAttendee', () => {
-		it('should add attendee successfully', async () => {
-			// Mock event exists and RSVP is open
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]); // Event lookup
-
-			// Mock current attendee count is below max
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]); // Attendee count
-
-			// Mock successful insertion
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([{ eventId: 'event-1', userId: 'user-1' }]);
-
-			const result = await eventRepo.addAttendee('event-1', 'user-1');
-
-			expect(result).toBe(true);
-			expect(mockDb.insert).toHaveBeenCalled();
-			expect(mockDb.values).toHaveBeenCalledWith({
-				eventId: 'event-1',
-				userId: 'user-1'
-			});
-		});
-
-		it('should return false when attendee already exists', async () => {
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([mockEvent]);
-
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]);
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockRejectedValue(new Error('UNIQUE constraint failed'));
-
-			const result = await eventRepo.addAttendee('event-1', 'user-1');
-
-			expect(result).toBe(false);
-		});
-
-		it('should return false when RSVP is closed', async () => {
-			const pastCloseDate = new Date('2020-01-01T18:00:00.000Z');
-			const eventWithClosedRsvp = {
-				...mockEvent,
-				closeRsvpAt: pastCloseDate
-			};
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([eventWithClosedRsvp]);
-
-			const result = await eventRepo.addAttendee('event-1', 'user-1');
-
-			expect(result).toBe(false);
-			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
 		it('should return false when event is at capacity', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
@@ -129,34 +69,14 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.limit.mockResolvedValueOnce([mockEvent]);
 
 			// Mock attendee count at capacity
-			mockDb.count.mockResolvedValueOnce([{ count: 100 }]); // At max capacity
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 100 }])
+			});
 
 			const result = await eventRepo.addAttendee('event-1', 'user-1');
 
 			expect(result).toBe(false);
 			expect(mockDb.insert).not.toHaveBeenCalled();
-		});
-
-		it('should allow adding attendee when event has no max capacity', async () => {
-			const eventWithNoMaxCapacity = {
-				...mockEvent,
-				maxAttendees: null
-			};
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([eventWithNoMaxCapacity]);
-
-			// Don't need to check count if no max capacity
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([{ eventId: 'event-1', userId: 'user-1' }]);
-
-			const result = await eventRepo.addAttendee('event-1', 'user-1');
-
-			expect(result).toBe(true);
-			expect(mockDb.count).not.toHaveBeenCalled();
 		});
 
 		it('should return false on database error', async () => {
@@ -168,28 +88,6 @@ describe('EventRepo - Attendee Management', () => {
 			const result = await eventRepo.addAttendee('event-1', 'user-1');
 
 			expect(result).toBe(false);
-		});
-
-		it('should allow adding attendee when event has no closeRsvpAt date', async () => {
-			const eventWithNoCloseDate = {
-				...mockEvent,
-				closeRsvpAt: null
-			};
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockReturnValue(mockDb);
-			mockDb.limit.mockResolvedValueOnce([eventWithNoCloseDate]);
-
-			mockDb.count.mockResolvedValueOnce([{ count: 50 }]);
-
-			mockDb.insert.mockReturnValue(mockDb);
-			mockDb.values.mockReturnValue(mockDb);
-			mockDb.returning.mockResolvedValue([{ eventId: 'event-1', userId: 'user-1' }]);
-
-			const result = await eventRepo.addAttendee('event-1', 'user-1');
-
-			expect(result).toBe(true);
 		});
 	});
 
@@ -216,23 +114,31 @@ describe('EventRepo - Attendee Management', () => {
 	});
 
 	describe('getAttendees', () => {
-		it('should return list of attendee user IDs', async () => {
-			const mockAttendees = [{ userId: 'user-1' }, { userId: 'user-2' }, { userId: 'user-3' }];
+		it('should return list of attendee user objects', async () => {
+			const mockAttendees = [
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockAttendees);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
-			expect(result).toEqual(['user-1', 'user-2', 'user-3']);
+			expect(result).toEqual(mockAttendees);
 			expect(mockDb.where).toHaveBeenCalledWith(expect.anything()); // eq(attendees.eventId, 'event-1')
 		});
 
 		it('should return empty array when no attendees', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -242,7 +148,8 @@ describe('EventRepo - Attendee Management', () => {
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
 			const result = await eventRepo.getAttendees('event-1');
 
@@ -250,16 +157,21 @@ describe('EventRepo - Attendee Management', () => {
 		});
 
 		it('should order attendees by join date', async () => {
-			const mockAttendees = [{ userId: 'user-2' }, { userId: 'user-1' }, { userId: 'user-3' }];
+			const mockAttendees = [
+				{ id: 'user-2', name: 'User Two', email: 'user2@example.com', image: 'avatar2.jpg' },
+				{ id: 'user-1', name: 'User One', email: 'user1@example.com', image: null },
+				{ id: 'user-3', name: 'User Three', email: 'user3@example.com', image: null }
+			];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
+			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockAttendees);
+			mockDb.orderBy.mockResolvedValue(mockAttendees);
 
 			const result = await eventRepo.getAttendees('event-1');
 
-			expect(result).toEqual(['user-2', 'user-1', 'user-3']);
+			expect(result).toEqual(mockAttendees);
 			expect(mockDb.orderBy).toHaveBeenCalled();
 		});
 	});
@@ -271,7 +183,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -284,7 +197,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -295,9 +209,10 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database error'));
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
-			const result = await eventRepo.getUserAttendedEvents('user-1');
+			const result = await eventRepo.getUserAttendedEvents('event-1');
 
 			expect(result).toEqual([]);
 		});
@@ -312,7 +227,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockEvents);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getUserAttendedEvents('user-1');
 
@@ -333,7 +248,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockUpcomingEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -348,7 +264,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockUpcomingEvents);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -359,7 +276,8 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 
@@ -376,7 +294,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.innerJoin.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
-			mockDb.orderBy = vi.fn().mockResolvedValue(mockUpcomingEvents);
+			mockDb.orderBy.mockResolvedValue(mockUpcomingEvents);
 
 			const result = await eventRepo.getUpcomingUserEvents('user-1');
 

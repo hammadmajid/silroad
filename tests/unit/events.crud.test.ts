@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-	EventRepo,
 	type Event,
 	type EventCreateData,
 	type EventUpdateData,
 	type PaginationOptions
-} from '$lib/repos/events';
+} from '$lib/types';
+import { EventRepo } from '$lib/repos/events';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),
@@ -331,13 +331,17 @@ describe('EventRepo - CRUD Operations', () => {
 			const mockEvents = [mockEvent, { ...mockEvent, id: 'event-2', title: 'Second Event' }];
 			const totalCount = 2;
 
+			// Mock the count query (separate call)
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: totalCount }])
+			});
+
+			// Mock the data query (chained call)
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.orderBy.mockReturnValue(mockDb);
 			mockDb.limit.mockReturnValue(mockDb);
 			mockDb.offset.mockResolvedValue(mockEvents);
-
-			mockDb.count.mockResolvedValue([{ count: totalCount }]);
 
 			const result = await eventRepo.getAll();
 
@@ -357,13 +361,17 @@ describe('EventRepo - CRUD Operations', () => {
 			const totalCount = 15;
 			const pagination: PaginationOptions = { page: 2, pageSize: 5 };
 
+			// Mock the count query (separate call)
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: totalCount }])
+			});
+
+			// Mock the data query (chained call)
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.orderBy.mockReturnValue(mockDb);
 			mockDb.limit.mockReturnValue(mockDb);
 			mockDb.offset.mockResolvedValue(mockEvents);
-
-			mockDb.count.mockResolvedValue([{ count: totalCount }]);
 
 			const result = await eventRepo.getAll(pagination);
 
@@ -381,13 +389,17 @@ describe('EventRepo - CRUD Operations', () => {
 		});
 
 		it('should handle empty results', async () => {
+			// Mock the count query (separate call)
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 0 }])
+			});
+
+			// Mock the data query (chained call)
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.orderBy.mockReturnValue(mockDb);
 			mockDb.limit.mockReturnValue(mockDb);
 			mockDb.offset.mockResolvedValue([]);
-
-			mockDb.count.mockResolvedValue([{ count: 0 }]);
 
 			const result = await eventRepo.getAll();
 
@@ -405,13 +417,17 @@ describe('EventRepo - CRUD Operations', () => {
 		it('should sort events by date descending by default', async () => {
 			const mockEvents = [mockEvent];
 
+			// Mock the count query (separate call)
+			mockDb.select.mockReturnValueOnce({
+				from: vi.fn().mockResolvedValue([{ count: 1 }])
+			});
+
+			// Mock the data query (chained call)
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
 			mockDb.orderBy.mockReturnValue(mockDb);
 			mockDb.limit.mockReturnValue(mockDb);
 			mockDb.offset.mockResolvedValue(mockEvents);
-
-			mockDb.count.mockResolvedValue([{ count: 1 }]);
 
 			await eventRepo.getAll();
 

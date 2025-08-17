@@ -1,96 +1,16 @@
-import { getDb, getLogger } from '$lib/db';
-import { eq } from 'drizzle-orm';
-import { events } from '$lib/db/schema';
-
-/**
- * Represents an event entity.
- */
-export type Event = {
-	id: string;
-	title: string;
-	slug: string;
-	description: string | null;
-	dateOfEvent: Date;
-	closeRsvpAt: Date | null;
-	maxAttendees: number | null;
-	image: string | null;
-	organizationId: string;
-};
-
-/**
- * Data required to create a new event.
- * @property title - Event title (required)
- * @property slug - Unique slug identifier (required)
- * @property description - Optional event description
- * @property dateOfEvent - Event date and time (required)
- * @property closeRsvpAt - Optional RSVP deadline
- * @property maxAttendees - Optional maximum attendee limit
- * @property image - Optional event image URL
- * @property organizationId - Organization hosting the event (required)
- */
-export type EventCreateData = {
-	title: string;
-	slug: string;
-	description?: string;
-	dateOfEvent: Date;
-	closeRsvpAt?: Date;
-	maxAttendees?: number;
-	image?: string;
-	organizationId: string;
-};
-
-/**
- * Data for updating an event. All fields optional except organizationId.
- */
-export type EventUpdateData = Partial<Omit<EventCreateData, 'organizationId'>>;
-
-/**
- * Represents an event attendee relationship.
- */
-export type Attendee = {
-	eventId: string;
-	userId: string;
-};
-
-/**
- * Represents an event organizer relationship.
- */
-export type EventOrganizer = {
-	eventId: string;
-	userId: string;
-};
-
-/**
- * Event with aggregated attendee count.
- */
-export type EventWithAttendeeCount = Event & {
-	attendeeCount: number;
-};
-
-/**
- * Pagination options for listing events.
- * @property page - Page number (1-based)
- * @property pageSize - Number of items per page
- */
-export type PaginationOptions = {
-	page: number;
-	pageSize: number;
-};
-
-/**
- * Result of a paginated query.
- * @property data - Array of results
- * @property pagination - Pagination metadata
- */
-export type PaginationResult<T> = {
-	data: T[];
-	pagination: {
-		page: number;
-		pageSize: number;
-		totalCount: number;
-		totalPages: number;
-	};
-};
+import { getDb } from '$lib/db';
+import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
+import { events, attendees, eventOrganizers, organizationMembers, users } from '$lib/db/schema';
+import { Logger } from '$lib/utils/logger';
+import type {
+	Event,
+	EventCreateData,
+	EventUpdateData,
+	EventWithAttendeeCount,
+	PaginationOptions,
+	PaginationResult,
+	User
+} from '$lib/types';
 
 /**
  * Repository for event CRUD operations and queries.
@@ -101,17 +21,36 @@ export class EventRepo {
 
 	constructor(platform: App.Platform | undefined) {
 		this.db = getDb(platform);
-		this.logger = getLogger(platform);
+		this.logger = new Logger(platform);
 	}
 
 	// Core CRUD Operations
 	/**
 	 * Creates a new event.
-	 * @param _eventData - Event creation data
+	 * @param eventData - Event creation data
 	 * @returns The created event, or null on error
 	 */
-	async create(_eventData: EventCreateData): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async create(eventData: EventCreateData): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.insert(events)
+				.values({
+					title: eventData.title,
+					slug: eventData.slug,
+					description: eventData.description ?? null,
+					dateOfEvent: eventData.dateOfEvent,
+					closeRsvpAt: eventData.closeRsvpAt ?? null,
+					maxAttendees: eventData.maxAttendees ?? null,
+					image: eventData.image ?? null,
+					organizationId: eventData.organizationId
+				})
+				.returning();
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.error('EventRepo', 'create', error);
+			return null;
+		}
 	}
 
 	/**
@@ -125,11 +64,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getById', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getById', error);
 			return null;
 		}
 	}
@@ -145,193 +80,551 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.writeDataPoint({
-				blobs: ['error', 'EventRepo', 'getBySlug', JSON.stringify(error)],
-				doubles: [1],
-				indexes: [crypto.randomUUID()]
-			});
+			this.logger.error('EventRepo', 'getBySlug', error);
 			return null;
 		}
 	}
 
 	/**
 	 * Updates an event.
-	 * @param _id - Event UUID
-	 * @param _eventData - Partial update data
+	 * @param id - Event UUID
+	 * @param eventData - Partial update data
 	 * @returns The updated event, or null if not found or error
 	 */
-	async update(_id: string, _eventData: EventUpdateData): Promise<Event | null> {
-		throw new Error('Not implemented');
+	async update(id: string, eventData: EventUpdateData): Promise<Event | null> {
+		try {
+			const result = await this.db
+				.update(events)
+				.set(eventData)
+				.where(eq(events.id, id))
+				.returning();
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.error('EventRepo', 'update', error);
+			return null;
+		}
 	}
 
 	/**
 	 * Deletes an event by its UUID.
-	 * @param _id - Event UUID
+	 * @param id - Event UUID
 	 */
-	async delete(_id: string): Promise<void> {
-		throw new Error('Not implemented');
+	async delete(id: string): Promise<void | Error> {
+		try {
+			await this.db.delete(events).where(eq(events.id, id));
+		} catch (error) {
+			this.logger.error('EventRepo', 'delete', error);
+			return error as Error;
+		}
 	}
 
 	/**
 	 * Gets a paginated list of events.
-	 * @param _pagination - Optional pagination options
+	 * @param pagination - Optional pagination options
 	 * @returns Paginated result of events
 	 */
-	async getAll(_pagination?: PaginationOptions): Promise<PaginationResult<Event>> {
-		throw new Error('Not implemented');
+	async getAll(pagination?: PaginationOptions): Promise<PaginationResult<Event>> {
+		try {
+			const page = pagination?.page ?? 1;
+			const pageSize = pagination?.pageSize ?? 10;
+			const offset = (page - 1) * pageSize;
+
+			// Get total count
+			const totalCountResult = await this.db.select({ count: count() }).from(events);
+			const totalCount = totalCountResult[0]?.count ?? 0;
+			const totalPages = Math.ceil(totalCount / pageSize);
+
+			// Get paginated events
+			const eventsData = await this.db
+				.select()
+				.from(events)
+				.orderBy(desc(events.dateOfEvent))
+				.limit(pageSize)
+				.offset(offset);
+
+			return {
+				data: eventsData,
+				pagination: {
+					page,
+					pageSize,
+					totalCount,
+					totalPages
+				}
+			};
+		} catch (error) {
+			this.logger.error('EventRepo', 'getAll', error);
+			return {
+				data: [],
+				pagination: {
+					page: 1,
+					pageSize: 10,
+					totalCount: 0,
+					totalPages: 0
+				}
+			};
+		}
 	}
 
 	// Attendee Management
 	/**
 	 * Adds a user as an attendee to an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to add as attendee
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to add as attendee
 	 * @returns true if attendee was added successfully, false otherwise
 	 */
-	async addAttendee(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async addAttendee(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if event exists and get event details
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			// 2. Check if RSVP is still open
+			if (event.closeRsvpAt && new Date() > event.closeRsvpAt) {
+				return false;
+			}
+
+			// 3. Check capacity if maxAttendees is set
+			if (event.maxAttendees !== null) {
+				const attendeeCountResult = await this.db
+					.select({ count: count() })
+					.from(attendees)
+					.where(eq(attendees.eventId, eventId));
+
+				const currentCount = attendeeCountResult[0]?.count ?? 0;
+				if (currentCount >= event.maxAttendees) {
+					return false;
+				}
+			}
+
+			// 4. Try to insert attendee
+			await this.db.insert(attendees).values({ eventId, userId }).returning();
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'addAttendee', error);
+			return false;
+		}
 	}
 
 	/**
 	 * Removes a user from event attendance.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to remove from attendance
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to remove from attendance
 	 * @returns true if attendee was removed successfully, false otherwise
 	 */
-	async removeAttendee(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async removeAttendee(eventId: string, userId: string): Promise<boolean> {
+		try {
+			await this.db
+				.delete(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, userId)));
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'removeAttendee', error);
+			return false;
+		}
 	}
 
 	/**
-	 * Gets all attendee user IDs for an event.
-	 * @param _eventId - Event UUID
-	 * @returns Array of user IDs who are attending, empty array if none or on error
+	 * Gets all attendees for an event.
+	 * @param eventId - Event UUID
+	 * @returns Array of user objects who are attending, empty array if none or on error
 	 */
-	async getAttendees(_eventId: string): Promise<string[]> {
-		throw new Error('Not implemented');
+	async getAttendees(eventId: string): Promise<User[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image
+				})
+				.from(attendees)
+				.innerJoin(users, eq(attendees.userId, users.id))
+				.where(eq(attendees.eventId, eventId))
+				.orderBy(users.name);
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getAttendees', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events that a user has attended (past events).
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of events the user attended, empty array if none or on error
 	 */
-	async getUserAttendedEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUserAttendedEvents(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(attendees, eq(events.id, attendees.eventId))
+				.where(eq(attendees.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUserAttendedEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all upcoming events that a user is attending.
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of upcoming events the user is attending, empty array if none or on error
 	 */
-	async getUpcomingUserEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingUserEvents(userId: string): Promise<Event[]> {
+		try {
+			const now = new Date();
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(attendees, eq(events.id, attendees.eventId))
+				.where(and(eq(attendees.userId, userId), gt(events.dateOfEvent, now)))
+				.orderBy(asc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUpcomingUserEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Checks if a user is attending an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to check attendance for
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to check attendance for
 	 * @returns true if user is attending, false otherwise or on error
 	 */
-	async isAttending(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async isAttending(eventId: string, userId: string): Promise<boolean> {
+		try {
+			const result = await this.db
+				.select({ userId: attendees.userId })
+				.from(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, userId)))
+				.limit(1);
+
+			return result.length > 0;
+		} catch (error) {
+			this.logger.error('EventRepo', 'isAttending', error);
+			return false;
+		}
 	}
 
 	// Organizer Management
 	/**
 	 * Adds a user as an organizer to an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to add as organizer
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to add as organizer
 	 * @returns true if organizer was added successfully, false otherwise
 	 */
-	async addOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async addOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if event exists
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			// 2. Try to insert organizer
+			await this.db.insert(eventOrganizers).values({ eventId, userId }).returning();
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'addOrganizer', error);
+			return false;
+		}
 	}
 
 	/**
 	 * Removes a user from event organization.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to remove from organization
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to remove from organization
 	 * @returns true if organizer was removed successfully, false otherwise
 	 */
-	async removeOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async removeOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check current organizer count
+			const organizerCountResult = await this.db
+				.select({ count: count() })
+				.from(eventOrganizers)
+				.where(eq(eventOrganizers.eventId, eventId));
+
+			const organizerCount = organizerCountResult[0]?.count ?? 0;
+
+			// 2. Prevent removing the last organizer
+			if (organizerCount <= 1) {
+				return false;
+			}
+
+			// 3. Remove the organizer
+			await this.db
+				.delete(eventOrganizers)
+				.where(and(eq(eventOrganizers.eventId, eventId), eq(eventOrganizers.userId, userId)));
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'removeOrganizer', error);
+			return false;
+		}
 	}
 
 	/**
-	 * Gets all organizer user IDs for an event.
-	 * @param _eventId - Event UUID
-	 * @returns Array of user IDs who are organizers, empty array if none or on error
+	 * Gets all organizer for an event.
+	 * @param eventId - Event UUID
+	 * @returns Array of user objects who are organizers, empty array if none or on error
 	 */
-	async getOrganizers(_eventId: string): Promise<string[]> {
-		throw new Error('Not implemented');
+	async getOrganizers(eventId: string): Promise<User[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image
+				})
+				.from(eventOrganizers)
+				.innerJoin(users, eq(eventOrganizers.userId, users.id))
+				.where(eq(eventOrganizers.eventId, eventId))
+				.orderBy(users.name);
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getOrganizers', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events that a user has organized.
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of events the user organized, empty array if none or on error
 	 */
-	async getUserOrganizedEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUserOrganizedEvents(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(eventOrganizers, eq(events.id, eventOrganizers.eventId))
+				.where(eq(eventOrganizers.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUserOrganizedEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Checks if a user is an organizer of an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to check organizer status for
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to check organizer status for
 	 * @returns true if user is an organizer, false otherwise or on error
 	 */
-	async isOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async isOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if user is explicit organizer
+			const organizerResult = await this.db
+				.select({ userId: eventOrganizers.userId })
+				.from(eventOrganizers)
+				.where(and(eq(eventOrganizers.eventId, eventId), eq(eventOrganizers.userId, userId)))
+				.limit(1);
+
+			if (organizerResult.length > 0) {
+				return true;
+			}
+
+			// 2. Check if user is member of event organization (implicit organizer access)
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			const memberResult = await this.db
+				.select({ userId: organizationMembers.userId })
+				.from(organizationMembers)
+				.where(
+					and(
+						eq(organizationMembers.organizationId, event.organizationId),
+						eq(organizationMembers.userId, userId)
+					)
+				)
+				.limit(1);
+
+			return memberResult.length > 0;
+		} catch (error) {
+			this.logger.error('EventRepo', 'isOrganizer', error);
+			return false;
+		}
 	}
 
 	// Query Methods
 	/**
 	 * Gets upcoming events ordered by date.
-	 * @param _limit - Optional limit on number of events to return
+	 * @param limit - Optional limit on number of events to return
 	 * @returns Array of upcoming events, empty array if none or on error
 	 */
-	async getUpcomingEvents(_limit?: number): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingEvents(limit?: number): Promise<Event[]> {
+		try {
+			const now = new Date();
+			const queryLimit = limit ?? 10;
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(gt(events.dateOfEvent, now))
+				.orderBy(asc(events.dateOfEvent))
+				.limit(queryLimit);
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUpcomingEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events for a specific organization.
-	 * @param _organizationId - Organization UUID
+	 * @param organizationId - Organization UUID
 	 * @returns Array of events for the organization, empty array if none or on error
 	 */
-	async getEventsByOrganization(_organizationId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getEventsByOrganization(organizationId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(eq(events.organizationId, organizationId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getEventsByOrganization', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets upcoming events for a specific organization.
-	 * @param _organizationId - Organization UUID
+	 * @param organizationId - Organization UUID
 	 * @returns Array of upcoming events for the organization, empty array if none or on error
 	 */
-	async getUpcomingEventsByOrganization(_organizationId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUpcomingEventsByOrganization(organizationId: string): Promise<Event[]> {
+		try {
+			const now = new Date();
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(and(eq(events.organizationId, organizationId), gt(events.dateOfEvent, now)))
+				.orderBy(asc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Searches events by title and description using case-insensitive matching.
-	 * @param _query - Search query string
-	 * @param _filters - Optional filters for the search
+	 * @param query - Search query string
+	 * @param filters - Optional filters for the search
 	 * @returns Array of matching events, empty array if none found or error
 	 */
-	async searchEvents(_query: string, _filters?: { organizationId?: string }): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async searchEvents(query: string, filters?: { organizationId?: string }): Promise<Event[]> {
+		try {
+			const searchPattern = `%${query}%`;
+
+			let whereCondition = or(
+				like(events.title, searchPattern),
+				like(events.description, searchPattern)
+			);
+
+			if (filters?.organizationId) {
+				whereCondition = and(whereCondition, eq(events.organizationId, filters.organizationId));
+			}
+
+			const result = await this.db
+				.select()
+				.from(events)
+				.where(whereCondition)
+				.orderBy(desc(events.dateOfEvent))
+				.limit(20);
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'searchEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets an event with aggregated attendee count.
-	 * @param _eventId - Event UUID
+	 * @param eventId - Event UUID
 	 * @returns Event with attendee count, or null if not found or error
 	 */
-	async getEventWithAttendeeCount(_eventId: string): Promise<EventWithAttendeeCount | null> {
-		throw new Error('Not implemented');
+	async getEventWithAttendeeCount(eventId: string): Promise<EventWithAttendeeCount | null> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId,
+					attendeeCount: count(attendees.userId)
+				})
+				.from(events)
+				.leftJoin(attendees, eq(events.id, attendees.eventId))
+				.where(eq(events.id, eventId))
+				.groupBy(events.id);
+
+			return result[0] ?? null;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getEventWithAttendeeCount', error);
+			return null;
+		}
 	}
 }
