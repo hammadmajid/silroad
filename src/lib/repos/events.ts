@@ -1,6 +1,6 @@
 import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
-import { events, attendees, eventOrganizers, organizationMembers } from '$lib/db/schema';
+import { events, attendees, eventOrganizers, organizationMembers, users } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Event,
@@ -8,7 +8,8 @@ import type {
 	EventUpdateData,
 	EventWithAttendeeCount,
 	PaginationOptions,
-	PaginationResult
+	PaginationResult,
+	User
 } from '$lib/types';
 
 /**
@@ -228,19 +229,25 @@ export class EventRepo {
 	}
 
 	/**
-	 * Gets all attendee user IDs for an event.
+	 * Gets all attendees for an event.
 	 * @param eventId - Event UUID
-	 * @returns Array of user IDs who are attending, empty array if none or on error
+	 * @returns Array of user objects who are attending, empty array if none or on error
 	 */
-	async getAttendees(eventId: string): Promise<string[]> {
+	async getAttendees(eventId: string): Promise<User[]> {
 		try {
 			const result = await this.db
-				.select({ userId: attendees.userId })
+				.select({
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image
+				})
 				.from(attendees)
+				.innerJoin(users, eq(attendees.userId, users.id))
 				.where(eq(attendees.eventId, eventId))
-				.orderBy(attendees.userId);
+				.orderBy(users.name);
 
-			return result.map((row) => row.userId);
+			return result;
 		} catch (error) {
 			this.logger.error('EventRepo', 'getAttendees', error);
 			return [];
@@ -390,19 +397,25 @@ export class EventRepo {
 	}
 
 	/**
-	 * Gets all organizer user IDs for an event.
+	 * Gets all organizer for an event.
 	 * @param eventId - Event UUID
-	 * @returns Array of user IDs who are organizers, empty array if none or on error
+	 * @returns Array of user objects who are organizers, empty array if none or on error
 	 */
-	async getOrganizers(eventId: string): Promise<string[]> {
+	async getOrganizers(eventId: string): Promise<User[]> {
 		try {
 			const result = await this.db
-				.select({ userId: eventOrganizers.userId })
+				.select({
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image
+				})
 				.from(eventOrganizers)
+				.innerJoin(users, eq(eventOrganizers.userId, users.id))
 				.where(eq(eventOrganizers.eventId, eventId))
-				.orderBy(eventOrganizers.userId);
+				.orderBy(users.name);
 
-			return result.map((row) => row.userId);
+			return result;
 		} catch (error) {
 			this.logger.error('EventRepo', 'getOrganizers', error);
 			return [];

@@ -1,15 +1,15 @@
 import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
-import { organizations, organizationMembers, events } from '$lib/db/schema';
+import { organizations, organizationMembers, events, users } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Organization,
 	OrganizationCreateData,
-	OrganizationMember,
 	OrganizationUpdateData,
 	OrganizationWithStats,
 	PaginationOptions,
-	PaginationResult
+	PaginationResult,
+	User
 } from '$lib/types';
 
 /**
@@ -216,21 +216,25 @@ export class OrganizationRepo {
 	}
 
 	/**
-	 * Gets all member user IDs for an organization.
+	 * Gets all members for an organization.
 	 * @param organizationId - Organization UUID
-	 * @returns Array of user IDs who are members, ordered by join date. Empty array if none or on error.
+	 * @returns Array of User objects who are members, ordered by name. Empty array if none or on error.
 	 */
-	async getMembers(organizationId: string): Promise<string[]> {
+	async getMembers(organizationId: string): Promise<User[]> {
 		try {
 			const members = await this.db
-				.select({ userId: organizationMembers.userId })
+				.select({
+					id: users.id,
+					name: users.name,
+					email: users.email,
+					image: users.image
+				})
 				.from(organizationMembers)
+				.innerJoin(users, eq(organizationMembers.userId, users.id))
 				.where(eq(organizationMembers.organizationId, organizationId))
-				.orderBy(asc(organizationMembers.userId));
+				.orderBy(asc(users.name));
 
-			// TODO: return full user data instead of just their Id's
-
-			return members.map((member) => member.userId);
+			return members;
 		} catch (error) {
 			this.logger.error('OrganizationRepo', 'getMembers', error);
 			return [];
