@@ -13,8 +13,12 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
+	import { Turnstile } from 'svelte-turnstile';
 
 	let { data } = $props();
+
+	// Call this to reset the turnstile
+	let reset = $state<() => void>();
 
 	function dismissError() {
 		const url = new URL($page.url);
@@ -38,6 +42,10 @@
 				userStore.setUser(result.data.user);
 				goto('/explore');
 			}
+		},
+		onUpdated() {
+			// When the form is updated, we reset the turnstile
+			reset?.();
 		}
 	});
 	const { form: formData, enhance, submitting, message } = form;
@@ -184,6 +192,10 @@
 				</Description>
 				<FieldErrors class="text-error-700-300" />
 			</Field>
+
+			{#if data.isProd}
+				<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
+			{/if}
 
 			<button
 				type="submit"
