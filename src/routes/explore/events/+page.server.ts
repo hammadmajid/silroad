@@ -4,7 +4,7 @@ export const load = async ({ platform, url }) => {
 	const eventRepo = new EventRepo(platform);
 
 	const page = parseInt(url.searchParams.get('page') || '1');
-	const pageSize = 6;
+	const pageSize = 9;
 
 	const result = await eventRepo.getAll({ page, pageSize });
 
