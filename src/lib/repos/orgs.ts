@@ -199,7 +199,7 @@ export class OrganizationRepo {
 	 */
 	async removeMember(organizationId: string, userId: string): Promise<boolean> {
 		try {
-			const result = await this.db
+			await this.db
 				.delete(organizationMembers)
 				.where(
 					and(
@@ -208,7 +208,7 @@ export class OrganizationRepo {
 					)
 				);
 
-			return result.success;
+			return true;
 		} catch (error) {
 			this.logger.error('OrganizationRepo', 'removeMember', error);
 			return false;
