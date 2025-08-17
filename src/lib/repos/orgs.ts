@@ -2,74 +2,7 @@ import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
 import { organizations, organizationMembers, events } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
-
-/**
- * Represents an organization entity.
- */
-export type Organization = {
-	id: string;
-	name: string;
-	slug: string;
-	description: string | null;
-	avatar: string | null;
-	backgroundImage: string | null;
-};
-
-/**
- * Data required to create a new organization.
- * @property name - Organization name (required)
- * @property slug - Unique slug identifier (required)
- * @property description - Optional description
- * @property avatar - Optional avatar image URL
- * @property backgroundImage - Optional background image URL
- */
-export type OrganizationCreateData = {
-	name: string;
-	slug: string;
-	description?: string;
-	avatar?: string;
-	backgroundImage?: string;
-};
-
-/**
- * Data for updating an organization. All fields optional.
- */
-export type OrganizationUpdateData = Partial<OrganizationCreateData>;
-
-export type OrganizationMember = {
-	userId: string;
-	organizationId: string;
-};
-
-export type OrganizationWithStats = Organization & {
-	memberCount: number;
-	eventCount: number;
-};
-
-/**
- * Pagination options for listing organizations.
- * @property page - Page number (1-based)
- * @property pageSize - Number of items per page
- */
-export type PaginationOptions = {
-	page: number;
-	pageSize: number;
-};
-
-/**
- * Result of a paginated query.
- * @property data - Array of results
- * @property pagination - Pagination metadata
- */
-export type PaginationResult<T> = {
-	data: T[];
-	pagination: {
-		page: number;
-		pageSize: number;
-		totalCount: number;
-		totalPages: number;
-	};
-};
+import type { Organization, OrganizationCreateData, OrganizationMember, OrganizationUpdateData, OrganizationWithStats, PaginationOptions, PaginationResult } from "$lib/types"
 
 /**
  * Repository for organization CRUD and queries.

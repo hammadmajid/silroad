@@ -3,18 +3,9 @@ import { generateSessionToken } from '$lib/utils/crypto';
 import { and, eq, gt, lt } from 'drizzle-orm';
 import { sessions, users } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
-import type { User } from './user';
+import type { User, SerializableSession } from '$lib/types';
 
 export const SESSION_COOKIE_NAME = 'session';
-
-/**
- * Session data that can be serialized and stored in KV.
- */
-export type SerializableSession = {
-	userId: string;
-	userImage: string | null;
-	sessionExpiresAt: string;
-};
 
 /**
  * Repository for session management with D1 database and KV cache.

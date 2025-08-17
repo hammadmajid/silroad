@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EventRepo, type Event } from '$lib/repos/events';
+import { EventRepo } from '$lib/repos/events';
+import type { Event } from '$lib/types';
 
 vi.mock('$lib/db', () => ({
 	getDb: vi.fn(),

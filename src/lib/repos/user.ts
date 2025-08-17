@@ -4,16 +4,7 @@ import { users } from '$lib/db/schema';
 import { comparePassword, hashPassword } from '$lib/utils/crypto';
 import { Logger } from '$lib/utils/logger';
 import { SessionRepo } from './session';
-
-/**
- * Represents a user entity.
- */
-export type User = {
-	id: string;
-	email: string;
-	name: string;
-	image: string | null;
-};
+import type { User } from '$lib/types';
 
 /**
  * Repository for user CRUD operations and authentication.
