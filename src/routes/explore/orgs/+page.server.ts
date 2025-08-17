@@ -1,30 +1,15 @@
-import { getDb } from '$lib/db';
-import { organizations } from '$lib/db/schema';
-import { count } from 'drizzle-orm';
+import { OrganizationRepo } from '$lib/repos/orgs';
 
 export const load = async ({ platform, url }) => {
-	const db = getDb(platform);
+	const orgRepo = new OrganizationRepo(platform);
 
 	const page = parseInt(url.searchParams.get('page') || '1');
 	const pageSize = 6;
-	const offset = (page - 1) * pageSize;
 
-	// Get total count and paginated organizations
-	const [totalCountResult, orgsResult] = await Promise.all([
-		db.select({ count: count() }).from(organizations),
-		db.select().from(organizations).limit(pageSize).offset(offset)
-	]);
-
-	const totalCount = totalCountResult[0].count;
-	const totalPages = Math.ceil(totalCount / pageSize);
+	const result = await orgRepo.getAll({ page, pageSize });
 
 	return {
-		orgs: orgsResult,
-		pagination: {
-			page,
-			pageSize,
-			totalCount,
-			totalPages
-		}
+		orgs: result.data,
+		pagination: result.pagination
 	};
 };

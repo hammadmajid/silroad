@@ -1,57 +1,37 @@
-import { getDb } from '$lib/db';
-import { events, organizations, users, attendees, eventOrganizers } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { EventRepo } from '$lib/repos/events';
+import { OrganizationRepo } from '$lib/repos/orgs';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params, platform }) => {
-	const db = getDb(platform);
+	const eventRepo = new EventRepo(platform);
+	const orgRepo = new OrganizationRepo(platform);
 	const { slug } = params;
 
-	// Get event with organization and attendee count
-	const [event] = await db
-		.select({
-			id: events.id,
-			title: events.title,
-			slug: events.slug,
-			description: events.description,
-			dateOfEvent: events.dateOfEvent,
-			closeRsvpAt: events.closeRsvpAt,
-			maxAttendees: events.maxAttendees,
-			image: events.image,
-			organizationId: events.organizationId,
-			organizationName: organizations.name,
-			organizationSlug: organizations.slug,
-			organizationAvatar: organizations.avatar
-		})
-		.from(events)
-		.leftJoin(organizations, eq(events.organizationId, organizations.id))
-		.where(eq(events.slug, slug));
+	// Get event by slug
+	const event = await eventRepo.getBySlug(slug);
 
 	if (!event) {
 		throw error(404, 'Event not found');
 	}
 
-	// Get attendee count
-	const attendeeCount = await db
-		.select({ count: attendees.userId })
-		.from(attendees)
-		.where(eq(attendees.eventId, event.id));
+	// Get organization details
+	const organization = await orgRepo.getById(event.organizationId);
+
+	// Get event with attendee count
+	const eventWithCount = await eventRepo.getEventWithAttendeeCount(event.id);
 
 	// Get organizers
-	const eventOrganizersList = await db
-		.select({
-			userId: users.id,
-			name: users.name,
-			image: users.image
-		})
-		.from(eventOrganizers)
-		.leftJoin(users, eq(eventOrganizers.userId, users.id))
-		.where(eq(eventOrganizers.eventId, event.id));
+	const organizers = await eventRepo.getOrganizers(event.id);
 
 	return {
-		event,
-		attendeeCount: attendeeCount.length,
-		organizers: eventOrganizersList
+		event: {
+			...event,
+			organizationName: organization?.name || null,
+			organizationSlug: organization?.slug || null,
+			organizationAvatar: organization?.avatar || null
+		},
+		attendeeCount: eventWithCount?.attendeeCount || 0,
+		organizers
 	};
 };
