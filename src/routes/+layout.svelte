@@ -9,7 +9,6 @@
 	import { generateBreadcrumbs } from '$lib/utils/breadcrumbs.js';
 	import { page } from '$app/stores';
 
-	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
 	import User from '@lucide/svelte/icons/user';
 	import LogIn from '@lucide/svelte/icons/log-in';
 
@@ -40,9 +39,8 @@
 <div class="flex h-full flex-col">
 	<AppBar>
 		{#snippet lead()}
-			<a href="/" class="flex items-center justify-center gap-2">
-				<CalendarHeart size={24} />
-				<span class="text-lg font-bold">Silroad</span>
+			<a href="/" class="flex items-center gap-2">
+				<span class="text-lg leading-none font-bold">Silroad</span>
 			</a>
 		{/snippet}
 		{#snippet trail()}
