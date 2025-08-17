@@ -40,7 +40,7 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('UserRepo', 'getById', JSON.stringify(error));
+			this.logger.error('UserRepo', 'getById', error);
 			return null;
 		}
 	}
@@ -65,7 +65,7 @@ export class UserRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('UserRepo', 'getByEmail', JSON.stringify(error));
+			this.logger.error('UserRepo', 'getByEmail', error);
 			return null;
 		}
 	}
@@ -103,7 +103,7 @@ export class UserRepo {
 				image: null
 			};
 		} catch (error) {
-			this.logger.error('UserRepo', 'create', JSON.stringify(error));
+			this.logger.error('UserRepo', 'create', error);
 			return null;
 		}
 	}
@@ -137,7 +137,7 @@ export class UserRepo {
 				image
 			};
 		} catch (error) {
-			this.logger.error('UserRepo', 'verify', JSON.stringify(error));
+			this.logger.error('UserRepo', 'verify', error);
 			return null;
 		}
 	}
@@ -168,7 +168,7 @@ export class UserRepo {
 			}
 			return updatedUser ?? null;
 		} catch (error) {
-			this.logger.error('UserRepo', 'update', JSON.stringify(error));
+			this.logger.error('UserRepo', 'update', error);
 			return null;
 		}
 	}
@@ -180,7 +180,7 @@ export class UserRepo {
 		try {
 			await this.db.delete(users).where(eq(users.id, userId));
 		} catch (error) {
-			this.logger.error('UserRepo', 'delete', JSON.stringify(error));
+			this.logger.error('UserRepo', 'delete', error);
 		}
 	}
 	/**
@@ -215,7 +215,7 @@ export class UserRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.error('UserRepo', 'updatePassword', JSON.stringify(error));
+			this.logger.error('UserRepo', 'updatePassword', error);
 			return false;
 		}
 	}

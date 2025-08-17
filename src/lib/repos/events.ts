@@ -40,7 +40,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('EventRepo', 'create', JSON.stringify(error));
+			this.logger.error('EventRepo', 'create', error);
 			return null;
 		}
 	}
@@ -56,7 +56,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getById', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getById', error);
 			return null;
 		}
 	}
@@ -72,7 +72,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getBySlug', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getBySlug', error);
 			return null;
 		}
 	}
@@ -93,7 +93,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('EventRepo', 'update', JSON.stringify(error));
+			this.logger.error('EventRepo', 'update', error);
 			return null;
 		}
 	}
@@ -106,7 +106,7 @@ export class EventRepo {
 		try {
 			await this.db.delete(events).where(eq(events.id, id));
 		} catch (error) {
-			this.logger.error('EventRepo', 'delete', JSON.stringify(error));
+			this.logger.error('EventRepo', 'delete', error);
 			return error as Error;
 		}
 	}
@@ -145,7 +145,7 @@ export class EventRepo {
 				}
 			};
 		} catch (error) {
-			this.logger.error('EventRepo', 'getAll', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getAll', error);
 			return {
 				data: [],
 				pagination: {
@@ -196,7 +196,7 @@ export class EventRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.error('EventRepo', 'addAttendee', JSON.stringify(error));
+			this.logger.error('EventRepo', 'addAttendee', error);
 			return false;
 		}
 	}
@@ -215,7 +215,7 @@ export class EventRepo {
 
 			return true;
 		} catch (error) {
-			this.logger.error('EventRepo', 'removeAttendee', JSON.stringify(error));
+			this.logger.error('EventRepo', 'removeAttendee', error);
 			return false;
 		}
 	}
@@ -235,7 +235,7 @@ export class EventRepo {
 
 			return result.map((row) => row.userId);
 		} catch (error) {
-			this.logger.error('EventRepo', 'getAttendees', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getAttendees', error);
 			return [];
 		}
 	}
@@ -266,7 +266,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getUserAttendedEvents', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getUserAttendedEvents', error);
 			return [];
 		}
 	}
@@ -298,7 +298,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getUpcomingUserEvents', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getUpcomingUserEvents', error);
 			return [];
 		}
 	}
@@ -319,7 +319,7 @@ export class EventRepo {
 
 			return result.length > 0;
 		} catch (error) {
-			this.logger.error('EventRepo', 'isAttending', JSON.stringify(error));
+			this.logger.error('EventRepo', 'isAttending', error);
 			return false;
 		}
 	}
@@ -393,7 +393,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getUpcomingEvents', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getUpcomingEvents', error);
 			return [];
 		}
 	}
@@ -413,7 +413,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getEventsByOrganization', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getEventsByOrganization', error);
 			return [];
 		}
 	}
@@ -435,7 +435,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', error);
 			return [];
 		}
 	}
@@ -468,7 +468,7 @@ export class EventRepo {
 
 			return result;
 		} catch (error) {
-			this.logger.error('EventRepo', 'searchEvents', JSON.stringify(error));
+			this.logger.error('EventRepo', 'searchEvents', error);
 			return [];
 		}
 	}
@@ -500,7 +500,7 @@ export class EventRepo {
 
 			return result[0] ?? null;
 		} catch (error) {
-			this.logger.error('EventRepo', 'getEventWithAttendeeCount', JSON.stringify(error));
+			this.logger.error('EventRepo', 'getEventWithAttendeeCount', error);
 			return null;
 		}
 	}

@@ -64,7 +64,7 @@ export class SessionRepo {
 				};
 			}
 		} catch (error) {
-			this.logger.error('SessionRepo', 'getByToken', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'getByToken', error);
 			return null;
 		}
 	}
@@ -102,7 +102,7 @@ export class SessionRepo {
 				expiresAt: new Date(expires)
 			};
 		} catch (error) {
-			this.logger.error('SessionRepo', 'create', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'create', error);
 			return null;
 		}
 	}
@@ -133,7 +133,7 @@ export class SessionRepo {
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
 		} catch (error) {
-			this.logger.error('SessionRepo', 'getByUserId', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'getByUserId', error);
 			return [];
 		}
 	}
@@ -157,7 +157,7 @@ export class SessionRepo {
 			await this.kv.put(sessionToken[0].sessionToken, JSON.stringify(session));
 			return session;
 		} catch (error) {
-			this.logger.error('SessionRepo', 'update', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'update', error);
 			return null;
 		}
 	}
@@ -170,7 +170,7 @@ export class SessionRepo {
 			await this.db.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
 			await this.kv.delete(sessionToken);
 		} catch (error) {
-			this.logger.error('SessionRepo', 'delete', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'delete', error);
 		}
 	}
 	/**
@@ -193,7 +193,7 @@ export class SessionRepo {
 
 			return userSessions.length;
 		} catch (error) {
-			this.logger.error('SessionRepo', 'deleteByUserId', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'deleteByUserId', error);
 			return 0;
 		}
 	}
@@ -210,7 +210,7 @@ export class SessionRepo {
 				.where(eq(sessions.sessionToken, sessionToken));
 			await this.kv.delete(sessionToken);
 		} catch (error) {
-			this.logger.error('SessionRepo', 'invalidate', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'invalidate', error);
 		}
 	}
 	/**
@@ -257,7 +257,7 @@ export class SessionRepo {
 
 			return refreshedSession;
 		} catch (error) {
-			this.logger.error('SessionRepo', 'refresh', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'refresh', error);
 			return null;
 		}
 	}
@@ -284,7 +284,7 @@ export class SessionRepo {
 				sessionExpiresAt: new Date(session.sessionExpiresAt).toISOString()
 			}));
 		} catch (error) {
-			this.logger.error('SessionRepo', 'getExpired', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'getExpired', error);
 			return [];
 		}
 	}
@@ -309,7 +309,7 @@ export class SessionRepo {
 
 			return expiredSessions.length;
 		} catch (error) {
-			this.logger.error('SessionRepo', 'deleteExpired', JSON.stringify(error));
+			this.logger.error('SessionRepo', 'deleteExpired', error);
 			return 0;
 		}
 	}

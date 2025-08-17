@@ -34,7 +34,7 @@ export class OrganizationRepo {
 			const result = await this.db.insert(organizations).values(createData).returning();
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'create', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'create', error);
 			return null;
 		}
 	}
@@ -53,7 +53,7 @@ export class OrganizationRepo {
 				.limit(1);
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getById', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getById', error);
 			return null;
 		}
 	}
@@ -73,7 +73,7 @@ export class OrganizationRepo {
 
 			return org.length === 0 ? null : org[0];
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getBySlug', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getBySlug', error);
 			return null;
 		}
 	}
@@ -94,7 +94,7 @@ export class OrganizationRepo {
 
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'update', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'update', error);
 			return null;
 		}
 	}
@@ -108,7 +108,7 @@ export class OrganizationRepo {
 		try {
 			await this.db.delete(organizations).where(eq(organizations.id, id));
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'delete', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'delete', error);
 			return error instanceof Error ? error : new Error(String(error));
 		}
 	}
@@ -147,7 +147,7 @@ export class OrganizationRepo {
 				}
 			};
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getAll', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getAll', error);
 			return {
 				data: [],
 				pagination: {
@@ -178,7 +178,7 @@ export class OrganizationRepo {
 				.returning();
 			return true;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'addMember', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'addMember', error);
 			return false;
 		}
 	}
@@ -202,7 +202,7 @@ export class OrganizationRepo {
 
 			return result.success;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'removeMember', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'removeMember', error);
 			return false;
 		}
 	}
@@ -224,7 +224,7 @@ export class OrganizationRepo {
 
 			return members.map((member) => member.userId);
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getMembers', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getMembers', error);
 			return [];
 		}
 	}
@@ -252,7 +252,7 @@ export class OrganizationRepo {
 
 			return orgs;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getUserOrganizations', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getUserOrganizations', error);
 			return [];
 		}
 	}
@@ -278,7 +278,7 @@ export class OrganizationRepo {
 
 			return result.length > 0;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'isMember', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'isMember', error);
 			return false;
 		}
 	}
@@ -315,7 +315,7 @@ export class OrganizationRepo {
 				.limit(20)
 				.orderBy(asc(organizations.name));
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'searchOrganizations', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'searchOrganizations', error);
 			return [];
 		}
 	}
@@ -349,7 +349,7 @@ export class OrganizationRepo {
 
 			return result.length > 0 ? result[0] : null;
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'getOrganizationStats', JSON.stringify(error));
+			this.logger.error('OrganizationRepo', 'getOrganizationStats', error);
 			return null;
 		}
 	}
