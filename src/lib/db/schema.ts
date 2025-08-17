@@ -41,6 +41,19 @@ export const organizationMembers = sqliteTable(
 	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
 );
 
+export const organizationFollowers = sqliteTable(
+	'organization_followers',
+	{
+		userId: text('user_id')
+			.notNull()
+			.references(() => users.id, { onDelete: 'cascade' }),
+		organizationId: text('organization_id')
+			.notNull()
+			.references(() => organizations.id, { onDelete: 'cascade' })
+	},
+	(t) => [primaryKey({ columns: [t.userId, t.organizationId] })]
+);
+
 export const events = sqliteTable('events', {
 	id: text('id')
 		.primaryKey()

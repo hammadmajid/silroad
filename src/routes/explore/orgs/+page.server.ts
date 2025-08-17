@@ -4,7 +4,7 @@ export const load = async ({ platform, url }) => {
 	const orgRepo = new OrganizationRepo(platform);
 
 	const page = parseInt(url.searchParams.get('page') || '1');
-	const pageSize = 6;
+	const pageSize = 9;
 
 	const result = await orgRepo.getAll({ page, pageSize });
 

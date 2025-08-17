@@ -8,8 +8,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { generateBreadcrumbs } from '$lib/utils/breadcrumbs.js';
 	import { page } from '$app/stores';
-
-	import CalendarHeart from '@lucide/svelte/icons/calendar-heart';
+	import { SvelteKitTopLoader } from 'sveltekit-top-loader';
 	import User from '@lucide/svelte/icons/user';
 	import LogIn from '@lucide/svelte/icons/log-in';
 
@@ -32,19 +31,17 @@
 		}
 	});
 
-	const homeLink = userStore.isLoggedIn ? '/explore' : '/';
-
 	// Generate breadcrumbs based on current page
 	const breadcrumbs = $derived(generateBreadcrumbs($page, data));
 	const showBreadcrumbs = $derived($page.url.pathname !== '/');
 </script>
 
 <div class="flex h-full flex-col">
+	<SvelteKitTopLoader color="#e9851d" showSpinner={false} />
 	<AppBar>
 		{#snippet lead()}
-			<a href={homeLink} class="flex items-center justify-center gap-2">
-				<CalendarHeart size={24} />
-				<span class="text-lg font-bold">Silroad</span>
+			<a href="/" class="flex items-center gap-2">
+				<span class="text-lg leading-none font-bold">Silroad</span>
 			</a>
 		{/snippet}
 		{#snippet trail()}
@@ -96,7 +93,7 @@
 				<div class="space-y-4">
 					<h4 class="font-semibold">Platform</h4>
 					<ul class="space-y-2">
-						<li><a href="/explore" class="anchor text-sm">Explore Events</a></li>
+						<li><a href="/explore/events" class="anchor text-sm">Explore Events</a></li>
 						<li>
 							<a href="/explore/orgs" class="anchor text-sm">Find Organizations</a>
 						</li>
