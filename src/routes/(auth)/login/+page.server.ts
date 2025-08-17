@@ -6,7 +6,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
 import { UserRepo } from '$lib/repos/user';
 import { getPublicTurnstileKey, getSecretTurnstileKey, isProduction } from '$lib/utils/env';
-import { Turnstile } from 'svelte-turnstile';
+import { validateToken } from '$lib/server/turnstile';
 
 function isSafeRedirect(url: string): boolean {
 	if (!url) return false;

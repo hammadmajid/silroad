@@ -1,11 +1,11 @@
-interface TokenValidateResponse {
+export interface TokenValidateResponse {
 	'error-codes': string[];
 	success: boolean;
 	action: string;
 	cdata: string;
 }
 
-async function validateToken(token: string, secret: string) {
+export async function validateToken(token: string, secret: string) {
 	const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
 		method: 'POST',
 		headers: {
