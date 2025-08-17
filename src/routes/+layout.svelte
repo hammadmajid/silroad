@@ -32,8 +32,6 @@
 		}
 	});
 
-	const homeLink = userStore.isLoggedIn ? '/explore' : '/';
-
 	// Generate breadcrumbs based on current page
 	const breadcrumbs = $derived(generateBreadcrumbs($page, data));
 	const showBreadcrumbs = $derived($page.url.pathname !== '/');
@@ -42,7 +40,7 @@
 <div class="flex h-full flex-col">
 	<AppBar>
 		{#snippet lead()}
-			<a href={homeLink} class="flex items-center justify-center gap-2">
+			<a href="/" class="flex items-center justify-center gap-2">
 				<CalendarHeart size={24} />
 				<span class="text-lg font-bold">Silroad</span>
 			</a>
