@@ -72,7 +72,7 @@
 		<p class="text-surface-600-300">Sign in to your account</p>
 	</header>
 
-	<Card variant="form">
+	<Card variant="form" classes="p-6">
 		<form class="w-full space-y-4" method="POST" use:enhance>
 			<Field {form} name="email">
 				<Control>

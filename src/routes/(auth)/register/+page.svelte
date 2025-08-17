@@ -75,7 +75,7 @@
 		<p class="text-surface-600-300">Join Silroad today</p>
 	</header>
 
-	<Card variant="form">
+	<Card variant="form" classes="p-6">
 		<form class="w-full space-y-4" method="POST" use:enhance>
 			<div class="flex flex-col gap-4 md:flex-row">
 				<div class="flex-1 space-y-2">
