@@ -1,11 +1,10 @@
 import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
-import { events, attendees } from '$lib/db/schema';
+import { events, attendees, eventOrganizers, organizationMembers } from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Event,
 	EventCreateData,
-	EventOrganizer,
 	EventUpdateData,
 	EventWithAttendeeCount,
 	PaginationOptions,
@@ -335,50 +334,153 @@ export class EventRepo {
 	// Organizer Management
 	/**
 	 * Adds a user as an organizer to an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to add as organizer
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to add as organizer
 	 * @returns true if organizer was added successfully, false otherwise
 	 */
-	async addOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async addOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if event exists
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			// 2. Try to insert organizer
+			await this.db.insert(eventOrganizers).values({ eventId, userId }).returning();
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'addOrganizer', error);
+			return false;
+		}
 	}
 
 	/**
 	 * Removes a user from event organization.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to remove from organization
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to remove from organization
 	 * @returns true if organizer was removed successfully, false otherwise
 	 */
-	async removeOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async removeOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check current organizer count
+			const organizerCountResult = await this.db
+				.select({ count: count() })
+				.from(eventOrganizers)
+				.where(eq(eventOrganizers.eventId, eventId));
+
+			const organizerCount = organizerCountResult[0]?.count ?? 0;
+
+			// 2. Prevent removing the last organizer
+			if (organizerCount <= 1) {
+				return false;
+			}
+
+			// 3. Remove the organizer
+			await this.db
+				.delete(eventOrganizers)
+				.where(and(eq(eventOrganizers.eventId, eventId), eq(eventOrganizers.userId, userId)));
+
+			return true;
+		} catch (error) {
+			this.logger.error('EventRepo', 'removeOrganizer', error);
+			return false;
+		}
 	}
 
 	/**
 	 * Gets all organizer user IDs for an event.
-	 * @param _eventId - Event UUID
+	 * @param eventId - Event UUID
 	 * @returns Array of user IDs who are organizers, empty array if none or on error
 	 */
-	async getOrganizers(_eventId: string): Promise<string[]> {
-		throw new Error('Not implemented');
+	async getOrganizers(eventId: string): Promise<string[]> {
+		try {
+			const result = await this.db
+				.select({ userId: eventOrganizers.userId })
+				.from(eventOrganizers)
+				.where(eq(eventOrganizers.eventId, eventId))
+				.orderBy(eventOrganizers.userId);
+
+			return result.map((row) => row.userId);
+		} catch (error) {
+			this.logger.error('EventRepo', 'getOrganizers', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Gets all events that a user has organized.
-	 * @param _userId - User UUID
+	 * @param userId - User UUID
 	 * @returns Array of events the user organized, empty array if none or on error
 	 */
-	async getUserOrganizedEvents(_userId: string): Promise<Event[]> {
-		throw new Error('Not implemented');
+	async getUserOrganizedEvents(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(eventOrganizers, eq(events.id, eventOrganizers.eventId))
+				.where(eq(eventOrganizers.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getUserOrganizedEvents', error);
+			return [];
+		}
 	}
 
 	/**
 	 * Checks if a user is an organizer of an event.
-	 * @param _eventId - Event UUID
-	 * @param _userId - User UUID to check organizer status for
+	 * @param eventId - Event UUID
+	 * @param userId - User UUID to check organizer status for
 	 * @returns true if user is an organizer, false otherwise or on error
 	 */
-	async isOrganizer(_eventId: string, _userId: string): Promise<boolean> {
-		throw new Error('Not implemented');
+	async isOrganizer(eventId: string, userId: string): Promise<boolean> {
+		try {
+			// 1. Check if user is explicit organizer
+			const organizerResult = await this.db
+				.select({ userId: eventOrganizers.userId })
+				.from(eventOrganizers)
+				.where(and(eq(eventOrganizers.eventId, eventId), eq(eventOrganizers.userId, userId)))
+				.limit(1);
+
+			if (organizerResult.length > 0) {
+				return true;
+			}
+
+			// 2. Check if user is member of event organization (implicit organizer access)
+			const event = await this.getById(eventId);
+			if (!event) {
+				return false;
+			}
+
+			const memberResult = await this.db
+				.select({ userId: organizationMembers.userId })
+				.from(organizationMembers)
+				.where(
+					and(
+						eq(organizationMembers.organizationId, event.organizationId),
+						eq(organizationMembers.userId, userId)
+					)
+				)
+				.limit(1);
+
+			return memberResult.length > 0;
+		} catch (error) {
+			this.logger.error('EventRepo', 'isOrganizer', error);
+			return false;
+		}
 	}
 
 	// Query Methods
