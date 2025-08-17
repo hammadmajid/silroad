@@ -52,7 +52,11 @@ export const actions = {
 		const token = form.data['cf-turnstile-response'];
 		const secret = getSecretTurnstileKey(platform);
 
-		const { success } = await validateToken(token, secret);
+		let success = true;
+		if (isProduction(platform)) {
+			const result = await validateToken(token, secret);
+			success = result.success;
+		}
 		if (!success) {
 			return message(form, 'Invalid captcha');
 		}
