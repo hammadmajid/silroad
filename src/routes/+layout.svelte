@@ -8,7 +8,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { generateBreadcrumbs } from '$lib/utils/breadcrumbs.js';
 	import { page } from '$app/stores';
-
+	import { SvelteKitTopLoader } from 'sveltekit-top-loader';
 	import User from '@lucide/svelte/icons/user';
 	import LogIn from '@lucide/svelte/icons/log-in';
 
@@ -37,6 +37,7 @@
 </script>
 
 <div class="flex h-full flex-col">
+	<SvelteKitTopLoader color="#e9851d" showSpinner={false} />
 	<AppBar>
 		{#snippet lead()}
 			<a href="/" class="flex items-center gap-2">
