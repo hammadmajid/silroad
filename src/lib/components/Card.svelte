@@ -25,7 +25,7 @@
 		base = 'card',
 		background = 'preset-filled-surface-100-900',
 		border = '',
-		padding = 'p-6',
+		padding = 'p-2',
 		rounded = 'rounded-container',
 		shadow = '',
 		hover = '',
