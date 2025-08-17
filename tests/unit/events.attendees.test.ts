@@ -212,7 +212,7 @@ describe('EventRepo - Attendee Management', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.orderBy.mockRejectedValue(new Error('Database error'));
 
-			const result = await eventRepo.getAttendees('event-1');
+			const result = await eventRepo.getUserAttendedEvents('event-1');
 
 			expect(result).toEqual([]);
 		});
