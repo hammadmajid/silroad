@@ -38,6 +38,9 @@
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
 		delayMs: 400,
+		onUpdated() {
+			reset?.();
+		},
 		onResult: async ({ result }) => {
 			if (result.type === 'success' && result.data?.user) {
 				// Set user in global store and redirect
@@ -124,11 +127,7 @@
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
-			<Turnstile
-				siteKey={data.publicTurnstileKey}
-				responseFieldName="cf-turnstile-response"
-				size="flexible"
-			/>
+			<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
 
 			<button
 				type="submit"
