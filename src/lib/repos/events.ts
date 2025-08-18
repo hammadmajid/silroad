@@ -276,6 +276,7 @@ export class EventRepo {
 				.from(events)
 				.innerJoin(attendees, eq(events.id, attendees.eventId))
 				.where(eq(attendees.userId, userId))
+				// TODO: fix filter past events
 				.orderBy(desc(events.dateOfEvent));
 
 			return result;
