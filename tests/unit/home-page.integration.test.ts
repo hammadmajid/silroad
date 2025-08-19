@@ -156,11 +156,13 @@ describe('Home Page Data Loading Integration', () => {
 			const allUserEvents = [
 				{
 					...mockEvents[0],
-					dateOfEvent: new Date('2024-12-01T10:00:00Z') // Future
+					title: 'Future Event',
+					dateOfEvent: new Date('2026-12-01T10:00:00Z') // Future (2026)
 				},
 				{
 					...mockEvents[1],
-					dateOfEvent: new Date('2023-06-01T10:00:00Z') // Past
+					title: 'Past Event',
+					dateOfEvent: new Date('2023-06-01T10:00:00Z') // Past (2023)
 				}
 			];
 
@@ -177,7 +179,7 @@ describe('Home Page Data Loading Integration', () => {
 			const pastEvents = await result.pastAttendedEvents;
 			expect(pastEvents).toHaveLength(1);
 			expect(pastEvents[0].title).toBe('Past Event');
-			expect(new Date(pastEvents[0].dateOfEvent)).toBeLessThan(new Date());
+			expect(new Date(pastEvents[0].dateOfEvent).getTime()).toBeLessThan(new Date().getTime());
 		});
 
 		it('should handle repository errors gracefully', async () => {
