@@ -1,6 +1,13 @@
 import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
-import { events, attendees, eventOrganizers, organizationMembers, users } from '$lib/db/schema';
+import {
+	events,
+	attendees,
+	eventOrganizers,
+	organizationMembers,
+	users,
+	organizationFollowers
+} from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Event,
@@ -560,6 +567,30 @@ export class EventRepo {
 			return result;
 		} catch (error) {
 			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', error);
+			return [];
+		}
+	}
+
+	/**
+	* Get events from organizations user is following
+	^ @param userId The id of the user
+	* @returns Array of Events
+	*/
+	async getEventsFromUserFollowedOrgs(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select()
+				.from(organizationFollowers)
+				.leftJoin(events, eq(events.id, organizationFollowers.organizationId))
+				.where(eq(organizationFollowers.userId, userId));
+
+			const eventList = result
+				.map((obj) => obj.events)
+				.filter((e): e is Event => e !== null && e !== undefined);
+
+			return eventList;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getEventsFromUserFollowedOrgs', error);
 			return [];
 		}
 	}
