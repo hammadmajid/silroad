@@ -86,7 +86,7 @@
 	</section>
 
 	<!-- Section 3: Events from followed organizations -->
-	<section class="space-y-4">
+	<section class="space-y-4" data-testid="recommended-section">
 		<h2 class="h2">Recommended</h2>
 
 		{#if followedOrgsEvents}
