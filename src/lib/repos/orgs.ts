@@ -1,6 +1,12 @@
 import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
-import { organizations, organizationMembers, events, users } from '$lib/db/schema';
+import {
+	organizations,
+	organizationMembers,
+	events,
+	users,
+	organizationFollowers
+} from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Organization,
@@ -363,6 +369,39 @@ export class OrganizationRepo {
 		} catch (error) {
 			this.logger.error('OrganizationRepo', 'getOrganizationStats', error);
 			return null;
+		}
+	}
+
+	// Followers methods
+	async toggleFollow(userId: string, orgId: string): Promise<void> {
+		throw 'Not implemented yet';
+	}
+
+	/**
+	 * Get the array of organizations user follows
+	 * @param userId The id of the user
+	 * @return Array of Organization
+	 */
+	async getUserFollowing(userId: string): Promise<Organization[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: organizations.id,
+					name: organizations.name,
+					slug: organizations.slug,
+					avatar: organizations.avatar,
+					description: organizations.description,
+					backgroundImage: organizations.backgroundImage
+				})
+				.from(organizationFollowers)
+				.leftJoin(organizations, eq(organizations.id, organizationFollowers.organizationId))
+				.where(eq(organizationFollowers.userId, userId));
+
+			// Satisfy the type Organization
+			return result.filter((org): org is Organization => Boolean(org.id && org.name && org.slug));
+		} catch (error) {
+			this.logger.error('OrganizationRepo', 'getUserFollowing', error);
+			return [];
 		}
 	}
 }
