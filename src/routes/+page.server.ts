@@ -6,7 +6,8 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	if (!locals.user) {
 		return {
 			attendingEvents: null,
-			pastAttendedEvents: null
+			pastAttendedEvents: null,
+			followedOrgsEvents: null
 		};
 	}
 
@@ -19,6 +20,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 		attendingEvents: eventRepo.getUpcomingUserEvents(locals.user.id),
 		pastAttendedEvents: eventRepo
 			.getUserAttendedEvents(locals.user.id)
-			.then((events) => events.filter((event) => new Date(event.dateOfEvent) < now))
+			.then((events) => events.filter((event) => new Date(event.dateOfEvent) < now)),
+		followedOrgsEvents: eventRepo.getEventsFromUserFollowedOrgs(locals.user.id)
 	};
 };

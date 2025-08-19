@@ -12,7 +12,11 @@
 
 <div class="space-y-16">
 	{#if userStore.isLoggedIn}
-		<Feed attendingEvents={data.attendingEvents} pastAttendedEvents={data.pastAttendedEvents} />
+		<Feed
+			attendingEvents={data.attendingEvents}
+			pastAttendedEvents={data.pastAttendedEvents}
+			followedOrgsEvents={data.followedOrgsEvents}
+		/>
 	{:else}
 		<Landing />
 	{/if}
