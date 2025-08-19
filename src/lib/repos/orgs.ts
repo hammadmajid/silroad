@@ -373,8 +373,46 @@ export class OrganizationRepo {
 	}
 
 	// Followers methods
+	/**
+	 * Toggles the follow status for a user on an organization.
+	 * If the user is already following, unfollows the organization.
+	 * If the user is not following, starts following the organization.
+	 * @param userId - User UUID who is toggling follow status
+	 * @param orgId - Organization UUID to follow/unfollow
+	 * @throws Error if database operation fails
+	 */
 	async toggleFollow(userId: string, orgId: string): Promise<void> {
-		throw 'Not implemented yet';
+		try {
+			const existing = await this.db
+				.select()
+				.from(organizationFollowers)
+				.where(
+					and(
+						eq(organizationFollowers.userId, userId),
+						eq(organizationFollowers.organizationId, orgId)
+					)
+				)
+				.limit(1);
+
+			if (existing.length > 0) {
+				await this.db
+					.delete(organizationFollowers)
+					.where(
+						and(
+							eq(organizationFollowers.userId, userId),
+							eq(organizationFollowers.organizationId, orgId)
+						)
+					);
+			} else {
+				await this.db.insert(organizationFollowers).values({
+					userId,
+					organizationId: orgId
+				});
+			}
+		} catch (error) {
+			this.logger.error('OrganizationRepo', 'toggleFollow', error);
+			throw error;
+		}
 	}
 
 	/**
