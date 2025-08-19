@@ -381,36 +381,31 @@ export class OrganizationRepo {
 	 * @param orgId - Organization UUID to follow/unfollow
 	 * @throws Error if database operation fails
 	 */
-	async toggleFollow(userId: string, orgId: string): Promise<void> {
+	async toggleFollow(userId: string, orgId: string): Promise<"followed" | "unfollowed"> {
 		try {
-			const existing = await this.db
-				.select()
-				.from(organizationFollowers)
+			// Try deleting first and check if something was removed
+			const deleted = await this.db
+				.delete(organizationFollowers)
 				.where(
 					and(
 						eq(organizationFollowers.userId, userId),
 						eq(organizationFollowers.organizationId, orgId)
 					)
 				)
-				.limit(1);
+				.returning({ id: organizationFollowers.organizationId });
 
-			if (existing.length > 0) {
-				await this.db
-					.delete(organizationFollowers)
-					.where(
-						and(
-							eq(organizationFollowers.userId, userId),
-							eq(organizationFollowers.organizationId, orgId)
-						)
-					);
-			} else {
-				await this.db.insert(organizationFollowers).values({
-					userId,
-					organizationId: orgId
-				});
+			if (deleted.length > 0) {
+				return "unfollowed";
 			}
+
+			// If nothing deleted, insert
+			await this.db
+				.insert(organizationFollowers)
+				.values({ userId, organizationId: orgId });
+
+			return "followed";
 		} catch (error) {
-			this.logger.error('OrganizationRepo', 'toggleFollow', error);
+			this.logger.error("OrganizationRepo", "toggleFollow", error);
 			throw error;
 		}
 	}
