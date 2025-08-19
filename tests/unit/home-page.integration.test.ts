@@ -27,7 +27,7 @@ describe('Home Page Data Loading Integration', () => {
 		// Import the load function by relative path
 		const loadModule = {
 			load: async ({ locals, platform }: any) => {
-				if (!locals.user) {
+				if (!locals.user?.id) {
 					return {
 						attendingEvents: null,
 						pastAttendedEvents: null,
