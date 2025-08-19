@@ -34,7 +34,7 @@
 		{#if attendingEvents}
 			{#await attendingEvents}
 				<div class="grid gap-4">
-					<Loading />
+					<Loading data-testid="loading" />
 				</div>
 			{:then events}
 				{#if events.length > 0}
@@ -92,7 +92,7 @@
 		{#if followedOrgsEvents}
 			{#await followedOrgsEvents}
 				<div class="grid gap-4">
-					<Loading />
+					<Loading data-testid="loading" />
 				</div>
 			{:then events}
 				{#if events.length > 0}
@@ -156,7 +156,7 @@
 		{#if pastAttendedEvents}
 			{#await pastAttendedEvents}
 				<div class="grid gap-4">
-					<Loading />
+					<Loading data-testid="loading" />
 				</div>
 			{:then events}
 				{#if events.length > 0}

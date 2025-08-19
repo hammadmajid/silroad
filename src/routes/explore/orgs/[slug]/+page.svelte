@@ -111,6 +111,7 @@
 				type="submit"
 				class="btn flex items-center justify-center gap-2 preset-filled-primary-500"
 				disabled={isSubmitting}
+				data-testid="follow-toggle-btn"
 			>
 				{#if isSubmitting}
 					<Loader2 class="animate-spin" />
