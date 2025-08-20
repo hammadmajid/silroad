@@ -572,23 +572,30 @@ export class EventRepo {
 	}
 
 	/**
-	* Get events from organizations user is following
-	^ @param userId The id of the user
-	* @returns Array of Events
-	*/
+	 * Get events from organizations user is following
+	 * @param userId The id of the user
+	 * @returns Array of Events
+	 */
 	async getEventsFromUserFollowedOrgs(userId: string): Promise<Event[]> {
 		try {
 			const result = await this.db
-				.select()
-				.from(organizationFollowers)
-				.leftJoin(events, eq(events.id, organizationFollowers.organizationId))
-				.where(eq(organizationFollowers.userId, userId));
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(organizationFollowers, eq(events.organizationId, organizationFollowers.organizationId))
+				.where(eq(organizationFollowers.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
 
-			const eventList = result
-				.map((obj) => obj.events)
-				.filter((e): e is Event => e !== null && e !== undefined);
-
-			return eventList;
+			return result;
 		} catch (error) {
 			this.logger.error('EventRepo', 'getEventsFromUserFollowedOrgs', error);
 			return [];
