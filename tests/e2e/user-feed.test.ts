@@ -36,26 +36,55 @@ test.describe('User Feed with Followed Organizations', () => {
 	test('should show events from followed organizations in recommended section', async ({
 		page
 	}) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
-
 		// Setup: Create organization with events
 		await seedDatabase(page);
 
+		// Setup: Create and login user
+		await createAndLoginTestUser(page);
+
+
+
+		// Navigate to explore organizations page to find an organization to follow
+		await page.goto('/explore/orgs');
+		await page.waitForLoadState('networkidle');
+
+		// Wait for organizations to load and select the first one
+		const firstOrgCard = page.locator('a[href*="/explore/orgs/"]').first();
+		await expect(firstOrgCard).toBeVisible();
+		await firstOrgCard.click();
+
+		// Wait for organization page to load
+		await page.waitForLoadState('networkidle');
+
 		// Follow the organization
-		// TODO: Selected a random organizaton and follow it
-		// await page.getByTestId('follow-toggle-btn').click();
-		// await page.waitForLoadState('networkidle');
+		const followButton = page.getByTestId('follow-toggle-btn');
+		await expect(followButton).toBeVisible();
+
+		// Check if it says "Follow" (not already following)
+		const buttonText = await followButton.textContent();
+		if (buttonText?.includes('Follow') && !buttonText?.includes('Unfollow')) {
+			await followButton.click();
+			await page.waitForLoadState('networkidle');
+
+			// Wait for the button to change to "Unfollow"
+			await expect(followButton).toContainText('Unfollow');
+		}
 
 		// Navigate to home page
 		await page.goto('/');
+		await page.waitForLoadState('networkidle');
 
-		// Verify recommended section exists and shows events from followed organization
-		const recommendedSection = page.locator('[data-testid="recommended-section"]');
+		// Verify recommended section exists
+		const recommendedSection = page.getByTestId('recommended-section');
 		await expect(recommendedSection).toBeVisible();
 
-		// TODO: Look for the event from followed organization
-		// Edge case: seeded organization might not have any upcoming event
+		// Check if there are events shown in the recommended section
+		// Should either show events from followed organizations OR the appropriate empty state
+		const eventsInRecommended = recommendedSection.getByTestId('event-card');
+		// const noEventsMessage = recommendedSection.getByText('No events from organizations you follow');
+
+		// One of these should be visible
+		expect(await eventsInRecommended.count() > 0).toBe(true);
 	});
 
 	test('should show empty state when no followed organizations have events', async ({ page }) => {
