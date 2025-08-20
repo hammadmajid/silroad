@@ -45,7 +45,7 @@ describe('EventRepo - User Following Events', () => {
 		mockDb = {
 			select: vi.fn().mockReturnThis(),
 			from: vi.fn().mockReturnThis(),
-			leftJoin: vi.fn().mockReturnThis(),
+			innerJoin: vi.fn().mockReturnThis(),
 			where: vi.fn().mockReturnThis(),
 			limit: vi.fn().mockReturnThis(),
 			orderBy: vi.fn().mockReturnThis()
@@ -59,12 +59,11 @@ describe('EventRepo - User Following Events', () => {
 
 	describe('getEventsFromUserFollowedOrgs', () => {
 		it('should return events from organizations user follows', async () => {
-			const mockResults = [{ events: mockEvents[0] }, { events: mockEvents[1] }];
-
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -75,38 +74,21 @@ describe('EventRepo - User Following Events', () => {
 		it('should return empty array when user follows no organizations', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
 			expect(result).toEqual([]);
 		});
 
-		it('should filter out null events from join results', async () => {
-			const mockResults = [
-				{ events: mockEvents[0] },
-				{ events: null },
-				{ events: mockEvents[1] },
-				{ events: undefined }
-			];
-
-			mockDb.select.mockReturnValue(mockDb);
-			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
-
-			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
-
-			expect(result).toEqual(mockEvents);
-			expect(result).toHaveLength(2);
-		});
-
 		it('should return empty array on database error', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockRejectedValue(new Error('Database connection failed'));
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockRejectedValue(new Error('Database connection failed'));
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -118,12 +100,13 @@ describe('EventRepo - User Following Events', () => {
 			const invalidEvent = { ...mockEvents[1] };
 			delete (invalidEvent as any).id; // Remove required field to make it invalid
 
-			const mockResults = [{ events: validEvent }, { events: invalidEvent }, { events: null }];
+			const mockResults = [validEvent, invalidEvent];
 
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockResults);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -133,12 +116,11 @@ describe('EventRepo - User Following Events', () => {
 		});
 
 		it('should return correctly typed Event objects', async () => {
-			const mockResults = [{ events: mockEvents[0] }, { events: mockEvents[1] }];
-
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(mockEvents);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -168,12 +150,11 @@ describe('EventRepo - User Following Events', () => {
 				}
 			];
 
-			const mockResults = eventsWithDates.map((event) => ({ events: event }));
-
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue(eventsWithDates);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -196,12 +177,11 @@ describe('EventRepo - User Following Events', () => {
 				organizationId: 'org-1'
 			};
 
-			const mockResults = [{ events: eventWithNulls }];
-
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue(mockResults);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([eventWithNulls]);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-1');
 
@@ -216,8 +196,9 @@ describe('EventRepo - User Following Events', () => {
 		it('should work with users who have no followed organizations', async () => {
 			mockDb.select.mockReturnValue(mockDb);
 			mockDb.from.mockReturnValue(mockDb);
-			mockDb.leftJoin.mockReturnValue(mockDb);
-			mockDb.where.mockResolvedValue([]);
+			mockDb.innerJoin.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.orderBy.mockResolvedValue([]);
 
 			const result = await eventRepo.getEventsFromUserFollowedOrgs('user-with-no-follows');
 
