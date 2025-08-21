@@ -1,528 +1,190 @@
-import { faker } from '@faker-js/faker';
 import { generateSalt, hashPassword, generateSessionToken } from '$lib/utils/crypto';
 import * as schema from '$lib/db/schema';
 import { getDb, getKV } from '$lib/db';
 
-// Logging utilities
-type LogLevel = 'error' | 'warn' | 'info' | 'debug';
-
-interface Logger {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	error: (message: string, ...args: any[]) => void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	warn: (message: string, ...args: any[]) => void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	info: (message: string, ...args: any[]) => void;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	debug: (message: string, ...args: any[]) => void;
+interface SeedOptions {
+	numOrgs?: number;
+	numUsers?: number;
+	numEventsPerOrg?: number;
+	numSessions?: number;
 }
 
-function createLogger(level: LogLevel): Logger {
-	const levels: Record<LogLevel, number> = {
-		error: 0,
-		warn: 1,
-		info: 2,
-		debug: 3
-	};
-
-	const currentLevel = levels[level];
-
-	return {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		error: (message: string, ...args: any[]) => {
-			if (currentLevel >= 0) console.error(message, ...args);
-		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		warn: (message: string, ...args: any[]) => {
-			if (currentLevel >= 1) console.warn(message, ...args);
-		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		info: (message: string, ...args: any[]) => {
-			if (currentLevel >= 2) console.log(message, ...args);
-		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		debug: (message: string, ...args: any[]) => {
-			if (currentLevel >= 3) console.log(message, ...args);
-		}
-	};
-}
-
-// prevent worker from hitting the CPU time limit
 const password = 'Pass!234';
 const salt = generateSalt();
 const hashedPassword = await hashPassword(password, salt);
 
-// Image utilities
-function getRandomAvatar(): string {
+function getRandomImage(category: 'avatars' | 'orgs' | 'events'): string {
 	const imageNumber = Math.floor(Math.random() * 40) + 1;
-	return `https://static.silroad.space/avatars/${imageNumber}.png`;
+	return `https://static.silroad.space/${category}/${imageNumber}.png`;
 }
 
-function getRandomOrgBackground(): string {
-	const imageNumber = Math.floor(Math.random() * 40) + 1;
-	return `https://static.silroad.space/orgs/${imageNumber}.png`;
-}
-
-function getRandomEventBackground(): string {
-	const imageNumber = Math.floor(Math.random() * 40) + 1;
-	return `https://static.silroad.space/events/${imageNumber}.png`;
-}
-
-// Helper function to insert data in batches
-async function insertInBatches<T extends Record<string, unknown>>(
-	db: ReturnType<typeof getDb>,
-	table: Parameters<typeof db.insert>[0],
-	data: T[],
-	logger: Logger,
-	batchSize: number = 10
-) {
-	if (data.length === 0) {
-		logger.debug('📝 No data to insert, skipping batch insertion');
-		return;
-	}
-
-	logger.debug(`📦 Inserting ${data.length} records in batches of ${batchSize}`);
-	for (let i = 0; i < data.length; i += batchSize) {
-		const batch = data.slice(i, i + batchSize);
-		const batchNumber = Math.floor(i / batchSize) + 1;
-		const totalBatches = Math.ceil(data.length / batchSize);
-
-		try {
-			logger.debug(`📝 Inserting batch ${batchNumber}/${totalBatches} (${batch.length} records)`);
-			await db.insert(table).values(batch).run();
-			logger.debug(`✅ Batch ${batchNumber}/${totalBatches} inserted successfully`);
-		} catch (error) {
-			logger.error(`❌ Failed to insert batch ${batchNumber}/${totalBatches}:`, error);
-			throw error;
-		}
-	}
-	logger.debug(`🎯 All ${data.length} records inserted successfully`);
-}
-
-export async function seedDatabase(
-	platform: App.Platform | undefined,
-	count: number,
-	logLevel: LogLevel = 'error'
-) {
-	const db = getDb(platform);
-	const kv = getKV(platform);
-	const logger = createLogger(logLevel);
+export async function seedDatabase(platform: App.Platform | undefined, options: SeedOptions = {}) {
+	const { numOrgs = 3, numUsers = 5, numEventsPerOrg = 2, numSessions = 3 } = options;
 
 	try {
-		logger.info('🚀 Starting database seeding...');
-		logger.info(`📊 Configuration: ${count} items requested`);
+		const db = getDb(platform);
+		const kv = getKV(platform);
 
-		logger.info('🧹 Clearing KV store...');
-		await clearKV(kv, logger);
-		logger.info('✅ KV cleared');
+		await clearKV(kv);
+		await clearDatabase(db);
 
-		logger.info('🧹 Clearing database...');
-		await clearDatabase(db, logger);
-		logger.info('✅ Database cleared');
+		const organizations = await createOrganizations(db, numOrgs);
+		const users = await createUsers(db, numUsers);
+		await assignOrganizationMembers(db, users, organizations);
+		const events = await createEvents(db, organizations, numEventsPerOrg);
+		await assignEventOrganizersAndAttendees(db, events, users);
+		await createSessions(db, users, numSessions);
 
-		logger.info('🏢 Creating organizations...');
-		const organizations = await createOrganizations(db, count, logger);
-		logger.info(`✅ Created ${organizations.length} organizations`);
-
-		logger.info('👥 Creating users...');
-		const users = await createUsers(db, count, organizations, logger);
-		logger.info(`✅ Created ${users.length} users`);
-
-		logger.info('🤝 Assigning organization members...');
-		await assignOrganizationMembers(db, users, organizations, logger);
-		logger.info('✅ Assigned organization members');
-
-		logger.info('🎉 Creating events...');
-		const events = await createEvents(db, organizations, logger);
-		logger.info(`✅ Created ${events.length} events`);
-
-		logger.info('👤 Assigning event organizers and attendees...');
-		await assignEventOrganizersAndAttendees(db, events, users, logger);
-		logger.info('✅ Assigned event organizers and attendees');
-
-		logger.info('🔐 Creating sessions...');
-		await createSessions(db, count, users, logger);
-		logger.info(`✅ Created ${count} sessions`);
-
-		logger.info('🎊 Database seeding completed successfully!');
-		logger.info(
-			`📈 Final stats: ${organizations.length} orgs, ${users.length} users, ${events.length} events`
-		);
+		console.log('Database seeded successfully');
 	} catch (error) {
-		logger.error('💥 Error during database seeding:', error);
+		console.error('Failed to seed database:', error);
 		throw error;
 	}
 }
 
-// ----------------------------
-
-async function clearKV(kv: KVNamespace, logger: Logger) {
-	logger.debug('🗑️ Listing KV keys for deletion...');
+async function clearKV(kv: KVNamespace) {
 	const { keys } = await kv.list();
-	logger.debug(`🔑 Found ${keys.length} keys to delete`);
-
 	for (const key of keys) {
-		logger.debug(`🗑️ Deleting KV key: ${key.name}`);
 		await kv.delete(key.name);
 	}
-	logger.debug(`✅ Deleted ${keys.length} KV keys`);
 }
 
-async function clearDatabase(db: ReturnType<typeof getDb>, logger: Logger) {
-	logger.debug('🗑️ Clearing all database tables...');
-	const tables = [
-		'attendees',
-		'eventOrganizers',
-		'events',
-		'organizationMembers',
-		'sessions',
-		'verificationTokens',
-		'users',
-		'organizations'
-	];
-
-	for (const tableName of tables) {
-		logger.debug(`🗑️ Clearing table: ${tableName}`);
-		switch (tableName) {
-			case 'attendees':
-				await db.delete(schema.attendees).run();
-				break;
-			case 'eventOrganizers':
-				await db.delete(schema.eventOrganizers).run();
-				break;
-			case 'events':
-				await db.delete(schema.events).run();
-				break;
-			case 'organizationMembers':
-				await db.delete(schema.organizationMembers).run();
-				break;
-			case 'sessions':
-				await db.delete(schema.sessions).run();
-				break;
-			case 'verificationTokens':
-				await db.delete(schema.verificationTokens).run();
-				break;
-			case 'users':
-				await db.delete(schema.users).run();
-				break;
-			case 'organizations':
-				await db.delete(schema.organizations).run();
-				break;
-		}
-		logger.debug(`✅ Cleared table: ${tableName}`);
-	}
+async function clearDatabase(db: ReturnType<typeof getDb>) {
+	await db.delete(schema.attendees).run();
+	await db.delete(schema.eventOrganizers).run();
+	await db.delete(schema.events).run();
+	await db.delete(schema.organizationMembers).run();
+	await db.delete(schema.sessions).run();
+	await db.delete(schema.verificationTokens).run();
+	await db.delete(schema.users).run();
+	await db.delete(schema.organizations).run();
 }
 
-// ----------------------------
+async function createOrganizations(db: ReturnType<typeof getDb>, count: number) {
+	const orgNames = ['Tech Meetup', 'Writers Club', 'Runners Group', 'Art Society', 'Book Club'];
+	const organizations = Array.from({ length: count }, (_, i) => ({
+		id: crypto.randomUUID(),
+		name: orgNames[i] || `Organization ${i + 1}`,
+		slug: (orgNames[i] || `organization-${i + 1}`).toLowerCase().replace(/\s+/g, '-'),
+		description: `Community for ${orgNames[i] || `group ${i + 1}`} enthusiasts`,
+		avatar: getRandomImage('avatars'),
+		backgroundImage: getRandomImage('orgs')
+	}));
 
-async function createOrganizations(db: ReturnType<typeof getDb>, count: number, logger: Logger) {
-	const organizations: (typeof schema.organizations.$inferInsert)[] = [];
-	const usedSlugs = new Set<string>();
-
-	for (let i = 0; i < count; i++) {
-		const name = faker.company.name();
-		let slug = faker.helpers.slugify(name.toLowerCase());
-
-		// Ensure unique slugs
-		let counter = 1;
-		while (usedSlugs.has(slug)) {
-			slug = `${faker.helpers.slugify(name.toLowerCase())}-${counter}`;
-			counter++;
-		}
-		usedSlugs.add(slug);
-
-		logger.debug(`🏢 Creating organization ${i + 1}/${count}: ${name}`);
-		const avatar = getRandomAvatar();
-		const backgroundImage = getRandomOrgBackground();
-
-		organizations.push({
-			id: crypto.randomUUID(),
-			name,
-			slug,
-			description: faker.company.catchPhrase(),
-			avatar,
-			backgroundImage
-		});
-		logger.debug(`✅ Organization created: ${name} (${slug})`);
-	}
-
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.organizations, organizations, logger, 10);
+	await db.insert(schema.organizations).values(organizations).run();
 	return organizations;
 }
 
-// ----------------------------
+async function createUsers(db: ReturnType<typeof getDb>, count: number) {
+	const userNames = ['Test User', 'Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Wilson'];
+	const emails = [
+		'u@test.it',
+		'alice@example.com',
+		'bob@example.com',
+		'carol@example.com',
+		'david@example.com'
+	];
 
-async function createUsers(
-	db: ReturnType<typeof getDb>,
-	count: number,
-	organizations: (typeof schema.organizations.$inferInsert)[],
-	logger: Logger
-) {
-	const users: (typeof schema.users.$inferInsert)[] = [];
-	const usedEmails = new Set<string>();
-	const usedOrganizationIds = new Set<string>();
-
-	// Always create the testing user with email u@test.it
-	logger.debug(`👤 Creating test user: Test User (u@test.it)`);
-	const testUserAvatar = getRandomAvatar();
-	users.push({
+	const users = Array.from({ length: count }, (_, i) => ({
 		id: crypto.randomUUID(),
-		name: 'Test User',
-		email: 'u@test.it',
-		image: testUserAvatar,
+		name: userNames[i] || `User ${i + 1}`,
+		email: emails[i] || `user${i + 1}@example.com`,
+		image: getRandomImage('avatars'),
 		password: hashedPassword,
 		salt,
 		organizationId: null
-	});
-	usedEmails.add('u@test.it');
-	logger.debug(`✅ Test user created with avatar: ${testUserAvatar}`);
+	}));
 
-	for (let i = 0; i < count; i++) {
-		// Only assign organization if it hasn't been used (due to unique constraint)
-		let organization: typeof schema.organizations.$inferInsert | undefined;
-		if (organizations.length > 0) {
-			const availableOrgs = organizations.filter((org) => !usedOrganizationIds.has(org.id!));
-			if (availableOrgs.length > 0 && faker.datatype.boolean()) {
-				organization = faker.helpers.arrayElement(availableOrgs);
-				if (organization?.id) {
-					usedOrganizationIds.add(organization.id);
-				}
-			}
-		}
-
-		// Ensure unique emails
-		let email = faker.internet.email();
-		let counter = 1;
-		while (usedEmails.has(email)) {
-			const [localPart, domain] = email.split('@');
-			email = `${localPart}${counter}@${domain}`;
-			counter++;
-		}
-		usedEmails.add(email);
-
-		const fullName = faker.person.fullName();
-		logger.debug(`👤 Creating user ${i + 1}/${count}: ${fullName} (${email})`);
-		const userAvatar = getRandomAvatar();
-
-		users.push({
-			id: crypto.randomUUID(),
-			name: fullName,
-			email,
-			// Omit emailVerified to let it default to null/undefined
-			image: userAvatar,
-			password: hashedPassword,
-			salt,
-			organizationId: organization?.id || null
-		});
-		logger.debug(`✅ User created: ${fullName} with avatar: ${userAvatar}`);
-	}
-
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.users, users, logger, 10);
+	await db.insert(schema.users).values(users).run();
 	return users;
 }
-
-// ----------------------------
 
 async function assignOrganizationMembers(
 	db: ReturnType<typeof getDb>,
 	users: (typeof schema.users.$inferInsert)[],
-	organizations: (typeof schema.organizations.$inferInsert)[],
-	logger: Logger
+	organizations: (typeof schema.organizations.$inferInsert)[]
 ) {
-	logger.debug('🤝 Starting organization member assignment...');
-	const members: (typeof schema.organizationMembers.$inferInsert)[] = [];
-	const memberPairs = new Set<string>();
+	const members = users
+		.slice(0, Math.min(users.length, organizations.length * 2))
+		.map((user, i) => ({
+			userId: user.id!,
+			organizationId: organizations[i % organizations.length].id!
+		}));
 
-	for (const org of organizations) {
-		logger.debug(`🤝 Processing members for organization: ${org.name}`);
-		const orgUsers = users.filter((u) => u.organizationId === org.id);
-		const additionalUsers = faker.helpers.arrayElements(
-			users.filter((u) => u.organizationId !== org.id),
-			faker.number.int({ min: 0, max: 3 })
-		);
-
-		const allMembers = [...orgUsers, ...additionalUsers];
-		logger.debug(`👥 Assigning ${allMembers.length} members to ${org.name}`);
-
-		for (const user of allMembers) {
-			if (!user) continue;
-
-			const pairKey = `${user.id}-${org.id}`;
-			if (!memberPairs.has(pairKey)) {
-				memberPairs.add(pairKey);
-				members.push({
-					userId: user.id!,
-					organizationId: org.id!
-				});
-				logger.debug(`✅ Added ${user.name} to ${org.name}`);
-			}
-		}
+	if (members.length > 0) {
+		await db.insert(schema.organizationMembers).values(members).run();
 	}
-
-	logger.debug(`📊 Total organization memberships to create: ${members.length}`);
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.organizationMembers, members, logger, 10);
-}
-
-// ----------------------------
-
-// Helper function to create slug from title
-function createSlug(title: string): string {
-	return title
-		.toLowerCase()
-		.replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-		.replace(/\s+/g, '-') // Replace spaces with hyphens
-		.replace(/-+/g, '-') // Replace multiple hyphens with single
-		.trim();
-}
-
-// Helper function to create unique slug
-function createUniqueSlug(title: string, usedSlugs: Set<string>): string {
-	const baseSlug = createSlug(title);
-	let slug = baseSlug;
-	let counter = 1;
-
-	while (usedSlugs.has(slug)) {
-		slug = `${baseSlug}-${counter}`;
-		counter++;
-	}
-
-	usedSlugs.add(slug);
-	return slug;
 }
 
 async function createEvents(
 	db: ReturnType<typeof getDb>,
 	organizations: (typeof schema.organizations.$inferInsert)[],
-	logger: Logger
+	eventsPerOrg: number
 ) {
-	const events: (typeof schema.events.$inferInsert)[] = [];
-	const usedSlugs = new Set<string>();
+	const now = Date.now();
+	const events = [];
 
 	for (const org of organizations) {
-		const eventCount = faker.number.int({ min: 0, max: 3 });
-		logger.debug(`🎉 Creating ${eventCount} events for organization: ${org.name}`);
-
-		for (let i = 0; i < eventCount; i++) {
-			const now = Date.now();
-			const daysUntilEvent = faker.number.int({ min: 2, max: 14 }); // Start from 2 days
-			const daysUntilRsvpClose = faker.number.int({ min: 1, max: daysUntilEvent - 1 });
-			const title = faker.company.catchPhrase();
-
-			logger.debug(`🎉 Creating event ${i + 1}/${eventCount}: ${title}`);
-			const eventImage = getRandomEventBackground();
+		for (let i = 0; i < eventsPerOrg; i++) {
+			const isPast = i % 2 === 1;
+			const daysOffset = isPast ? -(i + 1) * 7 : (i + 1) * 7;
+			const rsvpOffset = isPast ? daysOffset - 2 : daysOffset - 2;
 
 			events.push({
 				id: crypto.randomUUID(),
-				title,
-				slug: createUniqueSlug(title, usedSlugs),
-				description: faker.lorem.sentence(),
-				dateOfEvent: new Date(now + daysUntilEvent * 86400000),
-				closeRsvpAt: new Date(now + daysUntilRsvpClose * 86400000),
-				maxAttendees: faker.number.int({ min: 10, max: 300 }),
-				image: eventImage,
+				title: `${org.name} Event ${i + 1}`,
+				slug: `${org.slug}-event-${i + 1}`,
+				description: `${isPast ? 'Past' : 'Upcoming'} event by ${org.name}`,
+				dateOfEvent: new Date(now + daysOffset * 24 * 60 * 60 * 1000),
+				closeRsvpAt: new Date(now + rsvpOffset * 24 * 60 * 60 * 1000),
+				maxAttendees: 20 + Math.floor(Math.random() * 30),
+				image: getRandomImage('events'),
 				organizationId: org.id!
 			});
-			logger.debug(`✅ Event created: ${title} with image: ${eventImage}`);
 		}
 	}
 
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.events, events, logger, 10);
+	await db.insert(schema.events).values(events).run();
 	return events;
 }
-
-// ----------------------------
 
 async function assignEventOrganizersAndAttendees(
 	db: ReturnType<typeof getDb>,
 	events: (typeof schema.events.$inferInsert)[],
-	users: (typeof schema.users.$inferInsert)[],
-	logger: Logger
+	users: (typeof schema.users.$inferInsert)[]
 ) {
-	logger.debug('👤 Starting event organizer and attendee assignment...');
-	const organizers: (typeof schema.eventOrganizers.$inferInsert)[] = [];
-	const attendees: (typeof schema.attendees.$inferInsert)[] = [];
-	const organizerPairs = new Set<string>();
-	const attendeePairs = new Set<string>();
+	const organizers = events.map((event, i) => ({
+		eventId: event.id!,
+		userId: users[i % users.length].id!
+	}));
 
-	for (const event of events) {
-		logger.debug(`🎯 Processing assignments for event: ${event.title}`);
-		const eligibleUsers = users.filter(
-			(u) => u.organizationId === event.organizationId || faker.datatype.boolean()
-		);
+	const attendees = events.flatMap((event) =>
+		users.slice(0, Math.min(3, users.length)).map((user) => ({
+			eventId: event.id!,
+			userId: user.id!
+		}))
+	);
 
-		if (eligibleUsers.length === 0) {
-			logger.warn(`⚠️ No eligible users found for event: ${event.title}`);
-			continue;
-		}
-
-		const organizerCount = Math.min(faker.number.int({ min: 1, max: 2 }), eligibleUsers.length);
-		const attendeeCount = Math.min(faker.number.int({ min: 1, max: 10 }), eligibleUsers.length);
-
-		logger.debug(
-			`👥 Assigning ${organizerCount} organizers and ${attendeeCount} attendees to ${event.title}`
-		);
-
-		const selectedOrganizers = faker.helpers.arrayElements(eligibleUsers, organizerCount);
-		const selectedAttendees = faker.helpers.arrayElements(eligibleUsers, attendeeCount);
-
-		for (const user of selectedOrganizers) {
-			const pairKey = `${event.id}-${user.id}`;
-			if (!organizerPairs.has(pairKey)) {
-				organizerPairs.add(pairKey);
-				organizers.push({ eventId: event.id!, userId: user.id! });
-				logger.debug(`👨‍💼 Added organizer: ${user.name} for ${event.title}`);
-			}
-		}
-
-		for (const user of selectedAttendees) {
-			const pairKey = `${event.id}-${user.id}`;
-			if (!attendeePairs.has(pairKey)) {
-				attendeePairs.add(pairKey);
-				attendees.push({ eventId: event.id!, userId: user.id! });
-				logger.debug(`🎫 Added attendee: ${user.name} for ${event.title}`);
-			}
-		}
+	if (organizers.length > 0) {
+		await db.insert(schema.eventOrganizers).values(organizers).run();
 	}
-
-	logger.debug(`📊 Total organizers to create: ${organizers.length}`);
-	logger.debug(`📊 Total attendees to create: ${attendees.length}`);
-
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.eventOrganizers, organizers, logger, 10);
-	await insertInBatches(db, schema.attendees, attendees, logger, 10);
+	if (attendees.length > 0) {
+		await db.insert(schema.attendees).values(attendees).run();
+	}
 }
-
-// ----------------------------
 
 async function createSessions(
 	db: ReturnType<typeof getDb>,
-	count: number,
 	users: (typeof schema.users.$inferInsert)[],
-	logger: Logger
+	count: number
 ) {
-	logger.debug(`🔐 Creating ${count} user sessions...`);
-	const sessions: (typeof schema.sessions.$inferInsert)[] = [];
+	const sessions = users.slice(0, Math.min(count, users.length)).map((user) => ({
+		userId: user.id!,
+		sessionToken: generateSessionToken(),
+		expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+	}));
 
-	for (let i = 0; i < count; i++) {
-		const user = users[i % users.length];
-		const sessionToken = generateSessionToken();
-		const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7);
-
-		sessions.push({
-			userId: user.id!,
-			sessionToken,
-			expires
-		});
-		logger.debug(
-			`🔑 Created session ${i + 1}/${count} for user: ${user.name} (expires: ${expires.toISOString()})`
-		);
+	if (sessions.length > 0) {
+		await db.insert(schema.sessions).values(sessions).run();
 	}
-
-	logger.debug(`📊 Total sessions to create: ${sessions.length}`);
-	// Insert in batches to avoid SQL limits
-	await insertInBatches(db, schema.sessions, sessions, logger, 10);
 }
