@@ -99,6 +99,9 @@
 					if (result.type === 'success') {
 						// Update was successful, keep the optimistic state
 						await update();
+					} else if (result.type === 'redirect') {
+						// Handle redirect (e.g., login redirect)
+						await update(); // This will perform the redirect
 					} else {
 						// Revert on error
 						localIsFollowing = !localIsFollowing;

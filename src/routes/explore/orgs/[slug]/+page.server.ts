@@ -45,11 +45,14 @@ export const actions: Actions = {
 		const logger = new Logger(platform);
 		const orgRepo = new OrganizationRepo(platform);
 
-		try {
-			if (!locals.user) {
-				handleLoginRedirect(event, 'You must be logged in to follow organizations');
-			}
+		if (!locals.user) {
+			throw redirect(
+				303,
+				handleLoginRedirect(event, 'You must be logged in to follow organizations')
+			);
+		}
 
+		try {
 			const formData = await request.formData();
 			const organizationId = formData.get('organizationId') as string;
 
@@ -62,6 +65,7 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (err) {
 			logger.error('toggleFollow action', 'toggleFollow', err);
+			throw err;
 		}
 	}
 };
