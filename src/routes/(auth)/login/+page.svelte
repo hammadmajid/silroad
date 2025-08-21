@@ -26,7 +26,7 @@
 	onMount(() => {
 		if (userStore.isLoggedIn) {
 			const redirectTo = $page.url.searchParams.get('redirectTo');
-			const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+			const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/';
 			goto(redirectUrl);
 		}
 	});
@@ -39,7 +39,7 @@
 				// Set user in global store and redirect
 				userStore.setUser(result.data.user);
 				const redirectTo = $page.url.searchParams.get('redirectTo');
-				const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/explore';
+				const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/';
 				goto(redirectUrl);
 			}
 		}
