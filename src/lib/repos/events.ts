@@ -591,7 +591,10 @@ export class EventRepo {
 					organizationId: events.organizationId
 				})
 				.from(events)
-				.innerJoin(organizationFollowers, eq(events.organizationId, organizationFollowers.organizationId))
+				.innerJoin(
+					organizationFollowers,
+					eq(events.organizationId, organizationFollowers.organizationId)
+				)
 				.where(eq(organizationFollowers.userId, userId))
 				.orderBy(desc(events.dateOfEvent));
 

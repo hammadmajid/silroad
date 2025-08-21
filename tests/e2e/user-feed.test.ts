@@ -42,8 +42,6 @@ test.describe('User Feed with Followed Organizations', () => {
 		// Setup: Create and login user
 		await createAndLoginTestUser(page);
 
-
-
 		// Navigate to explore organizations page to find an organization to follow
 		await page.goto('/explore/orgs');
 		await page.waitForLoadState('networkidle');
@@ -84,7 +82,7 @@ test.describe('User Feed with Followed Organizations', () => {
 		// const noEventsMessage = recommendedSection.getByText('No events from organizations you follow');
 
 		// One of these should be visible
-		expect(await eventsInRecommended.count() > 0).toBe(true);
+		expect((await eventsInRecommended.count()) > 0).toBe(true);
 	});
 
 	test('should show empty state when no followed organizations have events', async ({ page }) => {

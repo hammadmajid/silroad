@@ -93,7 +93,9 @@ describe('OrganizationRepo - Followers', () => {
 			mockDb.insert.mockReturnValue(mockDb);
 			mockDb.values.mockRejectedValueOnce(new Error('UNIQUE constraint failed'));
 
-			await expect(orgRepo.toggleFollow('user-1', 'org-1')).rejects.toThrow('UNIQUE constraint failed');
+			await expect(orgRepo.toggleFollow('user-1', 'org-1')).rejects.toThrow(
+				'UNIQUE constraint failed'
+			);
 		});
 	});
 
