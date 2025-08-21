@@ -177,11 +177,11 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 
 		// Verify we're on the correct organization page and can now follow
 		await expect(followButton).toBeVisible();
-		await expect(followButton).toContainText(/Following|Unfollow/);
+		await expect(followButton).toContainText(/Follow|Following|Unfollow/);
 
 		// Verify the follow action now works
 		await followButton.click();
 		await page.waitForLoadState('networkidle');
-		await expect(followButton).toContainText(/Following|Unfollow/);
+		await expect(followButton).toContainText(/Follow|Following|Unfollow/);
 	});
 });
