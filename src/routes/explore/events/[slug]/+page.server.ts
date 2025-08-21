@@ -2,7 +2,7 @@ import { EventRepo } from '$lib/repos/events';
 import { OrganizationRepo } from '$lib/repos/orgs';
 import { error, redirect } from '@sveltejs/kit';
 import { Logger } from '$lib/utils/logger';
-import type { PageServerLoad, Actions } from './$types';
+import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 };
 
 export const actions: Actions = {
-	toggleAttendance: async (event) => {
+	toggleAttendance: async (event: RequestEvent) => {
 		const { request, platform, locals } = event;
 		const logger = new Logger(platform);
 		const eventRepo = new EventRepo(platform);
