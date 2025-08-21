@@ -274,7 +274,7 @@ test.describe('User Login Flow', () => {
 
 		// Check if login succeeded or if we get an error (depending on implementation)
 		const currentUrl = page.url();
-		if (currentUrl.includes('/')) {
+		if (currentUrl.endsWith('/') && !currentUrl.includes('/login')) {
 			// Case-insensitive login is supported
 			await expect(page).toHaveURL('/');
 		} else {
