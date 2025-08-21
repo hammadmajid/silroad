@@ -30,6 +30,7 @@
 	<!-- Section 2: Upcoming events user is attending -->
 	<section class="space-y-4">
 		<h2 class="h2">Your Upcoming Events</h2>
+		<p class="text-surface-600-300">Events you've RSVP'd to attend</p>
 
 		{#if attendingEvents}
 			{#await attendingEvents}
@@ -88,6 +89,7 @@
 	<!-- Section 3: Events from followed organizations -->
 	<section class="space-y-4" data-testid="recommended-section">
 		<h2 class="h2">Recommended</h2>
+		<p class="text-surface-600-300">Events from organizations you follow</p>
 
 		{#if followedOrgsEvents}
 			{#await followedOrgsEvents}
@@ -152,6 +154,7 @@
 	<!-- Section 4: Past events user attended -->
 	<section class="space-y-4">
 		<h2 class="h2">Past Events</h2>
+		<p class="text-surface-600-300">Events you've previously attended</p>
 
 		{#if pastAttendedEvents}
 			{#await pastAttendedEvents}
