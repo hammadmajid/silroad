@@ -35,8 +35,8 @@ test.describe('User Registration Flow', () => {
 		// Submit the form
 		await page.getByTestId('register-submit-btn').click();
 
-		// Verify successful registration and redirect to explore page
-		await expect(page).toHaveURL('/explore');
+		// Verify successful registration and redirect to home page
+		await expect(page).toHaveURL('/');
 	});
 
 	test('should show validation errors for invalid form data', async ({ page }) => {
@@ -82,13 +82,13 @@ test.describe('User Registration Flow', () => {
 		// First registration attempt
 		await page.getByTestId('register-submit-btn').click();
 
-		// If this email doesn't exist, it will succeed and redirect to /explore
+		// If this email doesn't exist, it will succeed and redirect to /
 		// If it exists, we should see an error message
 		await page.waitForLoadState('networkidle');
 
-		// Check if we're on explore (successful registration) or still on register (error)
+		// Check if we're on home (successful registration) or still on register (error)
 		const currentUrl = page.url();
-		if (currentUrl.includes('/explore')) {
+		if (currentUrl.includes('/')) {
 			// Cclear the sesion cookie fist
 			await page.context().clearCookies();
 
@@ -132,8 +132,8 @@ test.describe('User Registration Flow', () => {
 		// The button should be disabled during submission
 		await expect(submitButton).toBeDisabled();
 
-		// Eventually should redirect to explore
-		await expect(page).toHaveURL('/explore', { timeout: 10000 });
+		// Eventually should redirect to home
+		await expect(page).toHaveURL('/', { timeout: 10000 });
 	});
 
 	test('should redirect authenticated users away from registration page', async ({ page }) => {
@@ -153,13 +153,13 @@ test.describe('User Registration Flow', () => {
 		await page.getByTestId('terms-checkbox').check();
 		await page.getByTestId('register-submit-btn').click();
 
-		// Should be redirected to explore
-		await expect(page).toHaveURL('/explore');
+		// Should be redirected to home
+		await expect(page).toHaveURL('/');
 
 		// Now try to access registration page while authenticated
 		await page.goto('/register');
 
-		// Should be redirected back to explore since user is already authenticated
-		await expect(page).toHaveURL('/explore');
+		// Should be redirected back to home since user is already authenticated
+		await expect(page).toHaveURL('/');
 	});
 });

@@ -22,7 +22,7 @@ test.describe('User Login Flow', () => {
 		await page.getByTestId('register-submit-btn').click();
 
 		// Wait for registration to complete
-		await expect(page).toHaveURL('/explore');
+		await expect(page).toHaveURL('/');
 
 		// Clear session to prepare for login test
 		await page.context().clearCookies();
@@ -48,8 +48,8 @@ test.describe('User Login Flow', () => {
 		// Submit the form
 		await page.getByTestId('login-submit-btn').click();
 
-		// Verify successful login and redirect to explore page
-		await expect(page).toHaveURL('/explore');
+		// Verify successful login and redirect to home page
+		await expect(page).toHaveURL('/');
 	});
 
 	test('should show validation errors for empty form fields', async ({ page }) => {
@@ -153,8 +153,8 @@ test.describe('User Login Flow', () => {
 		// The button should be disabled during submission
 		await expect(submitButton).toBeDisabled();
 
-		// Eventually should redirect to explore
-		await expect(page).toHaveURL('/explore', { timeout: 10000 });
+		// Eventually should redirect to home
+		await expect(page).toHaveURL('/', { timeout: 10000 });
 	});
 
 	test('should redirect authenticated users away from login page', async ({ page }) => {
@@ -166,14 +166,14 @@ test.describe('User Login Flow', () => {
 		await page.getByTestId('password-input').fill(testUser.password);
 		await page.getByTestId('login-submit-btn').click();
 
-		// Should be redirected to explore
-		await expect(page).toHaveURL('/explore');
+		// Should be redirected to home
+		await expect(page).toHaveURL('/');
 
 		// Now try to access login page while authenticated
 		await page.goto('/login');
 
-		// Should be redirected back to explore since user is already authenticated
-		await expect(page).toHaveURL('/explore');
+		// Should be redirected back to home since user is already authenticated
+		await expect(page).toHaveURL('/');
 	});
 
 	test('should navigate to registration page from login', async ({ page }) => {
@@ -274,9 +274,9 @@ test.describe('User Login Flow', () => {
 
 		// Check if login succeeded or if we get an error (depending on implementation)
 		const currentUrl = page.url();
-		if (currentUrl.includes('/explore')) {
+		if (currentUrl.includes('/')) {
 			// Case-insensitive login is supported
-			await expect(page).toHaveURL('/explore');
+			await expect(page).toHaveURL('/');
 		} else {
 			// Case-insensitive login is not supported, should show error
 			await expect(page.getByTestId('error-message')).toBeVisible();

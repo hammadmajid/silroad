@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	// Note: We still check locals.user for server-side redirect
 	// The client will handle the user store initialization
 	if (locals.user) {
-		throw redirect(303, '/explore');
+		throw redirect(303, '/');
 	}
 
 	return {
@@ -71,8 +71,7 @@ export const actions = {
 		// Check for redirectTo parameter and redirect accordingly
 		const redirectTo = url.searchParams.get('redirectTo');
 		const decodedRedirect = redirectTo ? decodeURIComponent(redirectTo) : null;
-		const redirectUrl =
-			decodedRedirect && isSafeRedirect(decodedRedirect) ? decodedRedirect : '/explore';
+		const redirectUrl = decodedRedirect && isSafeRedirect(decodedRedirect) ? decodedRedirect : '/';
 
 		throw redirect(303, redirectUrl);
 	}

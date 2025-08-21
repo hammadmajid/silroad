@@ -22,7 +22,7 @@ test.describe('User Feed with Followed Organizations', () => {
 		await page.getByTestId('register-submit-btn').click();
 
 		// Wait for registration to complete
-		await expect(page).toHaveURL('/explore');
+		await expect(page).toHaveURL('/');
 
 		return testUser;
 	}

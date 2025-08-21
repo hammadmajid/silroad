@@ -25,7 +25,7 @@
 	// Redirect if user is already logged in
 	onMount(() => {
 		if (userStore.isLoggedIn) {
-			goto('/explore');
+			goto('/');
 		}
 	});
 
@@ -36,7 +36,7 @@
 			if (result.type === 'success' && result.data?.user) {
 				// Set user in global store and redirect
 				userStore.setUser(result.data.user);
-				goto('/explore');
+				goto('/');
 			}
 		}
 	});
