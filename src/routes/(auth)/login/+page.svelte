@@ -17,9 +17,6 @@
 
 	let { data } = $props();
 
-	// Call this to reset the turnstile
-	let reset = $state<() => void>();
-
 	function dismissError() {
 		const url = new URL($page.url);
 		url.searchParams.delete('msg');
@@ -38,9 +35,6 @@
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
 		delayMs: 400,
-		onUpdated() {
-			reset?.();
-		},
 		onResult: async ({ result }) => {
 			if (result.type === 'success' && result.data?.user) {
 				// Set user in global store and redirect
@@ -127,7 +121,13 @@
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
-			<Turnstile siteKey={data.publicTurnstileKey} size="flexible" bind:reset />
+			<Turnstile
+				on:callback={(e) => {
+					$formData['cf-turnstile-response'] = e.detail.token;
+				}}
+				siteKey={data.publicTurnstileKey}
+				size="flexible"
+			/>
 
 			<button
 				type="submit"
