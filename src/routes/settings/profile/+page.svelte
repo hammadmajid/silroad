@@ -53,127 +53,125 @@
 	<title>Profile - Settings | Silroad</title>
 </svelte:head>
 
-{#if userStore.current}
-	<div class="space-y-8">
-		{#if $message}
-			<Alert
-				type={$message === 'Profile updated successfully' ? 'success' : 'error'}
-				title={$message === 'Profile updated successfully' ? 'Success' : 'Error'}
-				dismissible={true}
-				data-testid={$message === 'Profile updated successfully'
-					? 'success-message'
-					: 'error-message'}
-			>
-				{#snippet icon()}
-					{#if $message === 'Profile updated successfully'}
-						<CheckCircle />
-					{:else}
-						<TriangleAlert />
-					{/if}
-				{/snippet}
-				{$message}
-			</Alert>
-		{/if}
+<div class="space-y-8">
+	{#if $message}
+		<Alert
+			type={$message === 'Profile updated successfully' ? 'success' : 'error'}
+			title={$message === 'Profile updated successfully' ? 'Success' : 'Error'}
+			dismissible={true}
+			data-testid={$message === 'Profile updated successfully'
+				? 'success-message'
+				: 'error-message'}
+		>
+			{#snippet icon()}
+				{#if $message === 'Profile updated successfully'}
+					<CheckCircle />
+				{:else}
+					<TriangleAlert />
+				{/if}
+			{/snippet}
+			{$message}
+		</Alert>
+	{/if}
 
-		<section class="space-y-6">
-			<header>
-				<h1 class="h2">Profile</h1>
-			</header>
+	<section class="space-y-6">
+		<header>
+			<h1 class="h2">Profile</h1>
+		</header>
 
-			<Card class="space-y-6 p-6">
-				<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
-					<!-- Avatar Section -->
-					<div class="flex flex-col items-center gap-4">
-						<Avatar
-							src={userStore.current?.image || undefined}
-							name="User"
-							size="w-24 h-24"
-							background="preset-filled-primary-500"
-						>
-							<User class="h-24 w-24" />
-						</Avatar>
-						<button class="btn flex items-center gap-2 preset-outlined btn-sm">
-							<Camera size={16} />
-							Change photo
-						</button>
-					</div>
-
-					<!-- Profile Info Form -->
-					<div class="flex-1 space-y-4">
-						<form class="space-y-4" method="POST">
-							<Field {form} name="name">
-								<Control>
-									{#snippet children({ props })}
-										<label class="label">
-											<span class="label-text">Full Name</span>
-											<input
-												class="input w-full"
-												{...props}
-												type="text"
-												bind:value={$formData.name}
-												placeholder="Enter your full name"
-												data-testid="name-input"
-											/>
-										</label>
-									{/snippet}
-								</Control>
-								<FieldErrors class="text-error-700-300" />
-							</Field>
-
-							<div class="space-y-2">
-								<label for="join-date" class="label-text">Member Since</label>
-								<input
-									id="join-date"
-									value={formatJoinDate()}
-									class="input w-full"
-									disabled
-									data-testid="join-date-input"
-								/>
-							</div>
-
-							<!-- Action Buttons -->
-							<div class="flex gap-3 pt-4">
-								<button
-									type="submit"
-									class="btn flex items-center gap-2 preset-filled-primary-500"
-									disabled={$submitting}
-									data-testid="save-changes-btn"
-								>
-									{#if $submitting}
-										<LoaderCircle class="animate-spin" size={16} />
-									{:else}
-										<Save size={16} />
-									{/if}
-									Save Changes
-								</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</Card>
-		</section>
-
-		<section class="space-y-6">
-			<Card variant="form" class="space-y-4 p-6">
-				<div
-					class="flex items-center justify-between rounded-lg border border-error-300 bg-error-50 p-4 dark:border-error-600 dark:bg-error-900/20"
-				>
-					<div class="space-y-1">
-						<h3 class="font-medium text-error-700 dark:text-error-300">Sign Out</h3>
-						<p class="text-sm text-error-600 dark:text-error-400">
-							Sign out of your account on this device
-						</p>
-					</div>
-					<button
-						onclick={handleLogout}
-						class="btn flex items-center gap-2 preset-filled-error-500 btn-sm"
-						data-testid="logout-btn"
+		<Card class="space-y-6 p-6">
+			<div class="flex flex-col gap-6 sm:flex-row sm:items-start">
+				<!-- Avatar Section -->
+				<div class="flex flex-col items-center gap-4">
+					<Avatar
+						src={userStore.current?.image || undefined}
+						name="User"
+						size="w-24 h-24"
+						background="preset-filled-primary-500"
 					>
-						<LogOut size={16} />
-						Sign Out
+						<User class="h-24 w-24" />
+					</Avatar>
+					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
+						<Camera size={16} />
+						Change photo
 					</button>
 				</div>
-			</Card>
-		</section>
-	</div>
-{/if}
+
+				<!-- Profile Info Form -->
+				<div class="flex-1 space-y-4">
+					<form class="space-y-4" method="POST">
+						<Field {form} name="name">
+							<Control>
+								{#snippet children({ props })}
+									<label class="label">
+										<span class="label-text">Full Name</span>
+										<input
+											class="input w-full"
+											{...props}
+											type="text"
+											bind:value={$formData.name}
+											placeholder="Enter your full name"
+											data-testid="name-input"
+										/>
+									</label>
+								{/snippet}
+							</Control>
+							<FieldErrors class="text-error-700-300" />
+						</Field>
+
+						<div class="space-y-2">
+							<label for="join-date" class="label-text">Member Since</label>
+							<input
+								id="join-date"
+								value={formatJoinDate()}
+								class="input w-full"
+								disabled
+								data-testid="join-date-input"
+							/>
+						</div>
+
+						<!-- Action Buttons -->
+						<div class="flex gap-3 pt-4">
+							<button
+								type="submit"
+								class="btn flex items-center gap-2 preset-filled-primary-500"
+								disabled={$submitting}
+								data-testid="save-changes-btn"
+							>
+								{#if $submitting}
+									<LoaderCircle class="animate-spin" size={16} />
+								{:else}
+									<Save size={16} />
+								{/if}
+								Save Changes
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</Card>
+	</section>
+
+	<section class="space-y-6">
+		<Card variant="form" class="space-y-4 p-6">
+			<div
+				class="flex items-center justify-between rounded-lg border border-error-300 bg-error-50 p-4 dark:border-error-600 dark:bg-error-900/20"
+			>
+				<div class="space-y-1">
+					<h3 class="font-medium text-error-700 dark:text-error-300">Sign Out</h3>
+					<p class="text-sm text-error-600 dark:text-error-400">
+						Sign out of your account on this device
+					</p>
+				</div>
+				<button
+					onclick={handleLogout}
+					class="btn flex items-center gap-2 preset-filled-error-500 btn-sm"
+					data-testid="logout-btn"
+				>
+					<LogOut size={16} />
+					Sign Out
+				</button>
+			</div>
+		</Card>
+	</section>
+</div>

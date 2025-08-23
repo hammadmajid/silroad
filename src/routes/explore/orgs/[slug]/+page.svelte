@@ -3,13 +3,23 @@
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 	import Users from '@lucide/svelte/icons/users';
 	import Calendar from '@lucide/svelte/icons/calendar';
-	import { userStore } from '$lib/stores/user.svelte';
-	import { handleLoginRedirect } from '$lib/utils/redirect';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Check from '@lucide/svelte/icons/check';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import { enhance } from '$app/forms';
+
 	let { data } = $props();
 
-	const { organization, events, memberCount, members } = data;
+	const { organization, events, memberCount, members, isFollowing } = data;
+
+	// Create local reactive states
+	let localIsFollowing = $state(isFollowing);
+	let isSubmitting = $state(false);
+
+	// Sync with server data when it changes
+	$effect(() => {
+		localIsFollowing = isFollowing;
+	});
 
 	// Format date for display
 	const formatDate = (timestamp: number) => {
@@ -21,17 +31,6 @@
 			hour: '2-digit',
 			minute: '2-digit'
 		});
-	};
-
-	const handleFollow = () => {
-		if (!userStore.isLoggedIn) {
-			goto(
-				handleLoginRedirect({ url: $page.url }, 'You must be logged in to follow organizations')
-			);
-			return;
-		}
-		// TODO: Implement follow functionality
-		alert('Follow functionality coming soon!');
 	};
 
 	// Separate upcoming and past events
@@ -87,7 +86,48 @@
 			<p class="text-surface-600-300 text-lg">{organization.description}</p>
 		{/if}
 
-		<button class="btn preset-filled-primary-500" onclick={handleFollow}> Follow </button>
+		<form
+			action="?/toggleFollow"
+			method="POST"
+			use:enhance={() => {
+				// Optimistically update the UI immediately
+				localIsFollowing = !localIsFollowing;
+				isSubmitting = true;
+
+				return async ({ result, update }) => {
+					isSubmitting = false;
+					if (result.type === 'success') {
+						// Update was successful, keep the optimistic state
+						await update();
+					} else if (result.type === 'redirect') {
+						// Handle redirect (e.g., login redirect)
+						await update(); // This will perform the redirect
+					} else {
+						// Revert on error
+						localIsFollowing = !localIsFollowing;
+					}
+				};
+			}}
+		>
+			<input type="hidden" name="organizationId" value={organization.id} />
+			<button
+				type="submit"
+				class="btn flex items-center justify-center gap-2 preset-filled-primary-500"
+				disabled={isSubmitting}
+				data-testid="follow-toggle-btn"
+			>
+				{#if isSubmitting}
+					<Loader2 class="animate-spin" />
+					<span> Loading... </span>
+				{:else if localIsFollowing}
+					<Check />
+					<span> Unfollow </span>
+				{:else}
+					<Plus />
+					<span> Follow </span>
+				{/if}
+			</button>
+		</form>
 	</section>
 
 	<div class="grid gap-8 px-4 lg:grid-cols-3">
@@ -201,7 +241,7 @@
 						<h3 class="h4">Members</h3>
 					</header>
 					<div class="space-y-3">
-						{#each members as member (member.userId)}
+						{#each members as member (member.id)}
 							<div class="flex items-center gap-3 overflow-hidden">
 								<Avatar
 									src={member.image || undefined}

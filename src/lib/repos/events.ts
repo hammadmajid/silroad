@@ -1,6 +1,13 @@
 import { getDb } from '$lib/db';
 import { desc, eq, count, gt, like, or, and, asc } from 'drizzle-orm';
-import { events, attendees, eventOrganizers, organizationMembers, users } from '$lib/db/schema';
+import {
+	events,
+	attendees,
+	eventOrganizers,
+	organizationMembers,
+	users,
+	organizationFollowers
+} from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Event,
@@ -276,6 +283,7 @@ export class EventRepo {
 				.from(events)
 				.innerJoin(attendees, eq(events.id, attendees.eventId))
 				.where(eq(attendees.userId, userId))
+				// TODO: fix filter past events
 				.orderBy(desc(events.dateOfEvent));
 
 			return result;
@@ -559,6 +567,40 @@ export class EventRepo {
 			return result;
 		} catch (error) {
 			this.logger.error('EventRepo', 'getUpcomingEventsByOrganization', error);
+			return [];
+		}
+	}
+
+	/**
+	 * Get events from organizations user is following
+	 * @param userId The id of the user
+	 * @returns Array of Events
+	 */
+	async getEventsFromUserFollowedOrgs(userId: string): Promise<Event[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent,
+					closeRsvpAt: events.closeRsvpAt,
+					maxAttendees: events.maxAttendees,
+					image: events.image,
+					organizationId: events.organizationId
+				})
+				.from(events)
+				.innerJoin(
+					organizationFollowers,
+					eq(events.organizationId, organizationFollowers.organizationId)
+				)
+				.where(eq(organizationFollowers.userId, userId))
+				.orderBy(desc(events.dateOfEvent));
+
+			return result;
+		} catch (error) {
+			this.logger.error('EventRepo', 'getEventsFromUserFollowedOrgs', error);
 			return [];
 		}
 	}

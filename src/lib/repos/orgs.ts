@@ -1,6 +1,12 @@
 import { getDb } from '$lib/db';
 import { eq, like, or, and, count, asc } from 'drizzle-orm';
-import { organizations, organizationMembers, events, users } from '$lib/db/schema';
+import {
+	organizations,
+	organizationMembers,
+	events,
+	users,
+	organizationFollowers
+} from '$lib/db/schema';
 import { Logger } from '$lib/utils/logger';
 import type {
 	Organization,
@@ -363,6 +369,70 @@ export class OrganizationRepo {
 		} catch (error) {
 			this.logger.error('OrganizationRepo', 'getOrganizationStats', error);
 			return null;
+		}
+	}
+
+	// Followers methods
+	/**
+	 * Toggles the follow status for a user on an organization.
+	 * If the user is already following, unfollows the organization.
+	 * If the user is not following, starts following the organization.
+	 * @param userId - User UUID who is toggling follow status
+	 * @param orgId - Organization UUID to follow/unfollow
+	 * @throws Error if database operation fails
+	 */
+	async toggleFollow(userId: string, orgId: string): Promise<'followed' | 'unfollowed'> {
+		try {
+			// Try deleting first and check if something was removed
+			const deleted = await this.db
+				.delete(organizationFollowers)
+				.where(
+					and(
+						eq(organizationFollowers.userId, userId),
+						eq(organizationFollowers.organizationId, orgId)
+					)
+				)
+				.returning({ id: organizationFollowers.organizationId });
+
+			if (deleted.length > 0) {
+				return 'unfollowed';
+			}
+
+			// If nothing deleted, insert
+			await this.db.insert(organizationFollowers).values({ userId, organizationId: orgId });
+
+			return 'followed';
+		} catch (error) {
+			this.logger.error('OrganizationRepo', 'toggleFollow', error);
+			throw error;
+		}
+	}
+
+	/**
+	 * Get the array of organizations user follows
+	 * @param userId The id of the user
+	 * @return Array of Organization
+	 */
+	async getUserFollowing(userId: string): Promise<Organization[]> {
+		try {
+			const result = await this.db
+				.select({
+					id: organizations.id,
+					name: organizations.name,
+					slug: organizations.slug,
+					avatar: organizations.avatar,
+					description: organizations.description,
+					backgroundImage: organizations.backgroundImage
+				})
+				.from(organizationFollowers)
+				.leftJoin(organizations, eq(organizations.id, organizationFollowers.organizationId))
+				.where(eq(organizationFollowers.userId, userId));
+
+			// Satisfy the type Organization
+			return result.filter((org): org is Organization => Boolean(org.id && org.name && org.slug));
+		} catch (error) {
+			this.logger.error('OrganizationRepo', 'getUserFollowing', error);
+			return [];
 		}
 	}
 }

@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	// Note: We still check locals.user for server-side redirect
 	// The client will handle the user store initialization
 	if (locals.user) {
-		throw redirect(303, '/explore');
+		throw redirect(303, '/');
 	}
 
 	return {
@@ -75,6 +75,6 @@ export const actions = {
 		// TODO: send the email verification code; then
 		// throw redirect(302, "/register/verify-email")
 
-		throw redirect(303, '/explore');
+		throw redirect(303, '/');
 	}
 };

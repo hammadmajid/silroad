@@ -87,11 +87,17 @@
 		<!-- RSVP Button -->
 		<div>
 			{#if isEventFull}
-				<button class="btn preset-filled-surface-500" disabled> Event Full </button>
+				<button class="btn preset-filled-surface-500" disabled data-testid="rsvp-btn">
+					Event Full
+				</button>
 			{:else if !isRsvpOpen}
-				<button class="btn preset-filled-surface-500" disabled> RSVP Closed </button>
+				<button class="btn preset-filled-surface-500" disabled data-testid="rsvp-btn">
+					RSVP Closed
+				</button>
 			{:else}
-				<button class="btn preset-filled-primary-500" onclick={handleRsvp}> RSVP to Event </button>
+				<button class="btn preset-filled-primary-500" onclick={handleRsvp} data-testid="rsvp-btn">
+					RSVP to Event
+				</button>
 			{/if}
 		</div>
 	</section>
