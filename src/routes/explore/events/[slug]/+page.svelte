@@ -9,10 +9,6 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import { enhance } from '$app/forms';
-	import { userStore } from '$lib/stores/user.svelte';
-	import { handleLoginRedirect } from '$lib/utils/redirect';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	
 	let { data } = $props();
 
@@ -37,14 +33,6 @@
 	// Check if RSVP is still open
 	const isRsvpOpen = event.closeRsvpAt ? new Date(event.closeRsvpAt) > new Date() : true;
 	const isEventFull = event.maxAttendees ? attendeeCount >= event.maxAttendees : false;
-
-	const handleRsvp = () => {
-		if (!userStore.isLoggedIn) {
-			goto(handleLoginRedirect({ url: $page.url }, 'You must be logged in to RSVP to events'));
-			return;
-		}
-		// This is now handled by the form enhance
-	};
 </script>
 
 <svelte:head>
@@ -101,10 +89,6 @@
 			{:else if !isRsvpOpen}
 				<button class="btn preset-filled-surface-500" disabled data-testid="rsvp-btn">
 					RSVP Closed
-				</button>
-			{:else if !userStore.isLoggedIn}
-				<button class="btn preset-filled-primary-500" onclick={handleRsvp} data-testid="rsvp-btn">
-					RSVP to Event
 				</button>
 			{:else}
 				<form
@@ -202,7 +186,7 @@
 						<h3 class="h4">Organizers</h3>
 					</header>
 					<div class="space-y-3">
-						{#each organizers as organizer (organizer.userId)}
+						{#each organizers as organizer (organizer.id)}
 							<div class="flex items-center gap-3 overflow-hidden">
 								<Avatar
 									src={organizer.image || undefined}
