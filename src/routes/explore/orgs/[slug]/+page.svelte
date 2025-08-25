@@ -13,13 +13,8 @@
 	const { organization, events, memberCount, members, isFollowing } = data;
 
 	// Create local reactive states
-	let localIsFollowing = $state(isFollowing);
+	let localIsFollowing = $derived(isFollowing);
 	let isSubmitting = $state(false);
-
-	// Sync with server data when it changes
-	$effect(() => {
-		localIsFollowing = isFollowing;
-	});
 
 	// Format date for display
 	const formatDate = (timestamp: number) => {
