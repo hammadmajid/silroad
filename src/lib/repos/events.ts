@@ -346,6 +346,45 @@ export class EventRepo {
 		}
 	}
 
+	/**
+	 * Toggles the attendance status for a user on an event.
+	 * If the user is already attending, removes them from the event.
+	 * If the user is not attending, adds them to the event.
+	 * @param userId - User UUID who is toggling attendance
+	 * @param eventId - Event UUID to join/leave
+	 * @returns 'joined' | 'left' on success, null on error
+	 */
+	async toggleAttendance(userId: string, eventId: string): Promise<'joined' | 'left' | null> {
+		try {
+			// Try removing first and check if something was removed
+			const removed = await this.db
+				.delete(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, userId)))
+				.returning({ id: attendees.eventId });
+
+			if (removed.length > 0) {
+				return 'left';
+			}
+
+			// If nothing removed, try to add attendee
+			const added = await this.addAttendee(eventId, userId);
+			if (added) {
+				return 'joined';
+			}
+
+			// If addAttendee failed (e.g., event full, RSVP closed), log and return null
+			this.logger.error(
+				'EventRepo',
+				'toggleAttendance',
+				'Unable to join event - it may be full or RSVP may be closed'
+			);
+			return null;
+		} catch (error) {
+			this.logger.error('EventRepo', 'toggleAttendance', error);
+			return null;
+		}
+	}
+
 	// Organizer Management
 	/**
 	 * Adds a user as an organizer to an event.

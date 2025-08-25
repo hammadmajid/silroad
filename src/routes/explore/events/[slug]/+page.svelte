@@ -5,13 +5,18 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import Users from '@lucide/svelte/icons/users';
 	import Clock from '@lucide/svelte/icons/clock';
-	import { userStore } from '$lib/stores/user.svelte';
-	import { handleLoginRedirect } from '$lib/utils/redirect';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import Check from '@lucide/svelte/icons/check';
+	import Plus from '@lucide/svelte/icons/plus';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import { enhance } from '$app/forms';
+	
 	let { data } = $props();
 
-	const { event, attendeeCount, organizers } = data;
+	const { event, attendeeCount, organizers, isAttending } = data;
+
+	// Local state for optimistic updates
+	let localIsAttending = $state(isAttending);
+	let isSubmitting = $state(false);
 
 	// Format date for display
 	const formatDate = (timestamp: number) => {
@@ -28,15 +33,6 @@
 	// Check if RSVP is still open
 	const isRsvpOpen = event.closeRsvpAt ? new Date(event.closeRsvpAt) > new Date() : true;
 	const isEventFull = event.maxAttendees ? attendeeCount >= event.maxAttendees : false;
-
-	const handleRsvp = () => {
-		if (!userStore.isLoggedIn) {
-			goto(handleLoginRedirect({ url: $page.url }, 'You must be logged in to RSVP to events'));
-			return;
-		}
-		// TODO: Implement RSVP functionality
-		alert('RSVP functionality coming soon!');
-	};
 </script>
 
 <svelte:head>
@@ -95,9 +91,50 @@
 					RSVP Closed
 				</button>
 			{:else}
-				<button class="btn preset-filled-primary-500" onclick={handleRsvp} data-testid="rsvp-btn">
-					RSVP to Event
-				</button>
+				<form
+					method="POST"
+					action="?/toggleAttendance"
+					use:enhance={() => {
+						// Optimistically update the UI immediately
+						localIsAttending = !localIsAttending;
+						isSubmitting = true;
+
+						return async ({ result, update }) => {
+							isSubmitting = false;
+							if (result.type === 'success') {
+								// Update was successful, keep the optimistic state
+								await update();
+							} else if (result.type === 'redirect') {
+								// Handle redirect (e.g., login redirect)
+								await update(); // This will perform the redirect
+							} else {
+								// Revert on error
+								localIsAttending = !localIsAttending;
+							}
+						};
+					}}
+				>
+					<input type="hidden" name="eventId" value={event.id} />
+					<button
+						type="submit"
+						class="btn flex items-center justify-center gap-2"
+						class:preset-filled-primary-500={!localIsAttending}
+						class:preset-filled-surface-600={localIsAttending}
+						disabled={isSubmitting}
+						data-testid="rsvp-btn"
+					>
+						{#if isSubmitting}
+							<Loader2 class="animate-spin" />
+							<span> Loading... </span>
+						{:else if localIsAttending}
+							<Check />
+							<span> Leave Event </span>
+						{:else}
+							<Plus />
+							<span> RSVP to Event </span>
+						{/if}
+					</button>
+				</form>
 			{/if}
 		</div>
 	</section>
@@ -149,7 +186,7 @@
 						<h3 class="h4">Organizers</h3>
 					</header>
 					<div class="space-y-3">
-						{#each organizers as organizer (organizer.userId)}
+						{#each organizers as organizer (organizer.id)}
 							<div class="flex items-center gap-3 overflow-hidden">
 								<Avatar
 									src={organizer.image || undefined}

@@ -349,4 +349,59 @@ describe('EventRepo - Attendee Management', () => {
 			expect(mockDb.limit).toHaveBeenCalledWith(1);
 		});
 	});
+
+	describe('toggleAttendance', () => {
+		it('should leave event if user is already attending', async () => {
+			// Mock delete returns row -> means left event
+			mockDb.delete.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.returning.mockResolvedValueOnce([{ eventId: 'event-1' }]);
+
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe('left');
+			expect(mockDb.delete).toHaveBeenCalled();
+			expect(mockDb.returning).toHaveBeenCalled();
+		});
+
+		it('should join event if user is not attending', async () => {
+			// Mock delete returns nothing -> user wasn't attending
+			mockDb.delete.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.returning.mockResolvedValueOnce([]);
+
+			// Mock successful addAttendee
+			const mockAddAttendee = vi.spyOn(eventRepo, 'addAttendee').mockResolvedValue(true);
+
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe('joined');
+			expect(mockAddAttendee).toHaveBeenCalledWith('event-1', 'user-1');
+		});
+
+		it('should return null if unable to join event (e.g., event full)', async () => {
+			// Mock delete returns nothing -> user wasn't attending
+			mockDb.delete.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.returning.mockResolvedValueOnce([]);
+
+			// Mock failed addAttendee (e.g., event is full)
+			const mockAddAttendee = vi.spyOn(eventRepo, 'addAttendee').mockResolvedValue(false);
+
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe(null);
+			expect(mockAddAttendee).toHaveBeenCalledWith('event-1', 'user-1');
+		});
+
+		it('should return null if delete operation fails', async () => {
+			mockDb.delete.mockReturnValue(mockDb);
+			mockDb.where.mockReturnValue(mockDb);
+			mockDb.returning.mockRejectedValueOnce(new Error('Database error'));
+
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe(null);
+		});
+	});
 });

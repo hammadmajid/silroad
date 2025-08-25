@@ -1,9 +1,11 @@
 import { EventRepo } from '$lib/repos/events';
 import { OrganizationRepo } from '$lib/repos/orgs';
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error, redirect } from '@sveltejs/kit';
+import { Logger } from '$lib/utils/logger';
+import type { PageServerLoad, Actions, RequestEvent } from './$types';
+import { handleLoginRedirect } from '$lib/utils/redirect';
 
-export const load: PageServerLoad = async ({ params, platform }) => {
+export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const eventRepo = new EventRepo(platform);
 	const orgRepo = new OrganizationRepo(platform);
 	const { slug } = params;
@@ -24,6 +26,12 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 	// Get organizers
 	const organizers = await eventRepo.getOrganizers(event.id);
 
+	// Check if user is attending this event
+	let isAttending = false;
+	if (locals.user) {
+		isAttending = await eventRepo.isAttending(event.id, locals.user.id);
+	}
+
 	return {
 		event: {
 			...event,
@@ -32,6 +40,40 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 			organizationAvatar: organization?.avatar || null
 		},
 		attendeeCount: eventWithCount?.attendeeCount || 0,
-		organizers
+		organizers,
+		isAttending
 	};
+};
+
+export const actions: Actions = {
+	toggleAttendance: async (event: RequestEvent) => {
+		const { request, platform, locals } = event;
+		const logger = new Logger(platform);
+		const eventRepo = new EventRepo(platform);
+
+		if (!locals.user) {
+			throw redirect(303, handleLoginRedirect(event, 'You must be logged in to RSVP to events'));
+		}
+
+		try {
+			const formData = await request.formData();
+			const eventId = formData.get('eventId') as string;
+
+			if (!eventId || !locals.user) {
+				throw error(400, 'Invalid ID');
+			}
+
+			const result = await eventRepo.toggleAttendance(locals.user.id, eventId);
+
+			if (result === null) {
+				logger.error('toggleAttendance action', 'toggleAttendance', 'Failed to toggle attendance');
+				throw error(500, 'Unable to update attendance status');
+			}
+
+			return { success: true };
+		} catch (err) {
+			logger.error('toggleAttendance action', 'toggleAttendance', err);
+			throw err;
+		}
+	}
 };
