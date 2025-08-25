@@ -22,10 +22,10 @@
 		validators: zod4Client(schema),
 		delayMs: 400,
 		onResult: async ({ result }) => {
-			if (result.type === 'success' && result.data) {
+			if (result.type === 'success' && result.data && userStore.current) {
 				// Update user store with new data if update was successful
 				const updatedUser = {
-					...userStore.current!,
+					...userStore.current,
 					name: result.data.form.data.name
 				};
 				userStore.setUser(updatedUser);

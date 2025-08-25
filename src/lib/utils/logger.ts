@@ -7,7 +7,7 @@ export class Logger {
 		this.logger = getLogger(platform);
 	}
 
-	error(source: string, stub: string, error: any) {
+	error(source: string, stub: string, error: unknown) {
 		this.logger.writeDataPoint({
 			blobs: ['error', source, stub, JSON.stringify(error)],
 			doubles: [1],
@@ -15,7 +15,7 @@ export class Logger {
 		});
 	}
 
-	stat(path: string, action: string, meta?: any) {
+	stat(path: string, action: string, meta?: unknown) {
 		this.logger.writeDataPoint({
 			blobs: ['stat', path, action, JSON.stringify(meta)],
 			doubles: [1],

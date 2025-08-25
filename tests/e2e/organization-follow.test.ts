@@ -143,9 +143,10 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 
 		// Get the org URL to test redirect preservation
 		const orgUrl = await firstOrgCard.getAttribute('href');
+		if (!orgUrl) throw new Error('Organization URL not found');
 
 		// Navigate directly to the organization page while not logged in
-		await page.goto(orgUrl!);
+		await page.goto(orgUrl);
 		await page.waitForLoadState('networkidle');
 
 		// Try to click the follow button without being logged in
@@ -156,7 +157,7 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 		// Expected error message
 		const errMsg = 'You must be logged in to follow organizations';
 		// Should be redirected to login page with redirectTo parameter and error message
-		const expectedRedirectUrl = `/login?redirectTo=${encodeURIComponent(orgUrl!)}&msg=${encodeURIComponent(errMsg)}`;
+		const expectedRedirectUrl = `/login?redirectTo=${encodeURIComponent(orgUrl)}&msg=${encodeURIComponent(errMsg)}`;
 		await expect(page).toHaveURL(
 			new RegExp(expectedRedirectUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
 		);
@@ -173,7 +174,7 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 		await page.getByTestId('login-submit-btn').click();
 
 		// Should be redirected back to the original organization page
-		await expect(page).toHaveURL(orgUrl!);
+		await expect(page).toHaveURL(orgUrl);
 
 		// Verify we're on the correct organization page and can now follow
 		await expect(followButton).toBeVisible();

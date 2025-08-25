@@ -14,12 +14,12 @@ export const POST: RequestHandler = async ({ platform, request }) => {
 	// if (!import.meta.env.DEV) throw error(403, 'Forbidden in production');
 
 	try {
-		const body = (await request.json().catch(() => ({}))) as Record<string, any>;
+		const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
 		const options: SeedOptions = {
-			numOrgs: body.numOrgs,
-			numUsers: body.numUsers,
-			numEventsPerOrg: body.numEventsPerOrg,
-			numSessions: body.numSessions
+			numOrgs: typeof body.numOrgs === 'number' ? body.numOrgs : undefined,
+			numUsers: typeof body.numUsers === 'number' ? body.numUsers : undefined,
+			numEventsPerOrg: typeof body.numEventsPerOrg === 'number' ? body.numEventsPerOrg : undefined,
+			numSessions: typeof body.numSessions === 'number' ? body.numSessions : undefined
 		};
 		await seedDatabase(platform, options);
 	} catch (error) {
