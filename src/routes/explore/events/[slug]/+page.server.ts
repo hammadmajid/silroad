@@ -52,10 +52,7 @@ export const actions: Actions = {
 		const eventRepo = new EventRepo(platform);
 
 		if (!locals.user) {
-			throw redirect(
-				303,
-				handleLoginRedirect(event, 'You must be logged in to RSVP to events')
-			);
+			throw redirect(303, handleLoginRedirect(event, 'You must be logged in to RSVP to events'));
 		}
 
 		try {
@@ -66,7 +63,12 @@ export const actions: Actions = {
 				throw error(400, 'Invalid ID');
 			}
 
-			await eventRepo.toggleAttendance(locals.user.id, eventId);
+			const result = await eventRepo.toggleAttendance(locals.user.id, eventId);
+
+			if (result === null) {
+				logger.error('toggleAttendance action', 'toggleAttendance', 'Failed to toggle attendance');
+				throw error(500, 'Unable to update attendance status');
+			}
 
 			return { success: true };
 		} catch (err) {

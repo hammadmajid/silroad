@@ -352,9 +352,9 @@ export class EventRepo {
 	 * If the user is not attending, adds them to the event.
 	 * @param userId - User UUID who is toggling attendance
 	 * @param eventId - Event UUID to join/leave
-	 * @throws Error if database operation fails
+	 * @returns 'joined' | 'left' on success, null on error
 	 */
-	async toggleAttendance(userId: string, eventId: string): Promise<'joined' | 'left'> {
+	async toggleAttendance(userId: string, eventId: string): Promise<'joined' | 'left' | null> {
 		try {
 			// Try removing first and check if something was removed
 			const removed = await this.db
@@ -372,11 +372,16 @@ export class EventRepo {
 				return 'joined';
 			}
 
-			// If addAttendee failed (e.g., event full, RSVP closed), throw error
-			throw new Error('Unable to join event - it may be full or RSVP may be closed');
+			// If addAttendee failed (e.g., event full, RSVP closed), log and return null
+			this.logger.error(
+				'EventRepo',
+				'toggleAttendance',
+				'Unable to join event - it may be full or RSVP may be closed'
+			);
+			return null;
 		} catch (error) {
 			this.logger.error('EventRepo', 'toggleAttendance', error);
-			throw error;
+			return null;
 		}
 	}
 

@@ -379,7 +379,7 @@ describe('EventRepo - Attendee Management', () => {
 			expect(mockAddAttendee).toHaveBeenCalledWith('event-1', 'user-1');
 		});
 
-		it('should throw error if unable to join event (e.g., event full)', async () => {
+		it('should return null if unable to join event (e.g., event full)', async () => {
 			// Mock delete returns nothing -> user wasn't attending
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
@@ -388,19 +388,20 @@ describe('EventRepo - Attendee Management', () => {
 			// Mock failed addAttendee (e.g., event is full)
 			const mockAddAttendee = vi.spyOn(eventRepo, 'addAttendee').mockResolvedValue(false);
 
-			await expect(eventRepo.toggleAttendance('user-1', 'event-1')).rejects.toThrow(
-				'Unable to join event - it may be full or RSVP may be closed'
-			);
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe(null);
+			expect(mockAddAttendee).toHaveBeenCalledWith('event-1', 'user-1');
 		});
 
-		it('should throw error if delete operation fails', async () => {
+		it('should return null if delete operation fails', async () => {
 			mockDb.delete.mockReturnValue(mockDb);
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.returning.mockRejectedValueOnce(new Error('Database error'));
 
-			await expect(eventRepo.toggleAttendance('user-1', 'event-1')).rejects.toThrow(
-				'Database error'
-			);
+			const result = await eventRepo.toggleAttendance('user-1', 'event-1');
+
+			expect(result).toBe(null);
 		});
 	});
 });
