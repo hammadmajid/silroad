@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 import { faker } from '@faker-js/faker';
-import type { Page } from '@playwright/test';
 import { loginTestUser } from './utils/auth-helpers.js';
 
 test.describe('Profile Settings Page', () => {
