@@ -6,7 +6,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
 import { UserRepo } from '$lib/repos/user';
 import { generateSalt, hashPassword } from '$lib/utils/crypto';
-import { isProduction } from '$lib/utils/env';
+import { getPublicTurnstileKey, getSecretTurnstileKey, isProduction } from '$lib/utils/env';
+import { validateToken } from '$lib/server/turnstile';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
 	// Note: We still check locals.user for server-side redirect
@@ -17,6 +18,7 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 
 	return {
 		isProd: isProduction(platform),
+		publicTurnstileKey: getPublicTurnstileKey(platform),
 		form: await superValidate(zod4(schema))
 	};
 };
@@ -32,6 +34,13 @@ export const actions = {
 		}
 
 		const { firstName, lastName, email, password } = form.data;
+		const token = form.data['cf-turnstile-response'];
+		const secret = getSecretTurnstileKey(platform);
+
+		const { success } = await validateToken(token, secret);
+		if (!success) {
+			return message(form, 'Invalid captcha');
+		}
 
 		// Always hash password to prevent timing attack
 		const salt = generateSalt();
