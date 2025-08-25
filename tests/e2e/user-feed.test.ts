@@ -1,37 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { faker } from '@faker-js/faker';
 import type { Page } from '@playwright/test';
+import { loginTestUser } from './utils/auth-helpers.js';
 
 test.describe('User Feed with Followed Organizations', () => {
-	// Helper function to create and login a test user
-	async function createAndLoginTestUser(page: Page) {
-		const testUser = {
-			firstName: faker.person.firstName(),
-			lastName: faker.person.lastName(),
-			email: faker.internet.email(),
-			password: 'TestPass123'
-		};
-
-		// Register the user
-		await page.goto('/register');
-		await page.getByTestId('first-name-input').fill(testUser.firstName);
-		await page.getByTestId('last-name-input').fill(testUser.lastName);
-		await page.getByTestId('email-input').fill(testUser.email);
-		await page.getByTestId('password-input').fill(testUser.password);
-		await page.getByTestId('terms-checkbox').check();
-		await page.getByTestId('register-submit-btn').click();
-
-		// Wait for registration to complete
-		await expect(page).toHaveURL('/');
-
-		return testUser;
-	}
-
 	test('should show events from followed organizations in recommended section', async ({
 		page
 	}) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore organizations page to find an organization to follow
 		await page.goto('/explore/orgs');
@@ -77,8 +53,8 @@ test.describe('User Feed with Followed Organizations', () => {
 	});
 
 	test('should show empty state when no followed organizations have events', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to home page (user follows no organizations)
 		await page.goto('/');
@@ -114,8 +90,8 @@ test.describe('User Feed with Followed Organizations', () => {
 	// });
 
 	test('should show empty state for upcoming events when user has no RSVPs', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to home page
 		await page.goto('/');
@@ -130,8 +106,8 @@ test.describe('User Feed with Followed Organizations', () => {
 	});
 
 	test('should show correct time-based greeting', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to home page
 		await page.goto('/');
