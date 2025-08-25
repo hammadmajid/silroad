@@ -27,13 +27,6 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 		return testUser;
 	}
 
-	// Seed database before all tests
-	test.beforeAll(async () => {
-		await fetch('http://localhost:8787/api/dev/seed', {
-			method: 'POST'
-		});
-	});
-
 	test('should follow an organization successfully', async ({ page }) => {
 		// Setup: Create and login user
 		await createAndLoginTestUser(page);

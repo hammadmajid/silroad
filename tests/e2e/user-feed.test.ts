@@ -27,18 +27,9 @@ test.describe('User Feed with Followed Organizations', () => {
 		return testUser;
 	}
 
-	async function seedDatabase(page: Page) {
-		const response = await page.request.post('/api/dev/seed');
-		expect(response.status()).toBe(200);
-		await page.waitForTimeout(1000); // Give database time to process
-	}
-
 	test('should show events from followed organizations in recommended section', async ({
 		page
 	}) => {
-		// Setup: Create organization with events
-		await seedDatabase(page);
-
 		// Setup: Create and login user
 		await createAndLoginTestUser(page);
 

@@ -27,13 +27,6 @@ test.describe('Event Join Functionality', () => {
 		return testUser;
 	}
 
-	// Seed database before all tests
-	test.beforeAll(async () => {
-		await fetch('http://localhost:8787/api/dev/seed', {
-			method: 'POST'
-		});
-	});
-
 	test('should join an event successfully', async ({ page }) => {
 		// Setup: Create and login user
 		await createAndLoginTestUser(page);
