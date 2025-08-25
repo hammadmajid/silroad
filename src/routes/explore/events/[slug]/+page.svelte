@@ -9,7 +9,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import { enhance } from '$app/forms';
-	
+
 	let { data } = $props();
 
 	const { event, attendeeCount, organizers, isAttending } = data;
