@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { faker } from '@faker-js/faker';
 import type { Page } from '@playwright/test';
 
 /**
@@ -7,17 +8,35 @@ import type { Page } from '@playwright/test';
  * @returns Promise with user info for tests that need it
  */
 export async function loginTestUser(page: Page) {
-	await page.goto('/login');
-	await page.getByTestId('email-input').fill('u@test.it');
-	await page.getByTestId('password-input').fill('Pass!234');
-	await page.getByTestId('login-submit-btn').click();
+	// Generate unique user data
+	const firstName = faker.person.firstName();
+	const lastName = faker.person.lastName();
+	const email = faker.internet.email();
+	const password = 'TestPass123';
 
-	// Wait for login to complete
+	// Register the user
+	await page.goto('/register');
+	await page.getByTestId('first-name-input').fill(firstName);
+	await page.getByTestId('last-name-input').fill(lastName);
+	await page.getByTestId('email-input').fill(email);
+	await page.getByTestId('password-input').fill(password);
+	await page.getByTestId('terms-checkbox').check();
+	await page.getByTestId('register-submit-btn').click();
+	await expect(page).toHaveURL('/');
+
+	// Log in (if not already authenticated)
+	// Optionally, you could skip this if registration auto-logs in
+	// But for consistency, clear cookies and log in again
+	await page.context().clearCookies();
+	await page.goto('/login');
+	await page.getByTestId('email-input').fill(email);
+	await page.getByTestId('password-input').fill(password);
+	await page.getByTestId('login-submit-btn').click();
 	await expect(page).toHaveURL('/');
 
 	// Return user info for tests that need it
 	return {
-		email: 'u@test.it',
-		fullName: 'Test User' // This should match what's in the seed data
+		email,
+		fullName: `${firstName} ${lastName}`
 	};
 }
