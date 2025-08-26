@@ -71,7 +71,7 @@
 					</div>
 				{:else}
 					<div class="py-8 text-center">
-						<p class="text-surface-500">You're not attending any upcoming events.</p>
+						<p class="text-surface-500">You're not attending any upcoming events</p>
 						<a href="/explore/events" class="variant-filled-primary mt-4 btn"> Explore Events </a>
 					</div>
 				{/if}
@@ -80,7 +80,7 @@
 			{/await}
 		{:else}
 			<div class="py-8 text-center">
-				<p class="text-surface-500">You're not attending any upcoming events.</p>
+				<p class="text-surface-500">You're not attending any upcoming events</p>
 				<a href="/explore/events" class="variant-filled-primary mt-4 btn"> Explore Events </a>
 			</div>
 		{/if}
@@ -130,7 +130,7 @@
 					</div>
 				{:else}
 					<div class="space-y-2 py-8 text-center">
-						<p class="text-surface-600-300">No events from organizations you follow.</p>
+						<p class="text-surface-600-300">No events from organizations you follow</p>
 						<a href="/explore/orgs" class="btn preset-filled-secondary-50-950">
 							Explore Organizations
 						</a>
@@ -143,7 +143,7 @@
 			{/await}
 		{:else}
 			<div class="space-y-2 py-8 text-center">
-				<p class="text-surface-600-300">No events from organizations you follow.</p>
+				<p class="text-surface-600-300">No events from organizations you follow</p>
 				<a href="/explore/orgs" class="btn preset-filled-secondary-50-950">
 					Explore Organizations
 				</a>

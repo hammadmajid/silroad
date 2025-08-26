@@ -113,13 +113,13 @@
 			>
 				{#if isSubmitting}
 					<Loader2 class="animate-spin" />
-					<span> Loading... </span>
+					<span>Loading...</span>
 				{:else if localIsFollowing}
 					<Check />
-					<span> Unfollow </span>
+					<span>Unfollow</span>
 				{:else}
 					<Plus />
-					<span> Follow </span>
+					<span>Follow</span>
 				{/if}
 			</button>
 		</form>
