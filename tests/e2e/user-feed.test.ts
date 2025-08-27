@@ -67,27 +67,6 @@ test.describe('User Feed with Followed Organizations', () => {
 		await expect(page.getByRole('link', { name: 'Explore Organizations' })).toBeVisible();
 	});
 
-	// TODO: RSVP login not implemented yet
-	// test('should show user upcoming events section when user has RSVPs', async ({ page }) => {
-	// 	// Setup: Create and login user
-	// 	await createAndLoginTestUser(page);
-
-	// 	// RSVP to an event
-	// 	// select a random event from /explore/events page
-	// 	const rsvpButton = page.getByTestId('rsvp-btn');
-	// 	if (await rsvpButton.isVisible()) {
-	// 		await rsvpButton.click();
-	// 		await page.waitForLoadState('networkidle');
-	// 	}
-
-	// 	// Navigate to home page
-	// 	await page.goto('/');
-
-	// 	// Verify upcoming events section shows the event user is attending
-	// 	const upcomingSection = page.locator('section:has-text("Your Upcoming Events")');
-	// 	await expect(upcomingSection).toBeVisible();
-	// });
-
 	test('should show empty state for upcoming events when user has no RSVPs', async ({ page }) => {
 		// Setup: Login with pre-seeded user
 		await loginTestUser(page);
