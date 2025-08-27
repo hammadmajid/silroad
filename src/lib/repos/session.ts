@@ -138,23 +138,25 @@ export class SessionRepo {
 		}
 	}
 	/**
-	 * Updates session data in KV cache.
+	 * Updates session data in KV cache for a specific session token.
+	 * @param sessionToken - Session token identifying which session to update
 	 * @param session - Updated session data
-	 * @returns Updated session data or null if not found
+	 * @returns Updated session data or null if session token not found
 	 */
-	async update(session: SerializableSession): Promise<SerializableSession | null> {
+	async update(sessionToken: string, session: SerializableSession): Promise<SerializableSession | null> {
 		try {
-			const sessionToken = await this.db
+			// Verify the session exists in the DB for the provided token
+			const existing = await this.db
 				.select({ sessionToken: sessions.sessionToken })
 				.from(sessions)
-				.where(eq(sessions.userId, session.userId))
+				.where(eq(sessions.sessionToken, sessionToken))
 				.limit(1);
 
-			if (!sessionToken[0]) {
+			if (!existing[0]) {
 				return null;
 			}
 
-			await this.kv.put(sessionToken[0].sessionToken, JSON.stringify(session));
+			await this.kv.put(sessionToken, JSON.stringify(session));
 			return session;
 		} catch (error) {
 			this.logger.error('SessionRepo', 'update', error);
