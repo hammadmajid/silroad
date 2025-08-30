@@ -15,17 +15,25 @@
 	data-testid="org-card"
 >
 	{#snippet header()}
-		{#if org.avatar}
-			<img
-				src={org.avatar}
-				alt={org.description}
-				class="aspect-[21/9] w-full rounded-lg object-cover"
-			/>
-		{/if}
+		<div class="relative w-full">
+			{#if org.backgroundImage}
+				<img
+					src={org.backgroundImage}
+					alt={`${org.name} background`}
+					class="aspect-[21/9] w-full rounded-lg object-cover"
+				/>
+			{/if}
+			{#if org.avatar}
+				<img
+					src={org.avatar}
+					alt={`${org.name} avatar`}
+					class="absolute bottom-2 left-2 h-20 w-20 rounded-full border-2 border-surface-100-900 object-cover bg-surface-100-900"
+				/>
+			{/if}
+		</div>
 	{/snippet}
 
 	<div class="space-y-2">
-		<h2 class="h6 text-primary-500">Organization</h2>
 		<h3 class="h3">{org.name}</h3>
 	</div>
 	<p class="text-surface-600-300">
