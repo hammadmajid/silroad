@@ -7,13 +7,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const session = sessionToken ? await repo.getByToken(sessionToken) : null;
 
-	if (session) {
+	if (session && sessionToken) {
 		event.locals.user = {
 			id: session.userId,
 			image: session.userImage
 		};
 
-		repo.refresh(sessionToken!, session);
+		event.platform?.ctx.waitUntil(repo.refresh(sessionToken, session))
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {

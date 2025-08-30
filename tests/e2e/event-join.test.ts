@@ -1,42 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { faker } from '@faker-js/faker';
-import type { Page } from '@playwright/test';
+import { loginTestUser } from './utils/auth-helpers.js';
 
 test.describe('Event Join Functionality', () => {
-	// Helper function to create and login a test user
-	async function createAndLoginTestUser(page: Page) {
-		const testUser = {
-			firstName: faker.person.firstName(),
-			lastName: faker.person.lastName(),
-			email: faker.internet.email(),
-			password: 'TestPass123'
-		};
-
-		// Register the user
-		await page.goto('/register');
-		await page.getByTestId('first-name-input').fill(testUser.firstName);
-		await page.getByTestId('last-name-input').fill(testUser.lastName);
-		await page.getByTestId('email-input').fill(testUser.email);
-		await page.getByTestId('password-input').fill(testUser.password);
-		await page.getByTestId('terms-checkbox').check();
-		await page.getByTestId('register-submit-btn').click();
-
-		// Wait for registration to complete
-		await expect(page).toHaveURL('/');
-
-		return testUser;
-	}
-
-	// Seed database before all tests
-	test.beforeAll(async () => {
-		await fetch('http://localhost:8787/api/dev/seed', {
-			method: 'POST'
-		});
-	});
-
 	test('should join an event successfully', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore events page to find an event to join
 		await page.goto('/explore/events');
@@ -70,8 +38,8 @@ test.describe('Event Join Functionality', () => {
 	});
 
 	test('should leave an event successfully', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore events page to find an event to join first
 		await page.goto('/explore/events');
@@ -102,8 +70,8 @@ test.describe('Event Join Functionality', () => {
 	});
 
 	test('should persist attendance status across page reloads', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore events page to find an event
 		await page.goto('/explore/events');

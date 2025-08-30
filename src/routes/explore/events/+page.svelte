@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
-	import Card from '$lib/components/Card.svelte';
+	import EventCard from '$lib/components/EventCard.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	// Icons
@@ -32,28 +32,7 @@
 	<section class="space-y-8">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.events as event (event.id)}
-				<Card variant="interactive" href="/explore/events/{event.slug}" padding="">
-					{#snippet header()}
-						<img
-							src={event.image}
-							alt={event.description}
-							class="aspect-[21/9] w-full rounded-lg object-cover"
-						/>
-					{/snippet}
-
-					<div class="space-y-2">
-						<h2 class="h6 text-primary-500">Event</h2>
-						<h3 class="h3">{event.title}</h3>
-					</div>
-					<p class="text-surface-600-300">
-						{event.description}
-					</p>
-
-					{#snippet footer()}
-						<small class="text-surface-600-300">Learn more</small>
-						<small class="text-surface-600-300">→</small>
-					{/snippet}
-				</Card>
+				<EventCard event={event} />
 			{/each}
 		</div>
 

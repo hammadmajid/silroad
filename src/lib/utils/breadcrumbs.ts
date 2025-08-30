@@ -1,12 +1,18 @@
 import type { Page } from '@sveltejs/kit';
+import type { Event, Organization } from '$lib/types';
 
 export interface BreadcrumbItem {
 	label: string;
 	href?: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function generateBreadcrumbs(page: Page, pageData?: Record<string, any>): BreadcrumbItem[] {
+interface BreadcrumbPageData {
+	event?: Event;
+	organization?: Organization;
+	[key: string]: unknown;
+}
+
+export function generateBreadcrumbs(page: Page, pageData?: BreadcrumbPageData): BreadcrumbItem[] {
 	const { pathname } = page.url;
 	const segments = pathname.split('/').filter(Boolean);
 	const breadcrumbs: BreadcrumbItem[] = [];

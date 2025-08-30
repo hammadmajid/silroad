@@ -106,10 +106,19 @@ async function assignOrganizationMembers(
 ) {
 	const members = users
 		.slice(0, Math.min(users.length, organizations.length * 2))
-		.map((user, i) => ({
-			userId: user.id!,
-			organizationId: organizations[i % organizations.length].id!
-		}));
+		.map((user, i) => {
+			const userId = user.id;
+			const organizationId = organizations[i % organizations.length].id;
+
+			if (!userId || !organizationId) {
+				throw new Error('User ID or Organization ID is missing');
+			}
+
+			return {
+				userId,
+				organizationId
+			};
+		});
 
 	if (members.length > 0) {
 		await db.insert(schema.organizationMembers).values(members).run();
@@ -125,6 +134,11 @@ async function createEvents(
 	const events = [];
 
 	for (const org of organizations) {
+		const organizationId = org.id;
+		if (!organizationId) {
+			throw new Error('Organization ID is missing');
+		}
+
 		for (let i = 0; i < eventsPerOrg; i++) {
 			const isPast = i % 2 === 1;
 			const daysOffset = isPast ? -(i + 1) * 7 : (i + 1) * 7;
@@ -139,7 +153,7 @@ async function createEvents(
 				closeRsvpAt: new Date(now + rsvpOffset * 24 * 60 * 60 * 1000),
 				maxAttendees: 20 + Math.floor(Math.random() * 30),
 				image: getRandomImage('events'),
-				organizationId: org.id!
+				organizationId
 			});
 		}
 	}
@@ -153,17 +167,38 @@ async function assignEventOrganizersAndAttendees(
 	events: (typeof schema.events.$inferInsert)[],
 	users: (typeof schema.users.$inferInsert)[]
 ) {
-	const organizers = events.map((event, i) => ({
-		eventId: event.id!,
-		userId: users[i % users.length].id!
-	}));
+	const organizers = events.map((event, i) => {
+		const eventId = event.id;
+		const userId = users[i % users.length].id;
 
-	const attendees = events.flatMap((event) =>
-		users.slice(0, Math.min(3, users.length)).map((user) => ({
-			eventId: event.id!,
-			userId: user.id!
-		}))
-	);
+		if (!eventId || !userId) {
+			throw new Error('Event ID or User ID is missing for organizer');
+		}
+
+		return {
+			eventId,
+			userId
+		};
+	});
+
+	const attendees = events.flatMap((event) => {
+		const eventId = event.id;
+		if (!eventId) {
+			throw new Error('Event ID is missing for attendee');
+		}
+
+		return users.slice(0, Math.min(3, users.length)).map((user) => {
+			const userId = user.id;
+			if (!userId) {
+				throw new Error('User ID is missing for attendee');
+			}
+
+			return {
+				eventId,
+				userId
+			};
+		});
+	});
 
 	if (organizers.length > 0) {
 		await db.insert(schema.eventOrganizers).values(organizers).run();
@@ -178,11 +213,18 @@ async function createSessions(
 	users: (typeof schema.users.$inferInsert)[],
 	count: number
 ) {
-	const sessions = users.slice(0, Math.min(count, users.length)).map((user) => ({
-		userId: user.id!,
-		sessionToken: generateSessionToken(),
-		expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-	}));
+	const sessions = users.slice(0, Math.min(count, users.length)).map((user) => {
+		const userId = user.id;
+		if (!userId) {
+			throw new Error('User ID is missing for session');
+		}
+
+		return {
+			userId,
+			sessionToken: generateSessionToken(),
+			expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+		};
+	});
 
 	if (sessions.length > 0) {
 		await db.insert(schema.sessions).values(sessions).run();

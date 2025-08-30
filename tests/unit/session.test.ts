@@ -14,11 +14,8 @@ vi.mock('$lib/utils/crypto', () => ({
 
 describe('SessionRepo', () => {
 	let sessionRepo: SessionRepo;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockDb: any;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockKV: any;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let mockLogger: any;
 
 	beforeEach(async () => {
@@ -241,7 +238,7 @@ describe('SessionRepo', () => {
 			mockDb.limit.mockResolvedValue([{ sessionToken: 'token123' }]);
 			mockKV.put.mockResolvedValue(undefined);
 
-			const result = await sessionRepo.update(session);
+			const result = await sessionRepo.update('token123', session);
 
 			expect(result).toEqual(session);
 			expect(mockKV.put).toHaveBeenCalledWith('token123', JSON.stringify(session));
@@ -259,7 +256,7 @@ describe('SessionRepo', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.limit.mockResolvedValue([]);
 
-			const result = await sessionRepo.update(session);
+			const result = await sessionRepo.update('token123', session);
 
 			expect(result).toBeNull();
 		});
@@ -276,7 +273,7 @@ describe('SessionRepo', () => {
 			mockDb.where.mockReturnValue(mockDb);
 			mockDb.limit.mockRejectedValue(new Error('Database error'));
 
-			const result = await sessionRepo.update(session);
+			const result = await sessionRepo.update('token123', session);
 
 			expect(result).toBeNull();
 			expect(mockLogger.writeDataPoint).toHaveBeenCalledWith({

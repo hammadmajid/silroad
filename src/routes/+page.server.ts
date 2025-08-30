@@ -1,5 +1,4 @@
 import { EventRepo } from '$lib/repos/events';
-import { OrganizationRepo } from '$lib/repos/orgs';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {

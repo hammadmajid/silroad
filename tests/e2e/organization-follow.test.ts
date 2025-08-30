@@ -1,42 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { faker } from '@faker-js/faker';
-import type { Page } from '@playwright/test';
+import { loginTestUser } from './utils/auth-helpers.js';
 
 test.describe('Organization Follow/Unfollow Workflow', () => {
-	// Helper function to create and login a test user
-	async function createAndLoginTestUser(page: Page) {
-		const testUser = {
-			firstName: faker.person.firstName(),
-			lastName: faker.person.lastName(),
-			email: faker.internet.email(),
-			password: 'TestPass123'
-		};
-
-		// Register the user
-		await page.goto('/register');
-		await page.getByTestId('first-name-input').fill(testUser.firstName);
-		await page.getByTestId('last-name-input').fill(testUser.lastName);
-		await page.getByTestId('email-input').fill(testUser.email);
-		await page.getByTestId('password-input').fill(testUser.password);
-		await page.getByTestId('terms-checkbox').check();
-		await page.getByTestId('register-submit-btn').click();
-
-		// Wait for registration to complete
-		await expect(page).toHaveURL('/');
-
-		return testUser;
-	}
-
-	// Seed database before all tests
-	test.beforeAll(async () => {
-		await fetch('http://localhost:8787/api/dev/seed', {
-			method: 'POST'
-		});
-	});
-
 	test('should follow an organization successfully', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore organizations page to find an organization to follow
 		await page.goto('/explore/orgs');
@@ -70,8 +38,8 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 	});
 
 	test('should unfollow an organization successfully', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore organizations page to find an organization to follow
 		await page.goto('/explore/orgs');
@@ -102,8 +70,8 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 	});
 
 	test('should persist follow status across page reloads', async ({ page }) => {
-		// Setup: Create and login user
-		await createAndLoginTestUser(page);
+		// Setup: Login with pre-seeded user
+		await loginTestUser(page);
 
 		// Navigate to explore organizations page to find an organization to follow
 		await page.goto('/explore/orgs');
@@ -143,9 +111,10 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 
 		// Get the org URL to test redirect preservation
 		const orgUrl = await firstOrgCard.getAttribute('href');
+		if (!orgUrl) throw new Error('Organization URL not found');
 
 		// Navigate directly to the organization page while not logged in
-		await page.goto(orgUrl!);
+		await page.goto(orgUrl);
 		await page.waitForLoadState('networkidle');
 
 		// Try to click the follow button without being logged in
@@ -156,7 +125,7 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 		// Expected error message
 		const errMsg = 'You must be logged in to follow organizations';
 		// Should be redirected to login page with redirectTo parameter and error message
-		const expectedRedirectUrl = `/login?redirectTo=${encodeURIComponent(orgUrl!)}&msg=${encodeURIComponent(errMsg)}`;
+		const expectedRedirectUrl = `/login?redirectTo=${encodeURIComponent(orgUrl)}&msg=${encodeURIComponent(errMsg)}`;
 		await expect(page).toHaveURL(
 			new RegExp(expectedRedirectUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
 		);
@@ -173,7 +142,7 @@ test.describe('Organization Follow/Unfollow Workflow', () => {
 		await page.getByTestId('login-submit-btn').click();
 
 		// Should be redirected back to the original organization page
-		await expect(page).toHaveURL(orgUrl!);
+		await expect(page).toHaveURL(orgUrl);
 
 		// Verify we're on the correct organization page and can now follow
 		await expect(followButton).toBeVisible();
