@@ -25,7 +25,6 @@
 	{/snippet}
 
 	<div class="space-y-2">
-		<h2 class="h6 text-primary-500">Event</h2>
 		<h3 class="h3">{event.title}</h3>
 	</div>
 	<p class="text-surface-600-300">
