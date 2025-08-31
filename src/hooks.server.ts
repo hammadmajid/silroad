@@ -13,7 +13,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			image: session.userImage
 		};
 
-		event.platform?.ctx.waitUntil(repo.refresh(sessionToken, session))
+		event.platform?.ctx.waitUntil(repo.refresh(sessionToken, session));
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {

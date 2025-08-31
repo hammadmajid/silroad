@@ -6,9 +6,7 @@ export const POST = async ({ cookies, platform }) => {
 	const kv = getKV(platform);
 
 	if (token && platform) {
-		platform.ctx.waitUntil(
-			kv.delete(token)
-		);
+		platform.ctx.waitUntil(kv.delete(token));
 	}
 
 	cookies.delete(SESSION_COOKIE_NAME, { path: '/' });

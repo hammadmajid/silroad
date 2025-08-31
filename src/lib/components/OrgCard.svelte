@@ -9,11 +9,7 @@
 	let { org }: Props = $props();
 </script>
 
-<Card
-	variant="interactive"
-	href={`/explore/orgs/${org.slug}`}
-	data-testid="org-card"
->
+<Card variant="interactive" href={`/explore/orgs/${org.slug}`} data-testid="org-card">
 	{#snippet header()}
 		<div class="relative w-full">
 			{#if org.backgroundImage}
@@ -27,7 +23,7 @@
 				<img
 					src={org.avatar}
 					alt={`${org.name} avatar`}
-					class="absolute bottom-2 left-2 h-20 w-20 rounded-full border-2 border-surface-100-900 object-cover bg-surface-100-900"
+					class="absolute bottom-2 left-2 h-20 w-20 rounded-full border-2 border-surface-100-900 bg-surface-100-900 object-cover"
 				/>
 			{/if}
 		</div>
@@ -45,5 +41,3 @@
 		<small class="text-surface-600-300">→</small>
 	{/snippet}
 </Card>
-
-

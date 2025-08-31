@@ -143,7 +143,10 @@ export class SessionRepo {
 	 * @param session - Updated session data
 	 * @returns Updated session data or null if session token not found
 	 */
-	async update(sessionToken: string, session: SerializableSession): Promise<SerializableSession | null> {
+	async update(
+		sessionToken: string,
+		session: SerializableSession
+	): Promise<SerializableSession | null> {
 		try {
 			// Verify the session exists in the DB for the provided token
 			const existing = await this.db

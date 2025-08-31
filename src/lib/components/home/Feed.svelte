@@ -41,7 +41,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
@@ -75,7 +75,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
@@ -115,7 +115,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
