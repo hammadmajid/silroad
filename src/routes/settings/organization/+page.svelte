@@ -18,7 +18,9 @@
 					<p class="text-surface-600-300-token">
 						Organizations help you collaborate with team members.
 					</p>
-					<button class="btn preset-filled-primary-500"> Create New Organization </button>
+					<a href="/settings/organization/create" class="btn preset-filled-primary-500">
+						Create New Organization
+					</a>
 				</div>
 			</div>
 
