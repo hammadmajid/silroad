@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import OrgCard from '$lib/components/OrgCard.svelte';
-	import Loading from '$lib/components/Loading.svelte';
 	import Badge from '$lib/components/Badge.svelte';
 
 	let { data } = $props();
@@ -55,12 +54,12 @@
 								</div>
 								<div class="flex gap-2">
 									<a
-										href="/org/{data.ownedOrganization.slug}"
+										href="/orgs/{data.ownedOrganization.slug}"
 										class="btn preset-outlined-surface-500"
 									>
 										View Profile
 									</a>
-									<a href="/settings/organization/edit" class="btn preset-filled-primary-500">
+									<a href="/manage/edit" class="btn preset-filled-primary-500">
 										Edit Organization
 									</a>
 								</div>
@@ -76,7 +75,7 @@
 						<p class="text-surface-600-300-token">
 							Organizations help you collaborate with team members and host events together.
 						</p>
-						<a href="/settings/organization/create" class="btn preset-filled-primary-500">
+						<a href="/manage/org/create" class="btn preset-filled-primary-500">
 							Create New Organization
 						</a>
 					</div>
@@ -124,7 +123,7 @@
 
 					{#if data.ownedOrganization}
 						<a
-							href="/settings/organization/members"
+							href="/manage/members"
 							class="border-surface-300-600-token hover:bg-surface-100-800-token rounded-lg border p-4 transition-colors"
 						>
 							<h3 class="mb-2 font-semibold">Manage Members</h3>
@@ -134,7 +133,7 @@
 						</a>
 
 						<a
-							href="/settings/organization/events"
+							href="/manage/events"
 							class="border-surface-300-600-token hover:bg-surface-100-800-token rounded-lg border p-4 transition-colors"
 						>
 							<h3 class="mb-2 font-semibold">Manage Events</h3>
