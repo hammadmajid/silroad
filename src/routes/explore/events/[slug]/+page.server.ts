@@ -70,6 +70,13 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		isAttending = attendingResult.length > 0;
 	}
 
+	// Determine if user can RSVP
+	const now = new Date();
+	const isRsvpOpen = event.closeRsvpAt ? now < event.closeRsvpAt : true;
+	const isEventFull = event.maxAttendees
+		? (eventWithCount?.attendeeCount || 0) >= event.maxAttendees
+		: false;
+
 	return {
 		event: {
 			...event,
@@ -79,7 +86,9 @@ export const load: PageServerLoad = async ({ params, platform, locals }) => {
 		},
 		attendeeCount: eventWithCount?.attendeeCount || 0,
 		organizers,
-		isAttending
+		isAttending,
+		isRsvpOpen,
+		isEventFull
 	};
 };
 
@@ -97,8 +106,8 @@ export const actions: Actions = {
 			const formData = await request.formData();
 			const eventId = formData.get('eventId') as string;
 
-			if (!eventId || !locals.user) {
-				throw error(400, 'Invalid ID');
+			if (!eventId) {
+				throw error(400, 'Invalid event ID');
 			}
 
 			// Toggle attendance logic - try removing first
@@ -107,43 +116,10 @@ export const actions: Actions = {
 				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, locals.user.id)))
 				.returning({ id: attendees.eventId });
 
-			if (deleted.length > 0) {
-				// User was attending, now removed
-				return { success: true };
+			if (deleted.length === 0) {
+				// User was not attending, add them
+				await db.insert(attendees).values({ eventId, userId: locals.user.id });
 			}
-
-			// User was not attending, try to add them
-			// First check if event exists and get event details
-			const eventResult = await db.select().from(events).where(eq(events.id, eventId)).limit(1);
-			const eventData = eventResult[0];
-
-			if (!eventData) {
-				logger.error('toggleAttendance action', 'toggleAttendance', 'Event not found');
-				throw error(400, 'Event not found');
-			}
-
-			// Check if RSVP is still open
-			if (eventData.closeRsvpAt && new Date() > eventData.closeRsvpAt) {
-				logger.error('toggleAttendance action', 'toggleAttendance', 'RSVP is closed');
-				throw error(400, 'RSVP is closed for this event');
-			}
-
-			// Check capacity if maxAttendees is set
-			if (eventData.maxAttendees !== null) {
-				const attendeeCountResult = await db
-					.select({ count: count() })
-					.from(attendees)
-					.where(eq(attendees.eventId, eventId));
-
-				const currentCount = attendeeCountResult[0]?.count ?? 0;
-				if (currentCount >= eventData.maxAttendees) {
-					logger.error('toggleAttendance action', 'toggleAttendance', 'Event is full');
-					throw error(400, 'Event is full');
-				}
-			}
-
-			// Add attendee
-			await db.insert(attendees).values({ eventId, userId: locals.user.id });
 
 			return { success: true };
 		} catch (err) {
