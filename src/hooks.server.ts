@@ -1,10 +1,6 @@
 import { type Handle } from '@sveltejs/kit';
 import { SESSION_COOKIE_NAME, getSessionByToken, refreshSession } from '$lib/utils/session';
 
-async function sessionRefresh(event: any, sessionToken: string, session: any) {
-	return await refreshSession(event.platform, sessionToken, session);
-}
-
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(SESSION_COOKIE_NAME);
 
@@ -16,7 +12,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			image: session.userImage
 		};
 
-		event.platform?.ctx.waitUntil(sessionRefresh(event, sessionToken, session));
+		event.platform?.ctx.waitUntil(refreshSession(event.platform, sessionToken, session));
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {
