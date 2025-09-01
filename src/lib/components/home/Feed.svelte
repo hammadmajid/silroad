@@ -41,7 +41,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
@@ -50,7 +50,7 @@
 						<a href="/explore/events" class="variant-filled-primary mt-4 btn"> Explore Events </a>
 					</div>
 				{/if}
-			{:catch err}
+			{:catch _err}
 				<div class="py-4 text-center text-error-500">Failed to load upcoming events.</div>
 			{/await}
 		{:else}
@@ -75,7 +75,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
@@ -86,7 +86,7 @@
 						</a>
 					</div>
 				{/if}
-			{:catch err}
+			{:catch _err}
 				<div class="py-4 text-center text-error-500">
 					Failed to load events from followed organizations.
 				</div>
@@ -115,7 +115,7 @@
 				{#if events.length > 0}
 					<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 						{#each events as event (event.id)}
-							<EventCard event={event} />
+							<EventCard {event} />
 						{/each}
 					</div>
 				{:else}
@@ -123,7 +123,7 @@
 						<p class="text-surface-500">You haven't attended any events yet.</p>
 					</div>
 				{/if}
-			{:catch err}
+			{:catch _err}
 				<div class="py-4 text-center text-error-500">Failed to load past events.</div>
 			{/await}
 		{:else}

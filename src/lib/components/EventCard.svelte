@@ -9,11 +9,7 @@
 	let { event }: Props = $props();
 </script>
 
-<Card
-	variant="interactive"
-	href={`/explore/events/${event.slug}`}
-	data-testid="event-card"
->
+<Card variant="interactive" href={`/explore/events/${event.slug}`} data-testid="event-card">
 	{#snippet header()}
 		{#if event.image}
 			<img

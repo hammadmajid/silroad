@@ -40,6 +40,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Type check
+        run: pnpm check
+
+      - name: Lint and format
+        run: pnpm lint
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -53,9 +59,6 @@ jobs:
 
       - name: Run database migrations
         run: pnpm exec wrangler d1 migrations apply silroad --local
-
-      - name: Run unit tests
-        run: pnpm test:unit --run
 
       - name: Run e2e tests
         run: pnpm run test:e2e

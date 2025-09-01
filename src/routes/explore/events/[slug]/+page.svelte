@@ -12,7 +12,7 @@
 
 	let { data } = $props();
 
-	const { event, attendeeCount, organizers, isAttending } = data;
+	const { event, attendeeCount, organizers, isAttending, isRsvpOpen, isEventFull } = data;
 
 	// Local state for optimistic updates
 	let localIsAttending = $state(isAttending);
@@ -29,10 +29,6 @@
 			minute: '2-digit'
 		});
 	};
-
-	// Check if RSVP is still open
-	const isRsvpOpen = event.closeRsvpAt ? new Date(event.closeRsvpAt) > new Date() : true;
-	const isEventFull = event.maxAttendees ? attendeeCount >= event.maxAttendees : false;
 </script>
 
 <svelte:head>

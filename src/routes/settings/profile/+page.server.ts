@@ -4,8 +4,9 @@ import { redirect, fail } from '@sveltejs/kit';
 import { schema } from './schema';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { UserRepo } from '$lib/repos/user';
-import { SESSION_COOKIE_NAME } from '$lib/repos/session';
+import { getDb } from '$lib/db';
+import { users } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals, platform } = event;
@@ -15,8 +16,18 @@ export const load: PageServerLoad = async (event) => {
 		throw redirect(303, handleLoginRedirect(event));
 	}
 
-	const userRepo = new UserRepo(platform);
-	const user = await userRepo.getById(locals.user.id);
+	const db = getDb(platform);
+	const userResult = await db
+		.select({
+			id: users.id,
+			email: users.email,
+			name: users.name,
+			image: users.image
+		})
+		.from(users)
+		.where(eq(users.id, locals.user.id))
+		.limit(1);
+	const user = userResult[0];
 
 	if (!user) {
 		throw redirect(303, handleLoginRedirect(event));
@@ -36,7 +47,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, platform, locals, cookies }) => {
+	default: async ({ request, platform, locals }) => {
 		const form = await superValidate(request, zod4(schema));
 
 		if (!locals.user) {
@@ -47,28 +58,38 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const userRepo = new UserRepo(platform);
+		const db = getDb(platform);
 		const { name } = form.data;
 
 		// Get current user data
-		const currentUser = await userRepo.getById(locals.user.id);
+		const currentUserResult = await db
+			.select({
+				id: users.id,
+				email: users.email,
+				name: users.name,
+				image: users.image
+			})
+			.from(users)
+			.where(eq(users.id, locals.user.id))
+			.limit(1);
+		const currentUser = currentUserResult[0];
 		if (!currentUser) {
 			return message(form, 'User not found');
 		}
 
-		// Get session token
-		const sessionToken = cookies.get(SESSION_COOKIE_NAME);
-		if (!sessionToken) {
-			return message(form, 'Failed to update profile');
-		}
-
 		// Update user
-		const updatedUser = await userRepo.update({
-			id: locals.user.id,
-			name,
-			email: currentUser.email,
-			image: currentUser.image
-		});
+		const [updatedUser] = await db
+			.update(users)
+			.set({
+				name
+			})
+			.where(eq(users.id, locals.user.id))
+			.returning({
+				id: users.id,
+				email: users.email,
+				name: users.name,
+				image: users.image
+			});
 
 		if (!updatedUser) {
 			return message(form, 'Failed to update profile');
