@@ -1,35 +1,73 @@
-import { EventRepo } from '$lib/repos/events';
-import { OrganizationRepo } from '$lib/repos/orgs';
+import { getDb } from '$lib/db';
+import { events, organizations, attendees, eventOrganizers, users } from '$lib/db/schema';
+import { eq, count, and } from 'drizzle-orm';
 import { error, redirect } from '@sveltejs/kit';
 import { Logger } from '$lib/utils/logger';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
-	const eventRepo = new EventRepo(platform);
-	const orgRepo = new OrganizationRepo(platform);
+	const db = getDb(platform);
 	const { slug } = params;
 
 	// Get event by slug
-	const event = await eventRepo.getBySlug(slug);
+	const eventResult = await db.select().from(events).where(eq(events.slug, slug)).limit(1);
+	const event = eventResult[0];
 
 	if (!event) {
 		throw error(404, 'Event not found');
 	}
 
 	// Get organization details
-	const organization = await orgRepo.getById(event.organizationId);
+	const organizationResult = await db
+		.select()
+		.from(organizations)
+		.where(eq(organizations.id, event.organizationId))
+		.limit(1);
+	const organization = organizationResult[0];
 
 	// Get event with attendee count
-	const eventWithCount = await eventRepo.getEventWithAttendeeCount(event.id);
+	const eventWithCountResult = await db
+		.select({
+			id: events.id,
+			title: events.title,
+			slug: events.slug,
+			description: events.description,
+			dateOfEvent: events.dateOfEvent,
+			closeRsvpAt: events.closeRsvpAt,
+			maxAttendees: events.maxAttendees,
+			image: events.image,
+			organizationId: events.organizationId,
+			attendeeCount: count(attendees.userId)
+		})
+		.from(events)
+		.leftJoin(attendees, eq(events.id, attendees.eventId))
+		.where(eq(events.id, event.id))
+		.groupBy(events.id);
+	const eventWithCount = eventWithCountResult[0];
 
 	// Get organizers
-	const organizers = await eventRepo.getOrganizers(event.id);
+	const organizers = await db
+		.select({
+			id: users.id,
+			name: users.name,
+			email: users.email,
+			image: users.image
+		})
+		.from(eventOrganizers)
+		.innerJoin(users, eq(eventOrganizers.userId, users.id))
+		.where(eq(eventOrganizers.eventId, event.id))
+		.orderBy(users.name);
 
 	// Check if user is attending this event
 	let isAttending = false;
 	if (locals.user) {
-		isAttending = await eventRepo.isAttending(event.id, locals.user.id);
+		const attendingResult = await db
+			.select({ userId: attendees.userId })
+			.from(attendees)
+			.where(and(eq(attendees.eventId, event.id), eq(attendees.userId, locals.user.id)))
+			.limit(1);
+		isAttending = attendingResult.length > 0;
 	}
 
 	return {
@@ -49,7 +87,7 @@ export const actions: Actions = {
 	toggleAttendance: async (event: RequestEvent) => {
 		const { request, platform, locals } = event;
 		const logger = new Logger(platform);
-		const eventRepo = new EventRepo(platform);
+		const db = getDb(platform);
 
 		if (!locals.user) {
 			throw redirect(303, handleLoginRedirect(event, 'You must be logged in to RSVP to events'));
@@ -63,12 +101,49 @@ export const actions: Actions = {
 				throw error(400, 'Invalid ID');
 			}
 
-			const result = await eventRepo.toggleAttendance(locals.user.id, eventId);
+			// Toggle attendance logic - try removing first
+			const deleted = await db
+				.delete(attendees)
+				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, locals.user.id)))
+				.returning({ id: attendees.eventId });
 
-			if (result === null) {
-				logger.error('toggleAttendance action', 'toggleAttendance', 'Failed to toggle attendance');
-				throw error(500, 'Unable to update attendance status');
+			if (deleted.length > 0) {
+				// User was attending, now removed
+				return { success: true };
 			}
+
+			// User was not attending, try to add them
+			// First check if event exists and get event details
+			const eventResult = await db.select().from(events).where(eq(events.id, eventId)).limit(1);
+			const eventData = eventResult[0];
+
+			if (!eventData) {
+				logger.error('toggleAttendance action', 'toggleAttendance', 'Event not found');
+				throw error(400, 'Event not found');
+			}
+
+			// Check if RSVP is still open
+			if (eventData.closeRsvpAt && new Date() > eventData.closeRsvpAt) {
+				logger.error('toggleAttendance action', 'toggleAttendance', 'RSVP is closed');
+				throw error(400, 'RSVP is closed for this event');
+			}
+
+			// Check capacity if maxAttendees is set
+			if (eventData.maxAttendees !== null) {
+				const attendeeCountResult = await db
+					.select({ count: count() })
+					.from(attendees)
+					.where(eq(attendees.eventId, eventId));
+
+				const currentCount = attendeeCountResult[0]?.count ?? 0;
+				if (currentCount >= eventData.maxAttendees) {
+					logger.error('toggleAttendance action', 'toggleAttendance', 'Event is full');
+					throw error(400, 'Event is full');
+				}
+			}
+
+			// Add attendee
+			await db.insert(attendees).values({ eventId, userId: locals.user.id });
 
 			return { success: true };
 		} catch (err) {

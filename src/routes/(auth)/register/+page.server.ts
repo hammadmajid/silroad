@@ -3,8 +3,11 @@ import { schema } from './schema';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
-import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
-import { UserRepo } from '$lib/repos/user';
+import { SESSION_COOKIE_NAME } from '$lib/utils/session';
+import { getDb, getKV } from '$lib/db';
+import { users, sessions } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
+import { generateSessionToken } from '$lib/utils/crypto';
 import { generateSalt, hashPassword } from '$lib/utils/crypto';
 import { isProduction } from '$lib/utils/env';
 
@@ -24,8 +27,6 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 export const actions = {
 	default: async ({ request, platform, cookies, locals }) => {
 		const form = await superValidate(request, zod4(schema));
-		const sessionRepo = new SessionRepo(platform);
-		const userRepo = new UserRepo(platform);
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -37,17 +38,51 @@ export const actions = {
 		const salt = generateSalt();
 		const hashedPassword = await hashPassword(password, salt);
 
-		const exists = await userRepo.getByEmail(email);
-		if (exists) {
+		const db = getDb(platform);
+		const kv = getKV(platform);
+		const existsResult = await db
+			.select({ id: users.id })
+			.from(users)
+			.where(eq(users.email, email))
+			.limit(1);
+		if (existsResult.length > 0) {
 			return message(form, 'Failed to create user');
 		}
 
-		const user = await userRepo.create(email, `${firstName} ${lastName}`, hashedPassword, salt);
-		if (!user) {
+		const [userRow] = await db
+			.insert(users)
+			.values({
+				email,
+				name: `${firstName} ${lastName}`,
+				password: hashedPassword,
+				salt,
+				image: null
+			})
+			.returning();
+		if (!userRow) {
 			return message(form, 'Failed to create user');
 		}
+		const user = {
+			id: userRow.id,
+			email,
+			name: `${firstName} ${lastName}`,
+			image: null
+		};
 
-		const session = await sessionRepo.create(user);
+		const token = generateSessionToken();
+		const expires = Date.now() + 1000 * 60 * 60 * 24 * 30;
+		await db.insert(sessions).values({
+			sessionToken: token,
+			userId: user.id,
+			expires: new Date(expires)
+		});
+		const sessionData = {
+			userId: user.id,
+			userImage: user.image,
+			sessionExpiresAt: new Date(expires).toISOString()
+		};
+		await kv.put(token, JSON.stringify(sessionData));
+		const session = { token, expiresAt: new Date(expires) };
 		if (!session) {
 			return message(form, 'Failed to create session');
 		}

@@ -1,32 +1,63 @@
-import { OrganizationRepo } from '$lib/repos/orgs';
-import { EventRepo } from '$lib/repos/events';
+import { getDb } from '$lib/db';
+import { organizations, organizationMembers, organizationFollowers, users } from '$lib/db/schema';
+import { eq, asc, and } from 'drizzle-orm';
+import { events } from '$lib/db/schema';
 import { error, redirect } from '@sveltejs/kit';
 import { Logger } from '$lib/utils/logger';
 import type { PageServerLoad, Actions } from './$types';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
-	const orgRepo = new OrganizationRepo(platform);
-	const eventRepo = new EventRepo(platform);
+	const db = getDb(platform);
 	const { slug } = params;
 
 	// Get organization
-	const organization = await orgRepo.getBySlug(slug);
+	const orgResult = await db
+		.select()
+		.from(organizations)
+		.where(eq(organizations.slug, slug))
+		.limit(1);
+	const organization = orgResult[0];
 
 	if (!organization) {
 		throw error(404, 'Organization not found');
 	}
 
 	// Get organization events
-	const organizationEvents = await eventRepo.getEventsByOrganization(organization.id);
+	const organizationEvents = await db
+		.select()
+		.from(events)
+		.where(eq(events.organizationId, organization.id))
+		.orderBy(asc(events.dateOfEvent));
 
 	// Get members
-	const members = await orgRepo.getMembers(organization.id);
+	const members = await db
+		.select({
+			id: users.id,
+			name: users.name,
+			email: users.email,
+			image: users.image
+		})
+		.from(organizationMembers)
+		.innerJoin(users, eq(organizationMembers.userId, users.id))
+		.where(eq(organizationMembers.organizationId, organization.id))
+		.orderBy(asc(users.name));
 
 	// Check if user is following this organization
 	let isFollowing = false;
 	if (locals.user) {
-		const userFollowing = await orgRepo.getUserFollowing(locals.user.id);
+		const userFollowing = await db
+			.select({
+				id: organizations.id,
+				name: organizations.name,
+				slug: organizations.slug,
+				avatar: organizations.avatar,
+				description: organizations.description,
+				backgroundImage: organizations.backgroundImage
+			})
+			.from(organizationFollowers)
+			.leftJoin(organizations, eq(organizations.id, organizationFollowers.organizationId))
+			.where(eq(organizationFollowers.userId, locals.user.id));
 		isFollowing = userFollowing.some((org) => org.id === organization.id);
 	}
 
@@ -43,7 +74,6 @@ export const actions: Actions = {
 	toggleFollow: async (event) => {
 		const { request, platform, locals } = event;
 		const logger = new Logger(platform);
-		const orgRepo = new OrganizationRepo(platform);
 
 		if (!locals.user) {
 			throw redirect(
@@ -60,7 +90,20 @@ export const actions: Actions = {
 				throw error(400, 'Invalid ID');
 			}
 
-			await orgRepo.toggleFollow(locals.user.id, organizationId);
+			// Toggle follow logic
+			const db = getDb(platform);
+			const deleted = await db
+				.delete(organizationFollowers)
+				.where(
+					and(
+						eq(organizationFollowers.userId, locals.user.id),
+						eq(organizationFollowers.organizationId, organizationId)
+					)
+				)
+				.returning({ id: organizationFollowers.organizationId });
+			if (deleted.length === 0) {
+				await db.insert(organizationFollowers).values({ userId: locals.user.id, organizationId });
+			}
 
 			return { success: true };
 		} catch (err) {

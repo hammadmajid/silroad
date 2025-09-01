@@ -1,4 +1,4 @@
-import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
+import { SESSION_COOKIE_NAME } from '$lib/utils/session';
 import { getKV } from '$lib/db';
 
 export const POST = async ({ cookies, platform }) => {
@@ -6,9 +6,7 @@ export const POST = async ({ cookies, platform }) => {
 	const kv = getKV(platform);
 
 	if (token && platform) {
-		platform.ctx.waitUntil(
-			kv.delete(token)
-		);
+		platform.ctx.waitUntil(kv.delete(token));
 	}
 
 	cookies.delete(SESSION_COOKIE_NAME, { path: '/' });
