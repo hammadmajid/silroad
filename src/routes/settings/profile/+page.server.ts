@@ -7,7 +7,6 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { getDb } from '$lib/db';
 import { users } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { SESSION_COOKIE_NAME } from '$lib/utils/session';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals, platform } = event;
@@ -76,12 +75,6 @@ export const actions: Actions = {
 		const currentUser = currentUserResult[0];
 		if (!currentUser) {
 			return message(form, 'User not found');
-		}
-
-		// Get session token
-		const sessionToken = cookies.get(SESSION_COOKIE_NAME);
-		if (!sessionToken) {
-			return message(form, 'Failed to update profile');
 		}
 
 		// Update user
