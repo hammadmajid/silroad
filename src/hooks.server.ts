@@ -1,11 +1,10 @@
 import { type Handle } from '@sveltejs/kit';
-import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
+import { SESSION_COOKIE_NAME, getSessionByToken, refreshSession } from '$lib/utils/session';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(SESSION_COOKIE_NAME);
-	const repo = new SessionRepo(event.platform);
 
-	const session = sessionToken ? await repo.getByToken(sessionToken) : null;
+	const session = sessionToken ? await getSessionByToken(event.platform, sessionToken) : null;
 
 	if (session && sessionToken) {
 		event.locals.user = {
@@ -13,7 +12,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			image: session.userImage
 		};
 
-		event.platform?.ctx.waitUntil(repo.refresh(sessionToken, session));
+		event.platform?.ctx.waitUntil(refreshSession(event.platform, sessionToken, session));
 	} else {
 		// !redirection away from protected route must be handled at route level
 		event.cookies.delete(SESSION_COOKIE_NAME, {

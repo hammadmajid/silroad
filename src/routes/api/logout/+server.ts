@@ -1,4 +1,4 @@
-import { SESSION_COOKIE_NAME, SessionRepo } from '$lib/repos/session';
+import { SESSION_COOKIE_NAME } from '$lib/utils/session';
 import { getKV } from '$lib/db';
 
 export const POST = async ({ cookies, platform }) => {
