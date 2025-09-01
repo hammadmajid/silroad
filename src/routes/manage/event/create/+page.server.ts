@@ -89,8 +89,8 @@ export const actions: Actions = {
 			return message(form, 'An event with this slug already exists');
 		}
 
-		// Handle image upload if provided
-		let imageUrl: string | null = null;
+		// Handle image upload
+		let imageUrl: string;
 		const imageFile = form.data.image;
 
 		if (imageFile && imageFile.size > 0) {

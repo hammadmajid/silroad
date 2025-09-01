@@ -174,7 +174,7 @@
 					</Field>
 				</div>
 				<div class="flex-1 space-y-2">
-					<label for="event-image" class="label-text">Event image (optional)</label>
+					<label for="event-image" class="label-text">Event image</label>
 					<input
 						id="event-image"
 						class="input"

@@ -24,5 +24,5 @@ export const schema = z.object({
 	dateOfEvent: z.string().min(1, 'Event date is required'),
 	closeRsvpAt: z.string().optional().or(z.literal('')),
 	maxAttendees: z.number().int().positive('Must be a positive number').optional(),
-	image: fileSchema.optional()
+	image: fileSchema
 });
