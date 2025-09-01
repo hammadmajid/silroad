@@ -32,7 +32,7 @@
 	<section class="space-y-8">
 		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{#each data.events as event (event.id)}
-				<EventCard event={event} />
+				<EventCard {event} />
 			{/each}
 		</div>
 
