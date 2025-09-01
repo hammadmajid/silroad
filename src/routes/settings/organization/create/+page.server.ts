@@ -2,11 +2,12 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, fail } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { schema } from './schema';
-import { OrganizationRepo } from '$lib/repos/orgs';
 import { redirect } from '@sveltejs/kit';
 import { isProduction } from '$lib/utils/env';
 import { handleLoginRedirect } from '$lib/utils/redirect';
-import { getBucket } from '$lib/db';
+import { getBucket, getDb } from '$lib/db';
+import { organizations, organizationMembers } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals, platform } = event;
@@ -24,7 +25,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		const { request, locals, platform } = event;
-		const orgRepo = new OrganizationRepo(platform);
+		const db = getDb(platform);
 		const bucket = getBucket(platform);
 
 		if (!locals.user) {
@@ -43,7 +44,12 @@ export const actions: Actions = {
 		const description = (form.data.description || '').trim();
 
 		// Ensure slug uniqueness first
-		const exists = await orgRepo.getBySlug(slug);
+		const existsResult = await db
+			.select()
+			.from(organizations)
+			.where(eq(organizations.slug, slug))
+			.limit(1);
+		const exists = existsResult[0];
 		if (exists) {
 			return message(form, 'An organization with this slug already exists');
 		}
@@ -96,19 +102,25 @@ export const actions: Actions = {
 			return message(form, 'Failed to upload background image');
 		}
 
-		const org = await orgRepo.create({
-			name,
-			slug,
-			description: description || undefined,
-			avatar: avatarUrl,
-			backgroundImage: backgroundUrl
-		});
+		const [org] = await db
+			.insert(organizations)
+			.values({
+				name,
+				slug,
+				description: description || undefined,
+				avatar: avatarUrl,
+				backgroundImage: backgroundUrl
+			})
+			.returning();
 
 		if (!org) {
 			return message(form, 'Failed to create organization');
 		}
 
-		await orgRepo.addMember(org.id, locals.user.id);
+		await db.insert(organizationMembers).values({
+			organizationId: org.id,
+			userId: locals.user.id
+		});
 
 		throw redirect(303, `/explore/orgs/${org.slug}`);
 	}
