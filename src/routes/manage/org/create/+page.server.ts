@@ -122,9 +122,12 @@ export const actions: Actions = {
 			userId: locals.user.id
 		});
 
-		await db.update(users).set({
-			organizationId: org.id,
-		}).where(eq(users.id, locals.user.id));
+		await db
+			.update(users)
+			.set({
+				organizationId: org.id
+			})
+			.where(eq(users.id, locals.user.id));
 
 		throw redirect(303, `/explore/orgs/${org.slug}`);
 	}

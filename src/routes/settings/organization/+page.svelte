@@ -137,9 +137,7 @@
 							class="border-surface-300-600-token hover:bg-surface-100-800-token rounded-lg border p-4 transition-colors"
 						>
 							<h3 class="mb-2 font-semibold">Create Event</h3>
-							<p class="text-surface-600-300-token text-sm">
-								Create events for your organization.
-							</p>
+							<p class="text-surface-600-300-token text-sm">Create events for your organization.</p>
 						</a>
 					{/if}
 				</div>
