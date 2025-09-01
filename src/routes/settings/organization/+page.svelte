@@ -133,12 +133,12 @@
 						</a>
 
 						<a
-							href="/manage/events"
+							href="/manage/event/create"
 							class="border-surface-300-600-token hover:bg-surface-100-800-token rounded-lg border p-4 transition-colors"
 						>
-							<h3 class="mb-2 font-semibold">Manage Events</h3>
+							<h3 class="mb-2 font-semibold">Create Event</h3>
 							<p class="text-surface-600-300-token text-sm">
-								Create and manage events for your organization.
+								Create events for your organization.
 							</p>
 						</a>
 					{/if}
