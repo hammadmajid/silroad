@@ -90,7 +90,8 @@ export const actions: Actions = {
 		}
 
 		// Handle image upload
-		let imageUrl: string;
+		let imageUrl!: string | null;
+		imageUrl = null; // Default to no image
 		const imageFile = form.data.image;
 
 		if (imageFile && imageFile.size > 0) {
