@@ -92,13 +92,13 @@ export const actions: Actions = {
 
 		try {
 			avatarUrl = await upload(avatarFile, 'avatars');
-		} catch (e) {
+		} catch {
 			return message(form, 'Failed to upload avatar');
 		}
 
 		try {
 			backgroundUrl = await upload(bgFile, 'orgs');
-		} catch (e) {
+		} catch {
 			return message(form, 'Failed to upload background image');
 		}
 
@@ -122,9 +122,12 @@ export const actions: Actions = {
 			userId: locals.user.id
 		});
 
-		await db.update(users).set({
-			organizationId: org.id,
-		}).where(eq(users.id, locals.user.id));
+		await db
+			.update(users)
+			.set({
+				organizationId: org.id
+			})
+			.where(eq(users.id, locals.user.id));
 
 		throw redirect(303, `/explore/orgs/${org.slug}`);
 	}
