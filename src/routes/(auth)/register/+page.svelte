@@ -13,6 +13,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
+	import { Turnstile } from 'svelte-turnstile';
 
 	let { data } = $props();
 
@@ -184,6 +185,14 @@
 				</Description>
 				<FieldErrors class="text-error-700-300" />
 			</Field>
+
+			<Turnstile
+				on:callback={(e) => {
+					$formData['cf-turnstile-response'] = e.detail.token;
+				}}
+				siteKey={data.publicTurnstileKey}
+				size="flexible"
+			/>
 
 			<button
 				type="submit"

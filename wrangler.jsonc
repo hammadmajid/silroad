@@ -9,7 +9,8 @@
 	"compatibility_date": "2025-08-02",
 	"compatibility_flags": ["nodejs_compat"],
 	"vars": {
-		"NODE_ENV": "production"
+		"NODE_ENV": "production",
+		"PUBLIC_TURNSTILE_KEY": "0x4AAAAAABpHqAl_uR3jNJ2x"
 	},
 	"assets": {
 		"binding": "ASSETS",

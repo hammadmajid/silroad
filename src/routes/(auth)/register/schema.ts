@@ -12,5 +12,6 @@ export const schema = z.object({
 		),
 	agree: z.boolean().refine((val) => val === true, {
 		message: 'You must agree to the terms'
-	})
+	}),
+	'cf-turnstile-response': z.string().nonempty('Please complete turnstile')
 });
