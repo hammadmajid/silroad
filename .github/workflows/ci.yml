@@ -40,6 +40,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Type check
+        run: pnpm check
+
+      - name: Lint and format
+        run: pnpm lint
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
