@@ -6,7 +6,7 @@ import { redirect } from '@sveltejs/kit';
 import { isProduction } from '$lib/utils/env';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 import { getBucket, getDb } from '$lib/db';
-import { organizations, organizationMembers } from '$lib/db/schema';
+import { organizations, organizationMembers, users } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
@@ -121,6 +121,10 @@ export const actions: Actions = {
 			organizationId: org.id,
 			userId: locals.user.id
 		});
+
+		await db.update(users).set({
+			organizationId: org.id,
+		}).where(eq(users.id, locals.user.id));
 
 		throw redirect(303, `/explore/orgs/${org.slug}`);
 	}
