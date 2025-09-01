@@ -6,7 +6,10 @@ const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 const fileSchema = z
 	.instanceof(File, { message: 'Please upload a file.' })
 	.refine((f) => f.size < MAX_IMAGE_BYTES, 'Max 5 MB upload size.')
-	.refine((f) => IMAGE_MIME_TYPES.includes(f.type as typeof IMAGE_MIME_TYPES[number]), 'Invalid image type.');
+	.refine(
+		(f) => IMAGE_MIME_TYPES.includes(f.type as (typeof IMAGE_MIME_TYPES)[number]),
+		'Invalid image type.'
+	);
 
 export const schema = z.object({
 	name: z.string().min(2, 'Name must be at least 2 characters'),
