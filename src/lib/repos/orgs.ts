@@ -92,6 +92,36 @@ export class OrganizationRepo {
 		}
 	}
 
+
+	/**
+	 * Retrieves the organization owned by a specific user.
+	 *
+	 * This method queries the database for the user with the given `userId`.
+	 * If the user has an associated `organizationId`, it fetches and returns
+	 * the corresponding organization. If the user does not own an organization
+	 * or an error occurs during the process, it returns `null`.
+	 *
+	 * @param userId - The unique identifier of the user whose organization is to be retrieved.
+	 * @returns A promise that resolves to the user's owned {@link Organization} or `null` if none exists or an error occurs.
+	 */
+	async getUserOwnedOrganization(userId: string): Promise<Organization | null> {
+		try {
+			const [user] = await this.db.select().from(users).where(eq(users.id, userId));
+
+			if (user.organizationId) {
+				const [org] = await this.db.select().from(organizations).where(eq(organizations.id, user.organizationId))
+
+				return org;
+			}
+
+			return null;
+		}
+		catch (error) {
+			this.logger.error('OrganizationRepo', 'getUserOwnedOrganization', error);
+			return null;
+		}
+	}
+
 	/**
 	 * Updates an organization.
 	 * @param id - Organization UUID
