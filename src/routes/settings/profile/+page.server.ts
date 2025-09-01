@@ -47,7 +47,7 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, platform, locals, cookies }) => {
+	default: async ({ request, platform, locals }) => {
 		const form = await superValidate(request, zod4(schema));
 
 		if (!locals.user) {
