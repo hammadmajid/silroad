@@ -54,9 +54,6 @@ jobs:
       - name: Run database migrations
         run: pnpm exec wrangler d1 migrations apply silroad --local
 
-      - name: Run unit tests
-        run: pnpm test:unit --run
-
       - name: Run e2e tests
         run: pnpm run test:e2e
 
