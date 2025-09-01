@@ -92,13 +92,13 @@ export const actions: Actions = {
 
 		try {
 			avatarUrl = await upload(avatarFile, 'avatars');
-		} catch (e) {
+		} catch {
 			return message(form, 'Failed to upload avatar');
 		}
 
 		try {
 			backgroundUrl = await upload(bgFile, 'orgs');
-		} catch (e) {
+		} catch {
 			return message(form, 'Failed to upload background image');
 		}
 

@@ -6,7 +6,7 @@ import { redirect } from '@sveltejs/kit';
 import { isProduction } from '$lib/utils/env';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 import { getBucket, getDb } from '$lib/db';
-import { events, eventOrganizers, users, organizations } from '$lib/db/schema';
+import { events, eventOrganizers, users } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
@@ -118,7 +118,7 @@ export const actions: Actions = {
 
 				const obj = await bucket.put(key, ab, { httpMetadata: { contentType: imageFile.type } });
 				imageUrl = `https://static.silroad.space/${obj.key}`;
-			} catch (e) {
+			} catch {
 				return message(form, 'Failed to upload event image');
 			}
 		}
