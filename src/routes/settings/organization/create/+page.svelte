@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import { fileProxy, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { Field, Control, Label, Description, FieldErrors } from 'formsnap';
 	import { schema } from './schema.js';
@@ -14,6 +14,8 @@
 		delayMs: 300
 	});
 	const { form: formData, enhance, submitting, message } = form;
+	const avatarProxy = fileProxy(form, 'avatar');
+	const backgroundImageProxy = fileProxy(form, 'backgroundImage');
 </script>
 
 <svelte:head>
@@ -27,7 +29,7 @@
 	</header>
 
 	<Card variant="form" classes="p-6">
-		<form class="w-full space-y-4" method="POST" use:enhance>
+		<form class="w-full space-y-4" method="POST" enctype="multipart/form-data" use:enhance>
 			{#if $message}
 				<div class="card preset-outlined-error-500 p-3 text-sm">{$message}</div>
 			{/if}
@@ -66,8 +68,8 @@
 						{/snippet}
 					</Control>
 					<Description class="text-surface-600-300 text-xs"
-						>Lowercase letters, numbers and hyphens only.</Description
-					>
+						>Lowercase letters, numbers and hyphens only.
+					</Description>
 					<FieldErrors class="text-error-700-300" />
 				</Field>
 			</div>
@@ -93,40 +95,26 @@
 
 			<div class="flex flex-col gap-4 md:flex-row">
 				<div class="flex-1 space-y-2">
-					<Field {form} name="avatar">
-						<Control>
-							{#snippet children({ props })}
-								<Label class="label-text">Avatar URL</Label>
-								<input
-									class="input"
-									{...props}
-									type="url"
-									bind:value={$formData.avatar}
-									placeholder="https://example.com/logo.png"
-								/>
-							{/snippet}
-						</Control>
-						<Description class="sr-only">Optional URL for your organization's avatar.</Description>
-						<FieldErrors class="text-error-700-300" />
-					</Field>
+					<label for="avatar" class="label-text">Avatar image</label>
+					<input
+						id="avatar"
+						class="input"
+						type="file"
+						name="avatar"
+						accept="image/*"
+						bind:files={$avatarProxy}
+					/>
 				</div>
 				<div class="flex-1 space-y-2">
-					<Field {form} name="backgroundImage">
-						<Control>
-							{#snippet children({ props })}
-								<Label class="label-text">Background image URL</Label>
-								<input
-									class="input"
-									{...props}
-									type="url"
-									bind:value={$formData.backgroundImage}
-									placeholder="https://example.com/cover.jpg"
-								/>
-							{/snippet}
-						</Control>
-						<Description class="sr-only">Optional URL for a cover image.</Description>
-						<FieldErrors class="text-error-700-300" />
-					</Field>
+					<label for="background" class="label-text">Background image</label>
+					<input
+						id="background"
+						class="input"
+						type="file"
+						name="backgroundImage"
+						accept="image/*"
+						bind:files={$backgroundImageProxy}
+					/>
 				</div>
 			</div>
 
