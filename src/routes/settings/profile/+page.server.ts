@@ -88,8 +88,7 @@ export const actions: Actions = {
 		const [updatedUser] = await db
 			.update(users)
 			.set({
-				name,
-				email: currentUser.email
+				name
 			})
 			.where(eq(users.id, locals.user.id))
 			.returning({
