@@ -15,26 +15,6 @@
 	});
 	const { form: formData, enhance, submitting, message } = form;
 	const imageProxy = fileProxy(form, 'image');
-
-	// Helper to format datetime-local input value
-	function formatDateTimeLocal(date: Date): string {
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
-		const hours = String(date.getHours()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
-		return `${year}-${month}-${day}T${hours}:${minutes}`;
-	}
-
-	// Set default event date to next week
-	const nextWeek = new Date();
-	nextWeek.setDate(nextWeek.getDate() + 7);
-	nextWeek.setHours(18, 0, 0, 0); // Default to 6 PM
-
-	// Initialize form data with defaults if empty
-	if (!$formData.dateOfEvent) {
-		$formData.dateOfEvent = formatDateTimeLocal(nextWeek);
-	}
 </script>
 
 <svelte:head>
