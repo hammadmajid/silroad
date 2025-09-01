@@ -19,19 +19,22 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
 	const userId = locals.user.id;
 	return {
 		attendingEvents: db
-			.select()
+			.select({ events })
 			.from(attendees)
 			.innerJoin(events, eq(attendees.eventId, events.id))
-			.where(and(eq(attendees.userId, userId), gte(events.dateOfEvent, now))),
+			.where(and(eq(attendees.userId, userId), gte(events.dateOfEvent, now)))
+			.then((rows) => rows.map((row) => row.events)),
 		pastAttendedEvents: db
-			.select()
+			.select({ events })
 			.from(attendees)
 			.innerJoin(events, eq(attendees.eventId, events.id))
-			.where(and(eq(attendees.userId, userId), lt(events.dateOfEvent, now))),
+			.where(and(eq(attendees.userId, userId), lt(events.dateOfEvent, now)))
+			.then((rows) => rows.map((row) => row.events)),
 		followedOrgsEvents: db
-			.select()
+			.select({ events })
 			.from(organizationFollowers)
 			.innerJoin(events, eq(organizationFollowers.organizationId, events.organizationId))
 			.where(and(eq(organizationFollowers.userId, userId), gte(events.dateOfEvent, now)))
+			.then((rows) => rows.map((row) => row.events))
 	};
 };
