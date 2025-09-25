@@ -42,6 +42,19 @@ export async function seedDatabase(platform: App.Platform | undefined, options: 
 	}
 }
 
+export async function cleanupDatabase(platform: App.Platform | undefined) {
+	try {
+		const db = getDb(platform);
+		const kv = getKV(platform);
+		await clearKV(kv);
+		await clearDatabase(db);
+		console.log('Database cleaned up successfully');
+	} catch (error) {
+		console.error('Failed to cleanup database:', error);
+		throw error;
+	}
+}
+
 async function clearKV(kv: KVNamespace) {
 	const { keys } = await kv.list();
 	for (const key of keys) {
