@@ -11,6 +11,9 @@ export const users = sqliteTable('users', {
 	image: text('image'),
 	password: text('password').notNull(),
 	salt: text('salt').notNull(),
+	createdAt: integer('created_at', { mode: 'timestamp_ms' })
+		.$defaultFn(() => new Date())
+		.notNull(),
 	organizationId: text('organization_id')
 		.unique()
 		.references(() => organizations.id, { onDelete: 'set null' })
@@ -25,7 +28,10 @@ export const organizations = sqliteTable('organizations', {
 	slug: text('slug').unique().notNull(),
 	description: text('description'),
 	avatar: text('avatar'),
-	backgroundImage: text('background_image')
+	backgroundImage: text('background_image'),
+	createdAt: integer('created_at', { mode: 'timestamp_ms' })
+		.$defaultFn(() => new Date())
+		.notNull()
 });
 
 export const organizationMembers = sqliteTable(
@@ -66,6 +72,9 @@ export const events = sqliteTable('events', {
 	closeRsvpAt: integer('close_rsvp_at', { mode: 'timestamp_ms' }),
 	maxAttendees: integer('max_attendees'),
 	image: text('image'),
+	createdAt: integer('created_at', { mode: 'timestamp_ms' })
+		.$defaultFn(() => new Date())
+		.notNull(),
 	organizationId: text('organization_id')
 		.notNull()
 		.references(() => organizations.id, { onDelete: 'cascade' })
