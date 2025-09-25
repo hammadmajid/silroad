@@ -17,6 +17,7 @@
 	import { Avatar } from '@skeletonlabs/skeleton-svelte';
 
 	let { data } = $props();
+	const createdAt: string | Date = data.createdAt;
 
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
@@ -45,7 +46,9 @@
 	}
 
 	function formatJoinDate(): string {
-		return 'TODO: FIXME';
+		if (!createdAt) return '';
+		const date = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+		return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 	}
 </script>
 

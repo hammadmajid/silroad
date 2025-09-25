@@ -15,6 +15,7 @@ export type Organization = {
 	description: string | null;
 	avatar: string | null;
 	backgroundImage: string | null;
+	createdAt: Date;
 };
 
 /**

@@ -11,6 +11,7 @@ export type Event = {
 	maxAttendees: number | null;
 	image: string | null;
 	organizationId: string;
+	createdAt: Date;
 };
 
 /**

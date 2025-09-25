@@ -81,7 +81,8 @@ async function createOrganizations(db: ReturnType<typeof getDb>, count: number) 
 		slug: (orgNames[i] || `organization-${i + 1}`).toLowerCase().replace(/\s+/g, '-'),
 		description: `Community for ${orgNames[i] || `group ${i + 1}`} enthusiasts`,
 		avatar: getRandomImage('avatars'),
-		backgroundImage: getRandomImage('orgs')
+		backgroundImage: getRandomImage('orgs'),
+		createdAt: new Date()
 	}));
 
 	await db.insert(schema.organizations).values(organizations).run();
@@ -166,7 +167,8 @@ async function createEvents(
 				closeRsvpAt: new Date(now + rsvpOffset * 24 * 60 * 60 * 1000),
 				maxAttendees: 20 + Math.floor(Math.random() * 30),
 				image: getRandomImage('events'),
-				organizationId
+				organizationId,
+				createdAt: new Date()
 			});
 		}
 	}

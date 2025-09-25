@@ -22,7 +22,8 @@ export const load: PageServerLoad = async (event) => {
 			id: users.id,
 			email: users.email,
 			name: users.name,
-			image: users.image
+			image: users.image,
+			createdAt: users.createdAt
 		})
 		.from(users)
 		.where(eq(users.id, locals.user.id))
@@ -42,7 +43,8 @@ export const load: PageServerLoad = async (event) => {
 	);
 
 	return {
-		form
+		form,
+		createdAt: user.createdAt
 	};
 };
 
