@@ -1,8 +1,11 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
+	import Alert from '$lib/components/Alert.svelte';
 	import Key from '@lucide/svelte/icons/key';
-	import Download from '@lucide/svelte/icons/download';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
+
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -10,6 +13,15 @@
 </svelte:head>
 
 <div class="space-y-6">
+	{#if data.successMessage}
+		<Alert type="success" title="Success">
+			{#snippet icon()}
+				<CheckCircle />
+			{/snippet}
+			{data.successMessage}
+		</Alert>
+	{/if}
+
 	<Card class="p-6">
 		<h1 class="mb-6 h2">Account Settings</h1>
 
@@ -20,9 +32,16 @@
 				<div class="space-y-4">
 					<div>
 						<label for="primary-email" class="mb-2 label-text block">Primary Email</label>
-						<input id="primary-email" class="input w-full max-w-md" value="TODO: FIXME" disabled />
+						<input
+							id="primary-email"
+							class="input w-full max-w-md"
+							value={data.user.email}
+							disabled
+						/>
 					</div>
-					<button class="btn preset-outlined btn-sm"> Change Email </button>
+					<a href="/settings/account/change-email" class="btn preset-outlined btn-sm">
+						Change Email
+					</a>
 				</div>
 			</div>
 
@@ -31,10 +50,13 @@
 				<h2 class="mb-4 h3">Password</h2>
 				<div class="space-y-4">
 					<p class="text-surface-600-300-token">Manage your password and security settings.</p>
-					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
+					<a
+						href="/settings/account/change-password"
+						class="btn flex items-center gap-2 preset-outlined btn-sm"
+					>
 						<Key size={16} />
 						Change Password
-					</button>
+					</a>
 				</div>
 			</div>
 		</div>
@@ -55,10 +77,13 @@
 					Permanently delete your account and all data
 				</p>
 			</div>
-			<button class="btn flex items-center gap-2 preset-filled-error-500 btn-sm" disabled>
+			<a
+				href="/settings/account/confirm-delete"
+				class="btn flex items-center gap-2 preset-filled-error-500 btn-sm"
+			>
 				<Trash2 size={16} />
 				Delete Account
-			</button>
+			</a>
 		</div>
 	</Card>
 </div>
