@@ -11,6 +11,9 @@ export const users = sqliteTable('users', {
 	image: text('image'),
 	password: text('password').notNull(),
 	salt: text('salt').notNull(),
+	plan: text('plan', { enum: ['free', 'premium'] })
+		.notNull()
+		.default('free'),
 	createdAt: integer('created_at', { mode: 'timestamp_ms' })
 		.$defaultFn(() => new Date())
 		.notNull(),
