@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
@@ -22,14 +22,9 @@
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
 		delayMs: 400,
-		onUpdated: ({ form }) => {
-			if (form.message === 'Profile updated successfully' && userStore.current) {
-				// Update the user store with the form data
-				const updatedUser = {
-					...userStore.current,
-					name: form.data.name
-				};
-				userStore.setUser(updatedUser);
+		onResult: async ({ result }) => {
+			if (result.type === 'success') {
+				window.location.reload();
 			}
 		}
 	});
