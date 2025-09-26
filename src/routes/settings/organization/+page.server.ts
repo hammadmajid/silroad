@@ -36,7 +36,8 @@ export const load: PageServerLoad = async (event) => {
 			slug: organizations.slug,
 			description: organizations.description,
 			avatar: organizations.avatar,
-			backgroundImage: organizations.backgroundImage
+			backgroundImage: organizations.backgroundImage,
+			createdAt: organizations.createdAt
 		})
 		.from(organizationMembers)
 		.innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
@@ -50,7 +51,8 @@ export const load: PageServerLoad = async (event) => {
 			slug: organizations.slug,
 			description: organizations.description,
 			avatar: organizations.avatar,
-			backgroundImage: organizations.backgroundImage
+			backgroundImage: organizations.backgroundImage,
+			createdAt: organizations.createdAt
 		})
 		.from(users)
 		.innerJoin(organizations, eq(users.organizationId, organizations.id))
