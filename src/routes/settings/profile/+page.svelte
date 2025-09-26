@@ -3,7 +3,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
-	import { superForm } from 'sveltekit-superforms';
+	import { superForm, fileProxy } from 'sveltekit-superforms';
 	import { Field, Control, FieldErrors } from 'formsnap';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
@@ -22,18 +22,19 @@
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
 		delayMs: 400,
-		onResult: async ({ result }) => {
-			if (result.type === 'success' && result.data && userStore.current) {
-				// Update user store with new data if update was successful
+		onUpdated: ({ form }) => {
+			if (form.message === 'Profile updated successfully' && userStore.current) {
+				// Update the user store with the form data
 				const updatedUser = {
 					...userStore.current,
-					name: result.data.form.data.name
+					name: form.data.name
 				};
 				userStore.setUser(updatedUser);
 			}
 		}
 	});
-	const { form: formData, submitting, message } = form;
+	const { form: formData, submitting, message, enhance } = form;
+	const imageProxy = fileProxy(form, 'image');
 
 	async function handleLogout() {
 		await fetch('/api/logout', {
@@ -49,6 +50,11 @@
 		if (!createdAt) return '';
 		const date = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
 		return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+	}
+
+	function handleImageClick() {
+		const input = document.getElementById('profile-image') as HTMLInputElement;
+		input?.click();
 	}
 </script>
 
@@ -94,15 +100,38 @@
 					>
 						<User class="h-24 w-24" />
 					</Avatar>
-					<button class="btn flex items-center gap-2 preset-outlined btn-sm">
+					<button
+						type="button"
+						onclick={handleImageClick}
+						class="btn flex items-center gap-2 preset-outlined btn-sm"
+					>
 						<Camera size={16} />
 						Change photo
 					</button>
+					{#if $imageProxy && $imageProxy.length > 0}
+						<p class="text-surface-600-300 text-xs">Selected: {$imageProxy[0].name}</p>
+					{:else}
+						<p class="text-surface-600-300 text-xs">Max 5MB. PNG, JPEG, WebP, or AVIF format.</p>
+					{/if}
 				</div>
 
 				<!-- Profile Info Form -->
 				<div class="flex-1 space-y-4">
-					<form class="space-y-4" method="POST">
+					<form class="space-y-4" method="POST" enctype="multipart/form-data" use:enhance>
+						<!-- Hidden file input -->
+						<input
+							id="profile-image"
+							type="file"
+							name="image"
+							accept="image/*"
+							bind:files={$imageProxy}
+							class="hidden"
+						/>
+
+						<Field {form} name="image">
+							<FieldErrors class="text-error-700-300" />
+						</Field>
+
 						<Field {form} name="name">
 							<Control>
 								{#snippet children({ props })}

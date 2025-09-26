@@ -4,7 +4,7 @@ import { redirect, fail } from '@sveltejs/kit';
 import { schema } from './schema';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { getDb } from '$lib/db';
+import { getDb, getBucket } from '$lib/db';
 import { users } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 
@@ -50,7 +50,8 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	default: async ({ request, platform, locals }) => {
-		const form = await superValidate(request, zod4(schema));
+		const formData = await request.formData();
+		const form = await superValidate(formData, zod4(schema));
 
 		if (!locals.user) {
 			return fail(401, { form });
@@ -61,6 +62,7 @@ export const actions: Actions = {
 		}
 
 		const db = getDb(platform);
+		const bucket = getBucket(platform);
 		const { name } = form.data;
 
 		// Get current user data
@@ -79,11 +81,45 @@ export const actions: Actions = {
 			return message(form, 'User not found');
 		}
 
+		// Handle image upload
+		let imageUrl: string | null = currentUser.image;
+		const imageFile = form.data.image;
+
+		if (imageFile && imageFile.size > 0) {
+			// Extract extension from file MIME type
+			function mimeToExt(mime: string): string | undefined {
+				switch (mime) {
+					case 'image/png':
+						return 'png';
+					case 'image/jpeg':
+						return 'jpg';
+					case 'image/webp':
+						return 'webp';
+					case 'image/avif':
+						return 'avif';
+					default:
+						return undefined;
+				}
+			}
+
+			try {
+				const extFromMime = mimeToExt(imageFile.type);
+				const key = `users/${locals.user.id}-${crypto.randomUUID()}.${extFromMime}`;
+				const ab = await imageFile.arrayBuffer();
+
+				const obj = await bucket.put(key, ab, { httpMetadata: { contentType: imageFile.type } });
+				imageUrl = `https://static.silroad.space/${obj.key}`;
+			} catch {
+				return message(form, 'Failed to upload profile image');
+			}
+		}
+
 		// Update user
 		const [updatedUser] = await db
 			.update(users)
 			.set({
-				name
+				name,
+				image: imageUrl
 			})
 			.where(eq(users.id, locals.user.id))
 			.returning({
