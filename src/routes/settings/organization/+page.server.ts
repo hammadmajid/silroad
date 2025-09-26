@@ -4,6 +4,7 @@ import { getDb } from '$lib/db';
 import { users, organizations, organizationMembers } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { handleLoginRedirect } from '$lib/utils/redirect';
+import { canCreateOrganization } from '$lib/utils/plans';
 
 export const load: PageServerLoad = async (event) => {
 	const { platform, locals } = event;
@@ -15,6 +16,17 @@ export const load: PageServerLoad = async (event) => {
 	if (!localUser) {
 		throw redirect(303, handleLoginRedirect(event));
 	}
+
+	// Get user with plan information
+	const userWithPlan = await db
+		.select({
+			plan: users.plan
+		})
+		.from(users)
+		.where(eq(users.id, localUser.id))
+		.limit(1);
+
+	const userPlan = userWithPlan[0]?.plan || 'free';
 
 	// Get organizations where user is a member
 	const userOrganizations = await db
@@ -48,6 +60,8 @@ export const load: PageServerLoad = async (event) => {
 
 	return {
 		userOrganizations,
-		ownedOrganization
+		ownedOrganization,
+		userPlan,
+		canCreateOrganization: canCreateOrganization(userPlan)
 	};
 };

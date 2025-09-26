@@ -2,6 +2,7 @@
 	import Card from '$lib/components/Card.svelte';
 	import OrgCard from '$lib/components/OrgCard.svelte';
 	import Badge from '$lib/components/Badge.svelte';
+	import { getPlanConfig } from '$lib/utils/plans';
 
 	let { data } = $props();
 </script>
@@ -72,12 +73,79 @@
 				<div>
 					<h2 class="mb-4 h4">Create Organization</h2>
 					<div class="space-y-4">
-						<p class="text-surface-600-300-token">
-							Organizations help you collaborate with team members and host events together.
-						</p>
-						<a href="/manage/org/create" class="btn preset-filled-primary-500">
-							Create New Organization
-						</a>
+						{#if data.canCreateOrganization}
+							<p class="text-surface-600-300-token">
+								Organizations help you collaborate with team members and host events together.
+							</p>
+							<a href="/manage/org/create" class="btn preset-filled-primary-500">
+								Create New Organization
+							</a>
+						{:else}
+							<!-- Paywall for free users -->
+							<div
+								class="rounded-lg border border-warning-500 bg-warning-50 p-6 dark:bg-warning-900/20"
+							>
+								<div class="mb-4 flex items-start gap-4">
+									<div class="rounded-full bg-warning-100 p-2 dark:bg-warning-900/40">
+										<svg
+											class="size-5 text-warning-600 dark:text-warning-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+											/>
+										</svg>
+									</div>
+									<div class="flex-1">
+										<h3 class="mb-2 font-semibold text-warning-800 dark:text-warning-200">
+											Premium Feature
+										</h3>
+										<p class="mb-4 text-warning-700 dark:text-warning-300">
+											Creating organizations is a premium feature. Upgrade to unlock the ability to
+											create and manage your own organizations.
+										</p>
+										<div class="mb-4 space-y-2">
+											<p class="text-sm font-medium text-warning-700 dark:text-warning-300">
+												Premium includes:
+											</p>
+											<ul class="ml-4 space-y-1 text-sm text-warning-600 dark:text-warning-400">
+												{#each getPlanConfig('premium').features as feature}
+													<li class="flex items-center gap-2">
+														<svg
+															class="size-4 flex-shrink-0"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M5 13l4 4L19 7"
+															/>
+														</svg>
+														{feature}
+													</li>
+												{/each}
+											</ul>
+										</div>
+										<div class="flex flex-wrap gap-3">
+											<a href="/settings/payment" class="btn preset-filled-primary-500">
+												Upgrade to Premium
+											</a>
+											<a href="/explore/orgs" class="btn preset-outlined">
+												Explore Organizations
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 			{/if}
