@@ -12,6 +12,7 @@ import { generateSessionToken } from '$lib/utils/crypto';
 import { getKV } from '$lib/db';
 import { sessions } from '$lib/db/schema';
 import { isProduction } from '$lib/utils/env';
+import { getInbound } from '$lib/utils/inbound';
 
 function isSafeRedirect(url: string): boolean {
 	if (!url) return false;
@@ -109,6 +110,17 @@ export const actions = {
 		});
 
 		locals.user = user;
+
+		// send email in background
+		const inbound = getInbound(platform);
+		platform?.ctx.waitUntil(
+			inbound.emails.send({
+				from: 'Silroad <no-reply@silroad.space>',
+				to: user.email,
+				subject: 'Silroad Login Alert',
+				html: '<p>You recently logged into your silroad account.</p>'
+			})
+		);
 
 		// Check for redirectTo parameter and redirect accordingly
 		const redirectTo = url.searchParams.get('redirectTo');
