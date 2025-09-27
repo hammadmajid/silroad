@@ -1,9 +1,11 @@
 import { Inbound } from '@inboundemail/sdk';
 
-if (!process.env.INBOUND_API_KEY) {
-	throw 'Missing Inbound API key';
+export function getInbound(platform: App.Platform | undefined): Inbound {
+	const key = platform?.env.INBOUND_API_KEY;
+
+	if (!key) {
+		throw 'Missing Inbound API Key';
+	}
+
+	return new Inbound(key);
 }
-
-const inbound = new Inbound(process.env.INBOUND_API_KEY);
-
-export default inbound;
