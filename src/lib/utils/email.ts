@@ -141,13 +141,13 @@ export function createRsvpConfirmationEmail(
 				<h3 style="margin-top: 0;">${event.title}</h3>
 				${event.description ? `<p>${event.description}</p>` : ''}
 				<p><strong>Date:</strong> ${event.dateOfEvent.toLocaleDateString('en-US', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
-		})}</p>
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				})}</p>
 				<p><a href="https://silroad.space/explore/events/${event.slug}" style="color: #007bff;">View Event Details</a></p>
 			</div>
 			<p>We look forward to seeing you there!</p>
@@ -160,11 +160,11 @@ export function createRsvpConfirmationEmail(
 			<div style="border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px;">
 				<h3 style="margin-top: 0;">${event.title}</h3>
 				<p><strong>Date:</strong> ${event.dateOfEvent.toLocaleDateString('en-US', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		})}</p>
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+				})}</p>
 			</div>
 			<p>You can always RSVP again by visiting the event page.</p>
 			<p><strong>The Silroad Team</strong></p>
@@ -229,13 +229,13 @@ export function createEventCreatedEmail(
 				<p><strong>Organization:</strong> ${organization.name}</p>
 				${event.description ? `<p>${event.description}</p>` : ''}
 				<p><strong>Date:</strong> ${event.dateOfEvent.toLocaleDateString('en-US', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
-		})}</p>
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				})}</p>
 				<p><a href="https://silroad.space/explore/events/${event.slug}" style="color: #007bff;">View Event</a></p>
 			</div>
 			<p>Tips for promoting your event:</p>
