@@ -74,9 +74,10 @@ test.describe('Profile Settings Page', () => {
 		// Wait for validation
 		await page.waitForTimeout(500);
 
-		// Verify validation error is shown
-		await expect(page.locator('.text-error-700-300')).toBeVisible();
-		await expect(page.locator('.text-error-700-300')).toContainText('Name is required');
+		// Verify validation error is shown (find the error specifically for the name field)
+		const nameFieldError = page.locator('.text-error-700-300').filter({ hasText: 'Name is required' });
+		await expect(nameFieldError).toBeVisible();
+		await expect(nameFieldError).toContainText('Name is required');
 
 		// Verify we're still on the profile page
 		await expect(page).toHaveURL('/settings/profile');
@@ -96,9 +97,10 @@ test.describe('Profile Settings Page', () => {
 		// Wait for validation
 		await page.waitForTimeout(500);
 
-		// Verify validation error is shown
-		await expect(page.locator('.text-error-700-300')).toBeVisible();
-		await expect(page.locator('.text-error-700-300')).toContainText(
+		// Verify validation error is shown (find the error specifically for the name field)
+		const nameFieldError = page.locator('.text-error-700-300').filter({ hasText: 'Name must be less than 100 characters' });
+		await expect(nameFieldError).toBeVisible();
+		await expect(nameFieldError).toContainText(
 			'Name must be less than 100 characters'
 		);
 
@@ -137,8 +139,9 @@ test.describe('Profile Settings Page', () => {
 		await page.getByTestId('save-changes-btn').click();
 		await page.waitForTimeout(500);
 
-		// Verify validation error is shown
-		await expect(page.locator('.text-error-700-300')).toBeVisible();
+		// Verify validation error is shown (find the error specifically for the name field)
+		const nameFieldError = page.locator('.text-error-700-300').filter({ hasText: 'Name is required' });
+		await expect(nameFieldError).toBeVisible();
 
 		// Start typing in name field
 		await page.getByTestId('name-input').fill('New Name');
