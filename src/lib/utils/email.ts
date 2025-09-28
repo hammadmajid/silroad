@@ -255,3 +255,31 @@ export function createEventCreatedEmail(
 		}
 	};
 }
+
+export function createPasswordResetEmail(
+	email: string,
+	resetToken: string
+): Omit<EmailOptions, 'to'> {
+	return {
+		subject: 'Password Reset - Silroad',
+		html: `
+			<h2>Password Reset Request</h2>
+			<p>Hi,</p>
+			<p>You requested a password reset for your Silroad account.</p>
+			<p>Click the link below to reset your password:</p>
+			<div style="margin: 30px 0; text-align: center;">
+				<a href="https://silroad.space/forget-password/new?token=${resetToken}" 
+				   style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+					Reset Password
+				</a>
+			</div>
+			<p><strong>This link will expire in 15 minutes for security.</strong></p>
+			<p>If you did not request a password reset, you can safely ignore this email. Your password will not be changed.</p>
+			<p><strong>The Silroad Team</strong></p>
+		`,
+		metadata: {
+			emailType: 'password_reset',
+			userEmail: email
+		}
+	};
+}

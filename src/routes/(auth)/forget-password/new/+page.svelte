@@ -3,13 +3,10 @@
 	import { Field, Control, Description, FieldErrors } from 'formsnap';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
-	import SuperDebug from 'sveltekit-superforms';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import LogIn from '@lucide/svelte/icons/log-in';
+	import Key from '@lucide/svelte/icons/key';
 	import { goto } from '$app/navigation';
-	import { userStore } from '$lib/stores/user.svelte.js';
-	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
@@ -22,33 +19,15 @@
 		goto(url.pathname + url.search, { replaceState: true });
 	}
 
-	// Redirect if user is already logged in
-	onMount(() => {
-		if (userStore.isLoggedIn) {
-			const redirectTo = $page.url.searchParams.get('redirectTo');
-			const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/';
-			goto(redirectUrl);
-		}
-	});
-
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
-		delayMs: 400,
-		onResult: async ({ result }) => {
-			if (result.type === 'success' && result.data?.user) {
-				// Set user in global store and redirect
-				userStore.setUser(result.data.user);
-				const redirectTo = $page.url.searchParams.get('redirectTo');
-				const redirectUrl = redirectTo ? decodeURIComponent(redirectTo) : '/';
-				goto(redirectUrl);
-			}
-		}
+		delayMs: 400
 	});
 	const { form: formData, enhance, submitting, message } = form;
 </script>
 
 <svelte:head>
-	<title>Login | Silroad</title>
+	<title>Reset Password | Silroad</title>
 </svelte:head>
 
 <section class="space-y-8">
@@ -68,42 +47,17 @@
 	{/if}
 
 	<header class="space-y-2 text-center">
-		<h1 class="h2">Welcome Back</h1>
-		<p class="text-surface-600-300">Sign in to your account</p>
+		<h1 class="h2">Reset Password</h1>
+		<p class="text-surface-600-300">Enter your new password</p>
 	</header>
 
 	<Card variant="form" classes="p-6">
 		<form class="w-full space-y-4" method="POST" use:enhance>
-			<Field {form} name="email">
-				<Control>
-					{#snippet children({ props })}
-						<label class="label">
-							<span class="label-text">Email</span>
-							<input
-								class="input"
-								{...props}
-								type="email"
-								bind:value={$formData.email}
-								placeholder="john@example.com"
-								data-testid="email-input"
-							/>
-						</label>
-					{/snippet}
-				</Control>
-				<Description class="sr-only"
-					>Provide a valid email address for account verification and communication.</Description
-				>
-				<FieldErrors class="text-error-700-300" />
-			</Field>
-
 			<Field {form} name="password">
 				<Control>
 					{#snippet children({ props })}
 						<label class="label">
-							<div class="flex items-center justify-between">
-								<span class="label-text">Password</span>
-								<a href="/forget-password" class="anchor text-sm">Forgot password?</a>
-							</div>
+							<span class="label-text">New Password</span>
 							<input
 								class="input"
 								{...props}
@@ -114,9 +68,28 @@
 						</label>
 					{/snippet}
 				</Control>
-				<Description class="sr-only"
-					>Choose a strong password with at least 8 characters, including letters and numbers.</Description
-				>
+				<Description class="text-surface-600-300 text-sm">
+					Password must be 8+ characters with letters, numbers and special characters.
+				</Description>
+				<FieldErrors class="text-error-700-300" />
+			</Field>
+
+			<Field {form} name="confirmPassword">
+				<Control>
+					{#snippet children({ props })}
+						<label class="label">
+							<span class="label-text">Confirm New Password</span>
+							<input
+								class="input"
+								{...props}
+								type="password"
+								bind:value={$formData.confirmPassword}
+								data-testid="confirm-password-input"
+							/>
+						</label>
+					{/snippet}
+				</Control>
+				<Description class="sr-only">Re-enter your new password to confirm.</Description>
 				<FieldErrors class="text-error-700-300" />
 			</Field>
 
@@ -124,26 +97,22 @@
 				type="submit"
 				class="btn flex w-full items-center justify-center gap-2 preset-filled"
 				disabled={$submitting}
-				data-testid="login-submit-btn"
+				data-testid="reset-password-btn"
 			>
 				{#if $submitting}
 					<LoaderCircle class="animate-spin" size={20} />
 				{:else}
-					<LogIn size={20} />
+					<Key size={20} />
 				{/if}
-				Login
+				Reset Password
 			</button>
 		</form>
 	</Card>
 
 	<footer class="text-center">
 		<p class="text-surface-600-300 text-sm">
-			Don't have an account?
-			<a href="/register" class="anchor">Sign up</a>
+			Remember your password?
+			<a href="/login" class="anchor">Sign in</a>
 		</p>
 	</footer>
-
-	{#if !data.isProd}
-		<SuperDebug data={$formData} />
-	{/if}
 </section>
