@@ -5,6 +5,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { Logger } from '$lib/utils/logger';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { handleLoginRedirect } from '$lib/utils/redirect';
+import { sendEmail, createRsvpConfirmationEmail } from '$lib/utils/email';
 
 export const load: PageServerLoad = async ({ params, platform, locals }) => {
 	const db = getDb(platform);
@@ -110,15 +111,58 @@ export const actions: Actions = {
 				throw error(400, 'Invalid event ID');
 			}
 
+			// Get event details for email
+			const eventResult = await db
+				.select({
+					id: events.id,
+					title: events.title,
+					slug: events.slug,
+					description: events.description,
+					dateOfEvent: events.dateOfEvent
+				})
+				.from(events)
+				.where(eq(events.id, eventId))
+				.limit(1);
+			const eventDetails = eventResult[0];
+
+			if (!eventDetails) {
+				throw error(404, 'Event not found');
+			}
+
 			// Toggle attendance logic - try removing first
 			const deleted = await db
 				.delete(attendees)
 				.where(and(eq(attendees.eventId, eventId), eq(attendees.userId, locals.user.id)))
 				.returning({ id: attendees.eventId });
 
-			if (deleted.length === 0) {
+			const isJoining = deleted.length === 0;
+
+			if (isJoining) {
 				// User was not attending, add them
 				await db.insert(attendees).values({ eventId, userId: locals.user.id });
+			}
+
+			// Get full user details for email
+			const userResult = await db
+				.select({
+					name: users.name,
+					email: users.email
+				})
+				.from(users)
+				.where(eq(users.id, locals.user.id))
+				.limit(1);
+			const userDetails = userResult[0];
+
+			if (userDetails) {
+				const rsvpEmail = createRsvpConfirmationEmail(userDetails, eventDetails, isJoining);
+				sendEmail(
+					{
+						platform,
+						request,
+						user: { id: locals.user.id, ...userDetails, image: locals.user.image }
+					},
+					{ to: userDetails.email, ...rsvpEmail }
+				);
 			}
 
 			return { success: true };

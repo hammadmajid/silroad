@@ -13,6 +13,7 @@ import { getKV } from '$lib/db';
 import { sessions } from '$lib/db/schema';
 import { isProduction } from '$lib/utils/env';
 import { getInbound } from '$lib/utils/inbound';
+import { sendEmail } from '$lib/utils/email';
 
 function isSafeRedirect(url: string): boolean {
 	if (!url) return false;
@@ -111,15 +112,23 @@ export const actions = {
 
 		locals.user = user;
 
-		// send email in background
-		const inbound = getInbound(platform);
-		platform?.ctx.waitUntil(
-			inbound.emails.send({
-				from: 'Silroad <no-reply@silroad.space>',
+		// send login alert email in background
+		sendEmail(
+			{ platform, request, user },
+			{
 				to: user.email,
 				subject: 'Silroad Login Alert',
-				html: '<p>You recently logged into your silroad account.</p>'
-			})
+				html: `
+					<h2>Login Alert</h2>
+					<p>Hi ${user.name},</p>
+					<p>You recently logged into your Silroad account.</p>
+					<p>If this wasn't you, please secure your account immediately by changing your password.</p>
+					<p><strong>The Silroad Team</strong></p>
+				`,
+				metadata: {
+					emailType: 'login_alert'
+				}
+			}
 		);
 
 		// Check for redirectTo parameter and redirect accordingly

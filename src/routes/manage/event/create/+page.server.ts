@@ -6,8 +6,9 @@ import { redirect } from '@sveltejs/kit';
 import { isProduction } from '$lib/utils/env';
 import { handleLoginRedirect } from '$lib/utils/redirect';
 import { getBucket, getDb } from '$lib/db';
-import { events, eventOrganizers, users } from '$lib/db/schema';
+import { events, eventOrganizers, users, organizations } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { sendEmail, createEventCreatedEmail } from '$lib/utils/email';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals, platform } = event;
@@ -47,13 +48,13 @@ export const actions: Actions = {
 		}
 
 		// Verify user has an organization
-		const userResult = await db
+		const userOrgResult = await db
 			.select({ organizationId: users.organizationId })
 			.from(users)
 			.where(eq(users.id, locals.user.id))
 			.limit(1);
 
-		const user = userResult[0];
+		const user = userOrgResult[0];
 		if (!user?.organizationId) {
 			throw redirect(303, '/manage/org/create?msg=You need to create an organization first');
 		}
@@ -146,6 +147,40 @@ export const actions: Actions = {
 			eventId: newEvent.id,
 			userId: locals.user.id
 		});
+
+		// Get organization details for email
+		const orgResult = await db
+			.select({
+				name: organizations.name,
+				slug: organizations.slug
+			})
+			.from(organizations)
+			.where(eq(organizations.id, user.organizationId))
+			.limit(1);
+		const organization = orgResult[0];
+
+		// Get full user details for email
+		const userEmailResult = await db
+			.select({
+				name: users.name,
+				email: users.email
+			})
+			.from(users)
+			.where(eq(users.id, locals.user.id))
+			.limit(1);
+		const userDetails = userEmailResult[0];
+
+		if (organization && userDetails) {
+			const eventEmail = createEventCreatedEmail(userDetails, newEvent, organization);
+			sendEmail(
+				{
+					platform,
+					request,
+					user: { id: locals.user.id, ...userDetails, image: locals.user.image }
+				},
+				{ to: userDetails.email, ...eventEmail }
+			);
+		}
 
 		throw redirect(303, `/explore/events/${newEvent.slug}`);
 	}

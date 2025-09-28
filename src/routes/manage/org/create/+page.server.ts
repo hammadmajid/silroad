@@ -8,6 +8,7 @@ import { handleLoginRedirect } from '$lib/utils/redirect';
 import { getBucket, getDb } from '$lib/db';
 import { organizations, organizationMembers, users } from '$lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { sendEmail, createOrganizationCreatedEmail } from '$lib/utils/email';
 
 export const load: PageServerLoad = async (event) => {
 	const { locals, platform } = event;
@@ -128,6 +129,29 @@ export const actions: Actions = {
 				organizationId: org.id
 			})
 			.where(eq(users.id, locals.user.id));
+
+		// Get full user details for email
+		const userResult = await db
+			.select({
+				name: users.name,
+				email: users.email
+			})
+			.from(users)
+			.where(eq(users.id, locals.user.id))
+			.limit(1);
+		const userDetails = userResult[0];
+
+		if (userDetails) {
+			const orgEmail = createOrganizationCreatedEmail(userDetails, org);
+			sendEmail(
+				{
+					platform,
+					request,
+					user: { id: locals.user.id, ...userDetails, image: locals.user.image }
+				},
+				{ to: userDetails.email, ...orgEmail }
+			);
+		}
 
 		throw redirect(303, `/explore/orgs/${org.slug}`);
 	}

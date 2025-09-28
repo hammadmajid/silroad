@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm';
 import { generateSessionToken } from '$lib/utils/crypto';
 import { generateSalt, hashPassword } from '$lib/utils/crypto';
 import { isProduction } from '$lib/utils/env';
+import { sendEmail, createWelcomeEmail } from '$lib/utils/email';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
 	// Note: We still check locals.user for server-side redirect
@@ -97,6 +98,10 @@ export const actions = {
 		});
 
 		locals.user = user;
+
+		// send welcome email in background
+		const welcomeEmail = createWelcomeEmail(user);
+		sendEmail({ platform, request, user }, { to: user.email, ...welcomeEmail });
 
 		// TODO: send the email verification code; then
 		// throw redirect(302, "/register/verify-email")
