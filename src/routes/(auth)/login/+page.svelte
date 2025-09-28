@@ -6,6 +6,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import CheckCircle from '@lucide/svelte/icons/check-circle';
 	import LogIn from '@lucide/svelte/icons/log-in';
 	import { goto } from '$app/navigation';
 	import { userStore } from '$lib/stores/user.svelte.js';
@@ -45,6 +46,16 @@
 		}
 	});
 	const { form: formData, enhance, submitting, message } = form;
+
+	// Helper to determine if message is a success message
+	function isSuccessMessage(msg: string | null): boolean {
+		if (!msg) return false;
+		return msg.includes('reset successfully') || msg.includes('Password reset successfully');
+	}
+
+	// Get the current message (either from form or URL)
+	const currentMessage = $derived($message || $page.url.searchParams.get('msg'));
+	const isSuccess = $derived(isSuccessMessage(currentMessage));
 </script>
 
 <svelte:head>
@@ -52,18 +63,22 @@
 </svelte:head>
 
 <section class="space-y-8">
-	{#if $message || $page.url.searchParams.get('msg')}
+	{#if currentMessage}
 		<Alert
-			type="error"
-			title="Error"
+			type={isSuccess ? 'success' : 'error'}
+			title={isSuccess ? 'Success' : 'Error'}
 			dismissible={true}
 			onDismiss={dismissError}
-			data-testid="error-message"
+			data-testid={isSuccess ? 'success-message' : 'error-message'}
 		>
 			{#snippet icon()}
-				<TriangleAlert />
+				{#if isSuccess}
+					<CheckCircle />
+				{:else}
+					<TriangleAlert />
+				{/if}
 			{/snippet}
-			{$message || $page.url.searchParams.get('msg')}
+			{currentMessage}
 		</Alert>
 	{/if}
 
