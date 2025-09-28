@@ -74,6 +74,12 @@ export function sendEmail(context: EmailContext, options: EmailOptions): void {
 	const { platform } = context;
 	if (!platform) return;
 
+	if (platform.env.NODE_ENV === "test") {
+		// don't send email in test mode
+		console.warn("Test mode: will not send email");
+		return
+	}
+
 	const fullMetadata = {
 		...extractMetadata(context),
 		...options.metadata
@@ -268,7 +274,7 @@ export function createPasswordResetEmail(
 			<p>You requested a password reset for your Silroad account.</p>
 			<p>Click the link below to reset your password:</p>
 			<div style="margin: 30px 0; text-align: center;">
-				<a href="https://silroad.space/forget-password/new?token=${resetToken}" 
+				<a href="https://silroad.space/forget-password/new?token=${resetToken}"
 				   style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
 					Reset Password
 				</a>
