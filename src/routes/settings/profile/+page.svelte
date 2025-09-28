@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
@@ -22,11 +22,6 @@
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
 		delayMs: 400,
-		onResult: async ({ result }) => {
-			if (result.type === 'success') {
-				window.location.reload();
-			}
-		}
 	});
 	const { form: formData, submitting, message, enhance } = form;
 	const imageProxy = fileProxy(form, 'image');

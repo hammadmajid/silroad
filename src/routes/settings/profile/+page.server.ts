@@ -133,6 +133,6 @@ export const actions: Actions = {
 			return message(form, 'Failed to update profile');
 		}
 
-		return message(form, 'Profile updated successfully');
+		throw redirect(307, "/settings/profile?success=true")
 	}
 };
