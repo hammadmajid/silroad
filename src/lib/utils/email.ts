@@ -10,7 +10,7 @@ interface EmailMetadata {
 	userId?: string;
 	userName?: string;
 	userEmail?: string;
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 interface EmailOptions {

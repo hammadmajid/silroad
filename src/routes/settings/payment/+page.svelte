@@ -45,9 +45,9 @@
 							<div class="mb-2 flex items-center gap-3">
 								<h3 class="text-lg font-semibold">{currentPlanConfig.name} Plan</h3>
 								{#if data.userPlan === 'premium'}
-									<Badge variant={'filled'}>Premium</Badge>
+									<Badge variant="filled">Premium</Badge>
 								{:else}
-									<Badge variant={'filled'}>Free</Badge>
+									<Badge variant="filled">Free</Badge>
 								{/if}
 							</div>
 							<p class="text-surface-600-300-token">{currentPlanConfig.description}</p>
@@ -58,7 +58,7 @@
 									Included features:
 								</p>
 								<ul class="text-surface-600-300-token space-y-1 text-sm">
-									{#each currentPlanConfig.features as feature}
+									{#each currentPlanConfig.features as feature (feature)}
 										<li class="flex items-center gap-2">
 											<svg
 												class="size-4 flex-shrink-0 text-green-500"
@@ -100,7 +100,7 @@
 				<div class="border-surface-300-600-token border-t pt-6">
 					<h2 class="mb-4 h3">Available Plans</h2>
 					<div class="grid gap-4 md:grid-cols-2">
-						{#each Object.entries(PLANS) as [planKey, planConfig]}
+						{#each Object.entries(PLANS) as [planKey, planConfig] (planKey)}
 							<div
 								class="border-surface-300-600-token relative rounded-lg border p-6 transition-all hover:border-primary-500 {selectedPlan ===
 								planKey
@@ -139,7 +139,7 @@
 								</div>
 
 								<ul class="mb-6 space-y-2">
-									{#each planConfig.features as feature}
+									{#each planConfig.features as feature (feature)}
 										<li class="flex items-center gap-2 text-sm">
 											<svg
 												class="size-4 flex-shrink-0 text-green-500"

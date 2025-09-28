@@ -30,7 +30,6 @@
 	}
 
 	function dismissError() {
-		// Clear just the message without resetting the form data
 		$message = null;
 	}
 
@@ -38,7 +37,7 @@
 		validators: zod4Client(schema),
 		delayMs: 400
 	});
-	const { form: formData, submitting, message, enhance, reset } = form;
+	const { form: formData, submitting, message, enhance } = form;
 	const imageProxy = fileProxy(form, 'image');
 
 	async function handleLogout() {

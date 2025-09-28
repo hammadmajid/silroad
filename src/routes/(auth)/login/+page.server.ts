@@ -12,7 +12,6 @@ import { generateSessionToken } from '$lib/utils/crypto';
 import { getKV } from '$lib/db';
 import { sessions } from '$lib/db/schema';
 import { isProduction } from '$lib/utils/env';
-import { getInbound } from '$lib/utils/inbound';
 import { sendEmail } from '$lib/utils/email';
 
 function isSafeRedirect(url: string): boolean {

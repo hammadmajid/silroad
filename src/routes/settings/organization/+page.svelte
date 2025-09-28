@@ -114,7 +114,7 @@
 												Premium includes:
 											</p>
 											<ul class="ml-4 space-y-1 text-sm text-warning-600 dark:text-warning-400">
-												{#each getPlanConfig('premium').features as feature}
+												{#each getPlanConfig('premium').features as feature (feature)}
 													<li class="flex items-center gap-2">
 														<svg
 															class="size-4 flex-shrink-0"
