@@ -23,11 +23,22 @@
 	// Get success status from query parameter
 	const success = $derived($page.url.searchParams.get('success') === 'true');
 
+	function dismissSuccess() {
+		const url = new URL($page.url);
+		url.searchParams.delete('success');
+		goto(url.pathname + url.search, { replaceState: true });
+	}
+
+	function dismissError() {
+		// Clear just the message without resetting the form data
+		$message = null;
+	}
+
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
-		delayMs: 400,
+		delayMs: 400
 	});
-	const { form: formData, submitting, message, enhance } = form;
+	const { form: formData, submitting, message, enhance, reset } = form;
 	const imageProxy = fileProxy(form, 'image');
 
 	async function handleLogout() {
@@ -62,6 +73,7 @@
 			type="success"
 			title="Success"
 			dismissible={true}
+			onDismiss={dismissSuccess}
 			data-testid="success-message"
 		>
 			{#snippet icon()}
@@ -74,6 +86,7 @@
 			type="error"
 			title="Error"
 			dismissible={true}
+			onDismiss={dismissError}
 			data-testid="error-message"
 		>
 			{#snippet icon()}
