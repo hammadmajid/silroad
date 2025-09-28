@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import Card from '$lib/components/Card.svelte';
 	import Alert from '$lib/components/Alert.svelte';
 	import { userStore } from '$lib/stores/user.svelte.js';
@@ -18,6 +19,9 @@
 
 	let { data } = $props();
 	const createdAt: string | Date = data.createdAt;
+
+	// Get success status from query parameter
+	const success = $derived($page.url.searchParams.get('success') === 'true');
 
 	const form = superForm(data.form, {
 		validators: zod4Client(schema),
@@ -53,21 +57,27 @@
 </svelte:head>
 
 <div class="space-y-8">
-	{#if $message}
+	{#if success}
 		<Alert
-			type={$message === 'Profile updated successfully' ? 'success' : 'error'}
-			title={$message === 'Profile updated successfully' ? 'Success' : 'Error'}
+			type="success"
+			title="Success"
 			dismissible={true}
-			data-testid={$message === 'Profile updated successfully'
-				? 'success-message'
-				: 'error-message'}
+			data-testid="success-message"
 		>
 			{#snippet icon()}
-				{#if $message === 'Profile updated successfully'}
-					<CheckCircle />
-				{:else}
-					<TriangleAlert />
-				{/if}
+				<CheckCircle />
+			{/snippet}
+			Profile updated successfully
+		</Alert>
+	{:else if $message}
+		<Alert
+			type="error"
+			title="Error"
+			dismissible={true}
+			data-testid="error-message"
+		>
+			{#snippet icon()}
+				<TriangleAlert />
 			{/snippet}
 			{$message}
 		</Alert>
