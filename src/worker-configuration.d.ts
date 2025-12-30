@@ -9,6 +9,7 @@ declare namespace Cloudflare {
 		NODE_ENV: string;
 		SECRET_TURNSTILE_KEY: string;
 		INBOUND_API_KEY: string;
+		MAILEROO_API_KEY: string;
 		BUCKET: R2Bucket;
 		DB: D1Database;
 		LOGGER: AnalyticsEngineDataset;

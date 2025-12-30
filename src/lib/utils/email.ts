@@ -1,5 +1,3 @@
-import { getInbound } from './inbound';
-
 interface EmailMetadata {
 	userAgent?: string;
 	ipAddress?: string;
@@ -29,6 +27,22 @@ interface EmailContext {
 		email: string;
 		image?: string | null;
 	};
+}
+
+interface MailerooEmailAddress {
+	address: string;
+	display_name?: string;
+}
+
+interface MailerooEmailPayload {
+	from: MailerooEmailAddress;
+	to: MailerooEmailAddress[];
+	subject: string;
+	html: string;
+	plain?: string;
+	tracking?: boolean;
+	tags?: Record<string, string>;
+	headers?: Record<string, string>;
 }
 
 export function extractMetadata(context: EmailContext): EmailMetadata {
@@ -70,14 +84,31 @@ function generateMetadataHtml(metadata: EmailMetadata): string {
 	`;
 }
 
+async function sendToMaileroo(apiKey: string, payload: MailerooEmailPayload): Promise<Response> {
+	return fetch('https://smtp.maileroo.com/api/v2/emails', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${apiKey}`
+		},
+		body: JSON.stringify(payload)
+	});
+}
+
 export function sendEmail(context: EmailContext, options: EmailOptions): void {
 	const { platform } = context;
 	if (!platform) return;
 
-	if (platform.env.NODE_ENV === "test") {
+	if (platform.env.NODE_ENV === 'test') {
 		// don't send email in test mode
-		console.warn("Test mode: will not send email");
-		return
+		console.warn('Test mode: will not send email');
+		return;
+	}
+
+	const apiKey = platform.env.MAILEROO_API_KEY;
+	if (!apiKey) {
+		console.error('Missing MAILEROO_API_KEY environment variable');
+		return;
 	}
 
 	const fullMetadata = {
@@ -92,13 +123,28 @@ export function sendEmail(context: EmailContext, options: EmailOptions): void {
 		</div>
 	`;
 
-	const inbound = getInbound(platform);
-	platform?.ctx.waitUntil(
-		inbound.emails.send({
-			from: 'Silroad <no-reply@silroad.space>',
-			to: options.to,
-			subject: options.subject,
-			html: enrichedHtml
+	const payload: MailerooEmailPayload = {
+		from: {
+			address: 'no-reply@silroad.space',
+			display_name: 'Silroad'
+		},
+		to: [
+			{
+				address: options.to
+			}
+		],
+		subject: options.subject,
+		html: enrichedHtml,
+		tracking: true,
+		tags: {
+			environment: fullMetadata.environment,
+			...(fullMetadata.userId && { userId: fullMetadata.userId })
+		}
+	};
+
+	platform.ctx.waitUntil(
+		sendToMaileroo(apiKey, payload).catch((error) => {
+			console.error('Failed to send email via Maileroo:', error);
 		})
 	);
 }
