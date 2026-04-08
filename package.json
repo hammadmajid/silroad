@@ -64,7 +64,7 @@
 	"dependencies": {
 		"@faker-js/faker": "^9.9.0",
 		"@lucide/svelte": "^0.536.0",
-		"drizzle-orm": "^0.44.4",
+		"drizzle-orm": "^0.45.2",
 		"formsnap": "^2.0.1",
 		"sveltekit-superforms": "^2.27.1",
 		"sveltekit-top-loader": "^0.1.0"
