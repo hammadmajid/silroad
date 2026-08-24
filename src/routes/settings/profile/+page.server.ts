@@ -108,7 +108,7 @@ export const actions: Actions = {
 				const ab = await imageFile.arrayBuffer();
 
 				const obj = await bucket.put(key, ab, { httpMetadata: { contentType: imageFile.type } });
-				imageUrl = `https://static.silroad.space/${obj.key}`;
+				imageUrl = `https://static.silroad.me/${obj.key}`;
 			} catch {
 				return message(form, 'Failed to upload profile image');
 			}

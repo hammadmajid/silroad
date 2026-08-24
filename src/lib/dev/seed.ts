@@ -15,7 +15,7 @@ const hashedPassword = await hashPassword(password, salt);
 
 function getRandomImage(category: 'avatars' | 'orgs' | 'events'): string {
 	const imageNumber = Math.floor(Math.random() * 40) + 1;
-	return `https://static.silroad.space/${category}/${imageNumber}.png`;
+	return `https://static.silroad.me/${category}/${imageNumber}.png`;
 }
 
 export async function seedDatabase(platform: App.Platform | undefined, options: SeedOptions = {}) {

@@ -17,7 +17,7 @@ export async function GET({ platform }: RequestEvent) {
 			httpEtag: obj.httpEtag,
 			customMetadata: obj.customMetadata,
 			httpMetadata: obj.httpMetadata,
-			url: `https://static.silroad.space/${obj.key}`
+			url: `https://static.silroad.me/${obj.key}`
 		}));
 
 		return json({
@@ -63,7 +63,7 @@ export async function POST({ platform }: RequestEvent) {
 			dataSize: blob.length,
 			contentType: 'application/json',
 			uploadTimestamp: testData.timestamp,
-			bucketUrl: `https://static.silroad.space/${uniqueKey}`,
+			bucketUrl: `https://static.silroad.me/${uniqueKey}`,
 			testData,
 			obj
 		};

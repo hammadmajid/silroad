@@ -125,7 +125,7 @@ export function sendEmail(context: EmailContext, options: EmailOptions): void {
 
 	const payload: MailerooEmailPayload = {
 		from: {
-			address: 'no-reply@silroad.space',
+			address: 'no-reply@silroad.me',
 			display_name: 'Silroad'
 		},
 		to: [
@@ -165,7 +165,7 @@ export function createWelcomeEmail(user: {
 				<li>Host events and manage RSVPs</li>
 				<li>Connect with like-minded people in your community</li>
 			</ul>
-			<p>To get started, visit your <a href="https://silroad.space/settings/profile" style="color: #007bff;">profile settings</a> to complete your account setup.</p>
+			<p>To get started, visit your <a href="https://silroad.me/settings/profile" style="color: #007bff;">profile settings</a> to complete your account setup.</p>
 			<p>Happy event organizing!</p>
 			<p><strong>The Silroad Team</strong></p>
 		`,
@@ -200,7 +200,7 @@ export function createRsvpConfirmationEmail(
 					hour: '2-digit',
 					minute: '2-digit'
 				})}</p>
-				<p><a href="https://silroad.space/explore/events/${event.slug}" style="color: #007bff;">View Event Details</a></p>
+				<p><a href="https://silroad.me/explore/events/${event.slug}" style="color: #007bff;">View Event Details</a></p>
 			</div>
 			<p>We look forward to seeing you there!</p>
 			<p><strong>The Silroad Team</strong></p>
@@ -247,11 +247,11 @@ export function createOrganizationCreatedEmail(
 			<div style="border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px;">
 				<h3 style="margin-top: 0;">${organization.name}</h3>
 				${organization.description ? `<p>${organization.description}</p>` : ''}
-				<p><a href="https://silroad.space/explore/orgs/${organization.slug}" style="color: #007bff;">View Organization</a></p>
+				<p><a href="https://silroad.me/explore/orgs/${organization.slug}" style="color: #007bff;">View Organization</a></p>
 			</div>
 			<p>Next steps:</p>
 			<ul>
-				<li><a href="https://silroad.space/manage/event/create" style="color: #007bff;">Create your first event</a></li>
+				<li><a href="https://silroad.me/manage/event/create" style="color: #007bff;">Create your first event</a></li>
 				<li>Customize your organization profile</li>
 				<li>Invite team members to help manage events</li>
 			</ul>
@@ -288,7 +288,7 @@ export function createEventCreatedEmail(
 					hour: '2-digit',
 					minute: '2-digit'
 				})}</p>
-				<p><a href="https://silroad.space/explore/events/${event.slug}" style="color: #007bff;">View Event</a></p>
+				<p><a href="https://silroad.me/explore/events/${event.slug}" style="color: #007bff;">View Event</a></p>
 			</div>
 			<p>Tips for promoting your event:</p>
 			<ul>
@@ -320,7 +320,7 @@ export function createPasswordResetEmail(
 			<p>You requested a password reset for your Silroad account.</p>
 			<p>Click the link below to reset your password:</p>
 			<div style="margin: 30px 0; text-align: center;">
-				<a href="https://silroad.space/forget-password/new?token=${resetToken}"
+				<a href="https://silroad.me/forget-password/new?token=${resetToken}"
 				   style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
 					Reset Password
 				</a>

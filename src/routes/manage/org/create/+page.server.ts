@@ -88,7 +88,7 @@ export const actions: Actions = {
 
 			// Attempt to upload
 			const obj = await bucket.put(key, ab, { httpMetadata: { contentType: file.type } });
-			return `https://static.silroad.space/${obj.key}`;
+			return `https://static.silroad.me/${obj.key}`;
 		}
 
 		try {

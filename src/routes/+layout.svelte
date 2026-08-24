@@ -106,7 +106,7 @@
 					<ul class="space-y-2">
 						<li><a href="/privacy" class="anchor text-sm">Privacy Policy</a></li>
 						<li><a href="/terms" class="anchor text-sm">Terms of Service</a></li>
-						<li><a href="mailto:contact@silroad.space" class="anchor text-sm">Contact Us</a></li>
+						<li><a href="mailto:contact@silroad.me" class="anchor text-sm">Contact Us</a></li>
 					</ul>
 				</div>
 			</div>

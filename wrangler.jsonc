@@ -7,7 +7,9 @@
 	"name": "silroad",
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-08-02",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"vars": {
 		"NODE_ENV": "production"
 	},
@@ -27,11 +29,11 @@
 	},
 	"routes": [
 		{
-			"pattern": "silroad.space",
+			"pattern": "silroad.me",
 			"custom_domain": true
 		},
 		{
-			"pattern": "www.silroad.space",
+			"pattern": "www.silroad.me",
 			"custom_domain": true
 		}
 	],
@@ -39,14 +41,14 @@
 		{
 			"binding": "DB",
 			"database_name": "silroad",
-			"database_id": "593db8b3-fa2d-452b-92db-ac7c7d3f4659",
+			"database_id": "4b0a57b1-84c0-4904-87ff-d82c41188327",
 			"migrations_dir": "drizzle/"
 		}
 	],
 	"kv_namespaces": [
 		{
 			"binding": "KV",
-			"id": "819395fc9c1c4e7c97cef038f7d4d88c",
+			"id": "2f8dae5639ec4393bd1f4031ab2d89a1",
 			"preview_id": "f022f4074ec9401c9d5d1e38df373360"
 		}
 	],
